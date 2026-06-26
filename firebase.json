@@ -1,0 +1,10 @@
+{
+  "auth": {
+    "providers": {
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "KisanMitra",
+        "supportEmail": "priyanshgupta739@gmail.com"
+      }
+    }
+  }
+}
