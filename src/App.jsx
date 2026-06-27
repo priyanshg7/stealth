@@ -5,6 +5,7 @@ import {
   Smartphone, Wifi, Users, Truck, Compass, Sun, Wind, CloudRain, Calendar,
   Activity, CheckCircle2, ChevronRight, RefreshCw, Upload, AlertCircle
 } from 'lucide-react';
+import DashboardShell from './components/DashboardShell';
 
 // Firebase SDK Imports & Configuration
 import { initializeApp } from 'firebase/app';
@@ -354,6 +355,735 @@ export default function App() {
   // OCR card status
   const [soilHealthCardUploaded, setSoilHealthCardUploaded] = useState(false);
   const [soilOCRProcessing, setSoilOCRProcessing] = useState(false);
+
+  // Redesigned Dashboard State Variables
+  const [seasonPlanConfirmed, setSeasonPlanConfirmed] = useState(() => localStorage.getItem('km_season_confirmed') === 'true');
+  const [selectedFarmIndex, setSelectedFarmIndex] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [completedTasks, setCompletedTasks] = useState([]);
+  const [voiceAssistantOpen, setVoiceAssistantOpen] = useState(false);
+  const [voiceReplies, setVoiceReplies] = useState([
+    { sender: 'ai', text: 'Namaste! I am KisanMitra Voice Assistant. Ask me anything about your farm today.' }
+  ]);
+  const [activeDashboardTab, setActiveDashboardTab] = useState('dashboard');
+  const [soilCardReminderDismissed, setSoilCardReminderDismissed] = useState(false);
+  const [onboardingCarouselIndex, setOnboardingCarouselIndex] = useState(0);
+  const [showAnnualPlanWizard, setShowAnnualPlanWizard] = useState(false);
+  const [wizardSelectedCrop, setWizardSelectedCrop] = useState('wheat');
+  const [activeDialogTask, setActiveDialogTask] = useState(null);
+  const [selectedRescheduleDate, setSelectedRescheduleDate] = useState('');
+  const [selectedScheme, setSelectedScheme] = useState(null);
+  const [selectedMandiDetails, setSelectedMandiDetails] = useState(null);
+  const [selectedCommunityPost, setSelectedCommunityPost] = useState(null);
+  const [showAllTasksModal, setShowAllTasksModal] = useState(false);
+  // Gemini API & Speech Recognition States
+  const GROQ_API_KEY = "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";
+  const [isListening, setIsListening] = useState(false);
+  const [translatedDashboardData, setTranslatedDashboardData] = useState(null);
+  const [translating, setTranslating] = useState(false);
+
+  const languageName = {
+    en: "English",
+    hi: "Hindi",
+    mr: "Marathi",
+    te: "Telugu",
+    ta: "Tamil",
+    gu: "Gujarati",
+    kn: "Kannada",
+    ml: "Malayalam"
+  };
+
+  async function queryGroqAPI(prompt, systemInstruction = "", forceJson = false) {
+    try {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: "llama-3.1-8b-instant",
+          messages: [
+            ...(systemInstruction ? [{ role: "system", content: systemInstruction }] : []),
+            { role: "user", content: prompt }
+          ],
+          temperature: 0.1,
+          ...(forceJson ? { response_format: { type: "json_object" } } : {})
+        })
+      });
+      const data = await response.json();
+      return data.choices?.[0]?.message?.content || "Sorry, I am unable to connect to the AI service right now.";
+    } catch (err) {
+      console.error("Groq API Error:", err);
+      return "Network error. Please check your internet connection.";
+    }
+  }
+
+  // TTS: Puter.js (free, uses AWS Polly / OpenAI voices) with Web Speech API fallback
+  const speakText = async (text, langCode = 'en') => {
+    if (!voiceGuide || !text) return;
+    
+    // Map language to IETF BCP-47 locale for Web Speech API fallback
+    const localeMap = {
+      en: 'en-IN', hi: 'hi-IN', mr: 'mr-IN',
+      te: 'te-IN', ta: 'ta-IN', gu: 'gu-IN',
+      kn: 'kn-IN', ml: 'ml-IN', pa: 'pa-IN'
+    };
+
+    // Try Puter.js TTS first (free, unlimited, high-quality)
+    if (typeof puter !== 'undefined' && puter?.ai?.txt2speech) {
+      try {
+        const audio = await puter.ai.txt2speech(text);
+        audio.play();
+        return;
+      } catch (err) {
+        console.warn("Puter.js TTS failed, falling back to Web Speech:", err);
+      }
+    }
+
+    // Fallback: browser Web Speech Synthesis API
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = localeMap[langCode] || 'en-IN';
+      utterance.rate = 0.9;
+      const voices = window.speechSynthesis.getVoices();
+      const matchingVoice = voices.find(v => v.lang.startsWith(utterance.lang));
+      if (matchingVoice) utterance.voice = matchingVoice;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  // STT: Puter.js Whisper (free, highly accurate, multilingual) with Web Speech API fallback
+  const startSpeechRecognition = (onTranscript, onError) => {
+    const localeMap = {
+      en: 'en-IN', hi: 'hi-IN', mr: 'mr-IN',
+      te: 'te-IN', ta: 'ta-IN', gu: 'gu-IN',
+      kn: 'kn-IN', ml: 'ml-IN', pa: 'pa-IN'
+    };
+
+    // Try Puter.js Whisper STT (free, no API key, handles Indian languages well)
+    if (typeof puter !== 'undefined' && puter?.ai?.speech2text) {
+      setIsListening(true);
+      // Record audio using MediaRecorder, then send to Puter Whisper
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        const mediaRecorder = new MediaRecorder(stream);
+        const chunks = [];
+
+        mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+        mediaRecorder.onstop = async () => {
+          setIsListening(false);
+          stream.getTracks().forEach(t => t.stop());
+          try {
+            const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+            const audioFile = new File([audioBlob], 'recording.webm', { type: 'audio/webm' });
+            const result = await puter.ai.speech2text(audioFile);
+            if (result?.text) {
+              if (onTranscript) onTranscript(result.text);
+            }
+          } catch (err) {
+            console.warn("Puter STT error:", err);
+            if (onError) onError(err.message);
+          }
+        };
+
+        mediaRecorder.start();
+        // Auto-stop after 6 seconds
+        setTimeout(() => {
+          if (mediaRecorder.state === 'recording') mediaRecorder.stop();
+        }, 6000);
+      }).catch(err => {
+        setIsListening(false);
+        console.warn("Mic access denied, falling back to Web Speech:", err);
+        useBrowserSpeechRecognition(localeMap, onTranscript, onError);
+      });
+      return;
+    }
+
+    // Fallback: browser Web Speech API
+    useBrowserSpeechRecognition(localeMap, onTranscript, onError);
+  };
+
+  const useBrowserSpeechRecognition = (localeMap, onTranscript, onError) => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Speech recognition is not supported. Please use Chrome or Edge.");
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = localeMap[language] || 'en-IN';
+    recognition.onstart = () => setIsListening(true);
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      if (onTranscript) onTranscript(transcript);
+    };
+    recognition.onerror = (event) => {
+      setIsListening(false);
+      if (onError) onError(event.error);
+    };
+    recognition.onend = () => setIsListening(false);
+    recognition.start();
+  };
+
+  useEffect(() => {
+    const activeFarm = farms[selectedFarmIndex];
+    if (!activeFarm) {
+      setTranslatedDashboardData(null);
+      return;
+    }
+    const rawData = getFarmDashboardData(activeFarm);
+    if (language === 'en') {
+      setTranslatedDashboardData(null);
+      return;
+    }
+    const translateData = async () => {
+      setTranslating(true);
+      try {
+        const translatableFields = {
+          weatherInterpretation: rawData.weatherInterpretation,
+          market: {
+            reasoning: rawData.market.reasoning,
+            recommendedMandi: rawData.market.recommendedMandi,
+            recommendation: rawData.market.recommendation
+          },
+          tasks: rawData.tasks.map(t => ({
+            id: t.id,
+            title: t.title,
+            category: t.category,
+            why: t.why,
+            benefit: t.benefit,
+            resources: t.resources
+          })),
+          actionFeed: rawData.actionFeed.map(a => ({
+            id: a.id,
+            title: a.title,
+            problem: a.problem,
+            reason: a.reason,
+            action: a.action,
+            benefit: a.benefit,
+            actionText: a.actionText
+          })),
+          schemes: rawData.schemes.map(s => ({
+            id: s.id,
+            name: s.name,
+            benefits: s.benefits
+          })),
+          community: rawData.community.map(c => ({
+            id: c.id,
+            title: c.title,
+            location: c.location,
+            content: c.content
+          }))
+        };
+        const targetLangName = languageName[language] || 'Hindi';
+        const systemPrompt = "You are a professional agronomist translator. Translate the JSON values into the requested language. Return ONLY the translated JSON. Do not change JSON keys, ids, numbers, or tags. Do not put markdown wrappers.";
+        const prompt = `Translate this JSON object into ${targetLangName}:\n${JSON.stringify(translatableFields, null, 2)}`;
+
+        let reply = await queryGroqAPI(prompt, systemPrompt, true);
+        reply = reply.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
+        const translated = JSON.parse(reply);
+        
+        const mergedData = {
+          ...rawData,
+          weatherInterpretation: translated.weatherInterpretation || rawData.weatherInterpretation,
+          market: {
+            ...rawData.market,
+            reasoning: translated.market?.reasoning || rawData.market.reasoning,
+            recommendedMandi: translated.market?.recommendedMandi || rawData.market.recommendedMandi,
+            recommendation: translated.market?.recommendation || rawData.market.recommendation
+          },
+          tasks: rawData.tasks.map(t => {
+            const transTask = translated.tasks?.find(tt => tt.id === t.id);
+            return transTask ? { ...t, ...transTask } : t;
+          }),
+          actionFeed: rawData.actionFeed.map(a => {
+            const transAction = translated.actionFeed?.find(ta => ta.id === a.id);
+            return transAction ? { ...a, ...transAction } : a;
+          }),
+          schemes: rawData.schemes.map(s => {
+            const transScheme = translated.schemes?.find(ts => ts.id === s.id);
+            return transScheme ? { ...s, ...transScheme } : s;
+          }),
+          community: rawData.community.map(c => {
+            const transPost = translated.community?.find(tc => tc.id === c.id);
+            return transPost ? { ...c, ...transPost } : c;
+          })
+        };
+        setTranslatedDashboardData(mergedData);
+      } catch (err) {
+        console.error("Translation failed:", err);
+      } finally {
+        setTranslating(false);
+      }
+    };
+    translateData();
+  }, [language, selectedFarmIndex, farms]);
+
+  // Sync season plan confirmed state
+  useEffect(() => {
+    localStorage.setItem('km_season_confirmed', seasonPlanConfirmed);
+  }, [seasonPlanConfirmed]);
+
+  // Illustrated Onboarding swipeable items
+  const ONBOARDING_SLIDES = [
+    {
+      title: "Annual Planning",
+      icon: "calendar_today",
+      desc: "Calculate yearly crop rotations, water budgets, and crop profit forecasts tailored to your soil health indices.",
+      color: "from-green-600 to-emerald-800"
+    },
+    {
+      title: "Season Planning",
+      icon: "potted_plant",
+      desc: "Get automated daily schedules for land prep, seed treatment, irrigation, fertilizer dosages, and harvesting.",
+      color: "from-amber-600 to-orange-700"
+    },
+    {
+      title: "Disease Diagnosis",
+      icon: "photo_camera",
+      desc: "Upload images of diseased leaves or stems to receive instant identification, chemical dosage guides, and organic treatments.",
+      color: "from-red-600 to-rose-800"
+    },
+    {
+      title: "Market Intelligence",
+      icon: "trending_up",
+      desc: "Compare nearby mandi prices, adjust transport costs, and get AI recommendations on whether to sell today or hold.",
+      color: "from-blue-600 to-indigo-800"
+    },
+    {
+      title: "Government Schemes",
+      icon: "assignment_ind",
+      desc: "Direct verification of PM-Kisan and local agricultural subsidies. We cross-reference your registered farm to check eligibility.",
+      color: "from-purple-600 to-indigo-700"
+    },
+    {
+      title: "Voice Assistant",
+      icon: "mic",
+      desc: "Ask questions in Hindi, Marathi, English, or your local language. KisanMitra replies with agricultural voice warnings.",
+      color: "from-teal-600 to-cyan-800"
+    },
+    {
+      title: "Community Hub",
+      icon: "groups",
+      desc: "Discuss regional issues, report local pest spreads, get community warnings, and borrow machinery from neighboring farms.",
+      color: "from-sky-600 to-blue-700"
+    }
+  ];
+
+  // Dynamic Dashboard Data generator based on selected farm and crop
+  const getFarmDashboardData = (farm) => {
+    if (!farm) return null;
+    const cropId = farm.crop?.name || 'wheat';
+    const cropDetails = CROPS.find(c => c.id === cropId) || { name: 'Wheat', icon: '🌾' };
+    const cropStage = farm.crop?.stage || 'Vegetative / Growth';
+    
+    // Default structure
+    let data = {
+      cropName: cropDetails.name,
+      cropIcon: cropDetails.icon,
+      healthScore: 84,
+      growthProgress: 45,
+      harvestDays: 72,
+      expectedYield: "24 Quintals/Acre",
+      estimatedProfit: 120000,
+      weatherStatus: "Optimized",
+      diseaseRisk: "Low",
+      waterStatus: "Optimized",
+      timelineStageIndex: 3, // vegetative growth
+      tasks: [],
+      actionFeed: [],
+      healthMetrics: {
+        overall: 84,
+        water: 90,
+        nutrient: 78,
+        disease: 15,
+        weather: 20,
+        growth: 45,
+        readiness: 15
+      },
+      market: {
+        recommendation: "Hold",
+        expectedProfitIncrease: "₹12,500",
+        recommendedMandi: "Nashik APMC",
+        adjustedEarnings: "₹2,250/Quintal",
+        confidence: 88,
+        trend: "up",
+        reasoning: "Prices are expected to rise due to supply delays. Selling in 5-7 days will maximize profits."
+      },
+      schemes: [],
+      community: []
+    };
+
+    // Wheat specifics
+    if (cropId === 'wheat') {
+      data.healthScore = 88;
+      data.growthProgress = 35;
+      data.harvestDays = 85;
+      data.expectedYield = "22 Quintals/Acre";
+      data.estimatedProfit = Math.round((parseFloat(farm.area) || 2.5) * 45000);
+      data.diseaseRisk = "Medium";
+      data.waterStatus = "Irrigation Scheduled";
+      data.timelineStageIndex = 3; // Vegetative Growth
+      data.healthMetrics = {
+        overall: 88,
+        water: 85,
+        nutrient: 90,
+        disease: 35,
+        weather: 15,
+        growth: 35,
+        readiness: 10
+      };
+      data.tasks = [
+        {
+          id: 'w1',
+          title: 'Apply Nitrogen Fertilizer (Urea Top-dressing)',
+          category: 'Fertilization',
+          priority: 'High',
+          time: '07:30 AM',
+          duration: '1.5 hours',
+          why: `Based on your Soil Health report (Medium nitrogen level). Wheat tillering stage requires Nitrogen boost for healthy shoots.`,
+          benefit: 'Increases crop tillering and improves potential grain yield by 15-20%.',
+          resources: 'Urea (45 kg/acre), Spreader Backpack, Protective Mask',
+          status: 'pending'
+        },
+        {
+          id: 'w2',
+          title: 'Drip Irrigation Cycle',
+          category: 'Irrigation',
+          priority: 'High',
+          time: '09:00 AM',
+          duration: '2.5 hours',
+          why: `Soil moisture in ${farm.name} is currently at 52%. Crown root initiation requires consistent moisture.`,
+          benefit: 'Prevents moisture stress and supports uniform tillering.',
+          resources: 'Drip system active, 15,000 Litres of Water',
+          status: 'pending'
+        },
+        {
+          id: 'w3',
+          title: 'Inspect leaves for Stem Rust symptoms',
+          category: 'Crop Protection',
+          priority: 'Medium',
+          time: '11:00 AM',
+          duration: '1 hour',
+          why: 'Recent morning humidity has exceeded 85%, which is highly favorable for rust fungal spores.',
+          benefit: 'Early detection avoids severe foliage damage and prevents 40% yield loss.',
+          resources: 'KisanMitra Disease Scanner (Smart Camera)',
+          status: 'pending'
+        }
+      ];
+      data.actionFeed = [
+        {
+          id: 'af1',
+          type: 'disease',
+          title: 'Stem Rust Warning Nearby',
+          problem: 'Increasing reports of Stem Rust in neighboring village (Pimpalgaon, 3km away).',
+          reason: 'High morning humidity and moderate temperatures (24-28°C) are ideal for fungal spread.',
+          action: 'Inspect your fields and upload leaf photos immediately if you notice yellow/orange pustules.',
+          benefit: 'Early application of propiconazole fungicide can save up to ₹25,000 in damages.',
+          actionText: 'Open Leaf Scanner'
+        },
+        {
+          id: 'af2',
+          type: 'weather',
+          title: 'Moderate Rainfall Forecasted',
+          problem: 'Local weather station predicts 15mm rainfall in 48 hours.',
+          reason: 'Western disturbance approaching the district.',
+          action: 'Postpone your next scheduled drip irrigation cycle to save electricity and prevent root waterlogging.',
+          benefit: 'Saves around ₹450 in power bills and avoids nutrient leaching.',
+          actionText: 'Postpone Irrigation'
+        }
+      ];
+      data.schemes = [
+        {
+          id: 's1',
+          name: 'PM-Kisan Samman Nidhi',
+          status: 'Eligible',
+          benefits: '₹6,000/year (Direct Benefit Transfer)',
+          deadline: '2026-07-15',
+          progress: 80,
+          documents: 'Aadhaar Card, Land Registry (Khatauni), Bank Passbook',
+          desc: 'Income support scheme for small and marginal landholder farmer families.'
+        },
+        {
+          id: 's2',
+          name: 'Subsidized Wheat Seed Distribution Scheme',
+          status: 'In Progress',
+          benefits: '50% subsidy on certified high-yielding wheat seeds (Karan Vandana, HD-3226)',
+          deadline: '2026-08-01',
+          progress: 40,
+          documents: 'Farmer ID card, Soil Health Card, Land holding proof',
+          desc: 'Provides high quality seeds at subsidized rates to boost productivity.'
+        }
+      ];
+      data.community = [
+        {
+          id: 'c1',
+          title: 'Stem Rust spotted in Wheat crop',
+          author: 'Suresh Patil',
+          location: 'Pimpalgaon (3 km away)',
+          date: 'Today, 10:30 AM',
+          content: 'Hi fellow farmers, I noticed small orange spots on my wheat crop leaves this morning. Agronomist confirmed it is Stem Rust. Please check your fields and take preventive action.',
+          replies: 14,
+          likes: 28
+        },
+        {
+          id: 'c2',
+          title: 'Urea fertilizer availability at Cooperative',
+          author: 'Ramesh Sawant',
+          location: 'Nashik District Center',
+          date: 'Yesterday',
+          content: 'Good news! Fresh stock of urea and DAP has arrived at the cooperative society center. Limit is 5 bags per farmer. Bring your Aadhaar Card.',
+          replies: 9,
+          likes: 19
+        }
+      ];
+    } else if (cropId === 'rice') {
+      data.healthScore = 91;
+      data.growthProgress = 20;
+      data.harvestDays = 110;
+      data.expectedYield = "28 Quintals/Acre";
+      data.estimatedProfit = Math.round((parseFloat(farm.area) || 2.5) * 52000);
+      data.diseaseRisk = "Low";
+      data.waterStatus = "Optimal Standing Water";
+      data.timelineStageIndex = 2; // Sowing/Transplanting
+      data.healthMetrics = {
+        overall: 91,
+        water: 95,
+        nutrient: 85,
+        disease: 10,
+        weather: 30,
+        growth: 20,
+        readiness: 5
+      };
+      data.tasks = [
+        {
+          id: 'r1',
+          title: 'Monitor standing water levels',
+          category: 'Irrigation',
+          priority: 'High',
+          time: '06:30 AM',
+          duration: '1 hour',
+          why: 'Rice seedlings require consistent standing water (2-5cm) during transplanting.',
+          benefit: 'Controls weed growth naturally and supports early root development.',
+          resources: 'Borewell water supply, gate valve',
+          status: 'pending'
+        },
+        {
+          id: 'r2',
+          title: 'Apply Zinc Sulphate Monohydrate',
+          category: 'Nutrition',
+          priority: 'Medium',
+          time: '08:00 AM',
+          duration: '2 hours',
+          why: 'Khaira disease is common in district soils due to zinc deficiency. Your manual entry shows medium nutrients.',
+          benefit: 'Prevents leaves yellowing and improves grain development.',
+          resources: 'Zinc Sulphate (10 kg/acre), Dry Sand mix',
+          status: 'pending'
+        }
+      ];
+      data.actionFeed = [
+        {
+          id: 'af3',
+          type: 'market',
+          title: 'Rice Mandi Price Hike',
+          problem: 'Basmati Paddy prices rose by 14% at Nashik Mandi.',
+          reason: 'Export demand surge and lower arrivals in northern states.',
+          action: 'If you have stored rice from the previous season, consider selling now.',
+          benefit: 'Earn an additional ₹350 per quintal over the standard support price.',
+          actionText: 'View Mandi Prices'
+        }
+      ];
+      data.schemes = [
+        {
+          id: 's3',
+          name: 'Pradhan Mantri Krishi Sinchayee Yojana (PMKSY)',
+          status: 'Eligible',
+          benefits: 'Up to 80% subsidy on micro-irrigation system setups',
+          deadline: '2026-07-31',
+          progress: 10,
+          documents: 'Land registry, Aadhaar, Bank Details, Pump Electricity Bill',
+          desc: 'Assistance for setting up drip or sprinkler systems to conserve water.'
+        }
+      ];
+      data.community = [
+        {
+          id: 'c3',
+          title: 'Best pesticide for leaf folder control?',
+          author: 'Baldev Singh',
+          location: 'Rampur (5 km away)',
+          date: '2 days ago',
+          content: 'My paddy leaves are folding and rolling. Seeing some white caterpillar cocoons. Which organic pesticide works best for this?',
+          replies: 22,
+          likes: 15
+        }
+      ];
+    } else {
+      // Sugarcane or other crops
+      data.healthScore = 80;
+      data.growthProgress = 60;
+      data.harvestDays = 140;
+      data.expectedYield = "45 Tonnes/Acre";
+      data.estimatedProfit = Math.round((parseFloat(farm.area) || 2.5) * 85000);
+      data.diseaseRisk = "Low";
+      data.waterStatus = "Optimized Drip";
+      data.timelineStageIndex = 3;
+      data.healthMetrics = {
+        overall: 80,
+        water: 88,
+        nutrient: 70,
+        disease: 15,
+        weather: 25,
+        growth: 60,
+        readiness: 40
+      };
+      data.tasks = [
+        {
+          id: 's1',
+          title: 'Trash Mulching between Cane Rows',
+          category: 'Agronomy',
+          priority: 'Medium',
+          time: '08:00 AM',
+          duration: '3 hours',
+          why: 'High temperatures are causing high evaporation. Mulching with dried cane leaves covers soil.',
+          benefit: 'Conserves 25% soil moisture and suppresses weed growth.',
+          resources: 'Dried cane leaves, Hand rake',
+          status: 'pending'
+        },
+        {
+          id: 's2',
+          title: 'Drip Fertigation - Potassium Nitrate',
+          category: 'Fertilization',
+          priority: 'High',
+          time: '04:00 PM',
+          duration: '2 hours',
+          why: 'Sugarcane is in active elongation stage. Potash is critical for sugar accumulation and stalk strength.',
+          benefit: 'Increases cane weight and sugar recovery percentage.',
+          resources: 'Venturi injector system, Potash fertilizer solubles',
+          status: 'pending'
+        }
+      ];
+      data.actionFeed = [
+        {
+          id: 'af4',
+          type: 'deadline',
+          title: 'Sugarcane Factory Registration Deadline',
+          problem: 'Cane crushing factory registration closing in 5 days.',
+          reason: 'Sugar mills coordinating seasonal schedule slots.',
+          action: 'Upload sugarcane area certificate and bank details on the mill portal.',
+          benefit: 'Ensures guaranteed harvest collection slot and timely billing.',
+          actionText: 'Register Mill Slot'
+        }
+      ];
+      data.schemes = [
+        {
+          id: 's4',
+          name: 'State Sugarcane Drip Subsidy Scheme',
+          status: 'Eligible',
+          benefits: '₹40,000 per hectare direct subsidy for drip line setups',
+          deadline: '2026-07-10',
+          progress: 90,
+          documents: 'Soil Card, CHC registration, Farm Area certificate',
+          desc: 'State-sponsored program encouraging water-efficient cane farming.'
+        }
+      ];
+      data.community = [
+        {
+          id: 'c4',
+          title: 'Sugarcane Stem Borer warning',
+          author: 'Arvind Patil',
+          location: 'Vikas Nagar (8 km away)',
+          date: '3 days ago',
+          content: 'Spotted stem borer in early shoots. The central leaves are drying up (dead hearts). Advise release of Trichogramma cards or chemical spray.',
+          replies: 18,
+          likes: 32
+        }
+      ];
+    }
+
+    // Weather interpretations
+    data.weatherInterpretation = "Ideal conditions for fertilizer application this morning. Wind is under 8 km/h.";
+    if (data.actionFeed.some(item => item.type === 'weather')) {
+      data.weatherInterpretation = "Heavy wind & precipitation expected: Avoid spraying pesticides and postpone irrigation.";
+    }
+
+    return data;
+  };
+
+  // Chatbot Command parser
+  const handleVoiceCommand = async (cmdText) => {
+    if (!cmdText) return;
+    
+    // Add user bubble
+    setVoiceReplies(prev => [...prev, { sender: 'user', text: cmdText }]);
+    // Add typing bubble
+    setVoiceReplies(prev => [...prev, { sender: 'ai', text: '...' }]);
+    
+    const activeFarm = farms[selectedFarmIndex] || DEFAULT_FARM;
+    
+    const systemPrompt = `You are KisanMitra, an intelligent agricultural AI companion for Indian farmers.
+Farmer profile:
+- Name: ${profile.name || 'Ramesh'}
+- Active Farm: ${activeFarm?.name || 'My Farm'}
+- Crop: ${activeFarm?.crop?.name || 'Wheat'} (${activeFarm?.crop?.stage || 'Growth'} stage)
+- Location: ${profile.village || 'Pimpalgaon'}, ${profile.district || 'Nashik'}, ${profile.state || 'Maharashtra'}
+- Soil: ${activeFarm?.soil?.type || 'Black Clay'} (pH ${activeFarm?.soil?.ph || '6.8'})
+- Water resources: ${activeFarm?.water?.sources?.join(', ') || 'Borewell'}
+
+Instructions:
+1. Always respond in the requested language: ${languageName[language] || 'English'}.
+2. Keep your answer brief, warm, and highly actionable (1-3 sentences maximum).
+3. If the user wants to navigate to a screen or perform an action, append one of these exact tokens to the very end of your response:
+   - For disease leaf scan / camera: [NAV: diagnosis]
+   - For mandi price / market info: [NAV: market]
+   - For government subsidies: [NAV: schemes]
+   - For farm list: [NAV: farms]
+   - For profile or voice settings: [NAV: settings]
+   - For today's tasks list: [NAV: tasks]
+   - For home dashboard: [NAV: dashboard]
+   - For switching to a crop (e.g. wheat, rice, sugarcane): [NAV: switch_wheat], [NAV: switch_rice], [NAV: switch_sugarcane]
+`;
+
+    const reply = await queryGroqAPI(cmdText, systemPrompt, false);
+    let cleanedReply = reply;
+    let navToken = null;
+    const navMatch = reply.match(/\[NAV:\s*([a-zA-Z0-9_]+)\]/);
+    if (navMatch) {
+      navToken = navMatch[1];
+      cleanedReply = reply.replace(/\[NAV:\s*[a-zA-Z0-9_]+\]/g, '').trim();
+    }
+    
+    setVoiceReplies(prev => {
+      const copy = [...prev];
+      if (copy[copy.length - 1]?.text === '...') {
+        copy[copy.length - 1] = { sender: 'ai', text: cleanedReply };
+      } else {
+        copy.push({ sender: 'ai', text: cleanedReply });
+      }
+      return copy;
+    });
+    
+    speakText(cleanedReply, language);
+    
+    if (navToken) {
+      if (navToken === 'diagnosis') setActiveDashboardTab('diagnosis');
+      else if (navToken === 'market') setActiveDashboardTab('market');
+      else if (navToken === 'schemes') setActiveDashboardTab('schemes');
+      else if (navToken === 'farms') setActiveDashboardTab('farms');
+      else if (navToken === 'settings') setActiveDashboardTab('settings');
+      else if (navToken === 'dashboard') setActiveDashboardTab('dashboard');
+      else if (navToken === 'tasks') setActiveDashboardTab('tasks');
+      else if (navToken.startsWith('switch_')) {
+        const targetCrop = navToken.replace('switch_', '');
+        const idx = farms.findIndex(f => f.crop?.name === targetCrop);
+        if (idx !== -1) {
+          setSelectedFarmIndex(idx);
+          setActiveDashboardTab('dashboard');
+        }
+      }
+    }
+  };
 
   // Trigger TTS voice guide
   useEffect(() => {
@@ -2667,166 +3397,69 @@ export default function App() {
           )}
 
           {/* Annual Farm Planner Dashboard */}
+          {/* Annual Farm Planner Dashboard */}
           {view === 'PLANNER' && (
-            <div className="w-full py-2 space-y-6">
-              
-              {/* Planner header banner */}
-              <div className="bg-gradient-to-r from-primary to-[#0c7234] rounded-card p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div>
-                  <div className="inline-block py-1 px-3 rounded-full bg-white/20 text-xs font-bold mb-2">Annual Planner Active</div>
-                  <h1 className="font-display text-2xl md:text-3xl font-bold">Welcome back, {profile.name || 'Rajesh Kumar'}!</h1>
-                  <p className="text-white/80 text-sm mt-1">Personalized advisor insights for {farms.length} active farm(s).</p>
-                </div>
-                <div className="flex gap-3">
-                  <button 
-                    onClick={() => {
-                      setView('WELCOME');
-                      setFarms([]);
-                      setMobileNumber('');
-                      setJwtToken('');
-                      setDecodedToken(null);
-                      localStorage.removeItem('km_jwt');
-                      localStorage.removeItem('km_decoded_jwt');
-                    }}
-                    className="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-xl text-xs transition-colors"
-                  >
-                    Reset Onboarding
-                  </button>
-                  <button 
-                    onClick={startNewFarmRegistration}
-                    className="bg-white text-primary font-bold py-2 px-4 rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95"
-                  >
-                    <Plus className="w-4 h-4" /> Add Farm
-                  </button>
-                </div>
-              </div>
-
-              {/* Main dashboard body */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                {/* Left column: Registered Farms list */}
-                <div className="lg:col-span-1 space-y-6">
-                  <div className="bg-white rounded-card p-5 border border-outline-variant shadow-lg space-y-4">
-                    <h2 className="font-display text-lg font-bold text-on-surface border-b border-surface-container-high pb-2 flex items-center gap-2">
-                      <Layers className="w-5 h-5 text-primary" /> Active Farm Profiles ({farms.length})
-                    </h2>
-                    <div className="space-y-3">
-                      {farms.map((f, i) => (
-                        <div key={i} className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex justify-between items-start gap-4">
-                          <div>
-                            <h4 className="font-bold text-on-surface">{f.name}</h4>
-                            <p className="text-xs text-on-surface-variant mt-0.5">{f.village}, {f.district}</p>
-                            <div className="flex flex-wrap gap-1.5 mt-2">
-                              <span className="py-0.5 px-2 rounded-full bg-primary/10 text-primary font-bold text-[10px]">
-                                {f.area} {f.unit}
-                              </span>
-                              <span className="py-0.5 px-2 rounded-full bg-secondary-container/40 text-on-secondary-container font-semibold text-[10px]">
-                                {f.crop.name.toUpperCase()} Stage: {f.crop.stage}
-                              </span>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => {
-                              setCurrentFarm(f);
-                              setBoundaryPoints(f.boundary || []);
-                              setEditingFarmIndex(i);
-                              setView('REVIEW');
-                            }}
-                            className="p-1.5 rounded-lg hover:bg-surface-container-high text-primary"
-                            title="Edit Farm"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Weather widgets */}
-                  <div className="bg-white rounded-card p-5 border border-outline-variant shadow-lg space-y-4">
-                    <h2 className="font-display text-lg font-bold text-on-surface border-b border-surface-container-high pb-2 flex items-center gap-2">
-                      <Sun className="w-5 h-5 text-[#f9a825]" /> Local Weather & Soil Conditions
-                    </h2>
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="bg-[#fcf8f0] p-2 rounded-xl">
-                        <span className="text-xs text-on-surface-variant block">Temp</span>
-                        <span className="text-base font-bold">31°C</span>
-                      </div>
-                      <div className="bg-[#f0fcf4] p-2 rounded-xl">
-                        <span className="text-xs text-on-surface-variant block">Rain Chance</span>
-                        <span className="text-base font-bold text-primary">82%</span>
-                      </div>
-                      <div className="bg-[#f0fcfc] p-2 rounded-xl">
-                        <span className="text-xs text-on-surface-variant block">Wind</span>
-                        <span className="text-base font-bold">12 km/h</span>
-                      </div>
-                    </div>
-                    <div className="p-3 bg-blue-50 text-blue-800 rounded-xl border border-blue-100 text-xs flex gap-2 items-start">
-                      <CloudRain className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                      <span>Moderate showers forecast for tomorrow evening. Postpone any pesticide spraying scheduled.</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right columns: Smart planner recommendation list */}
-                <div className="lg:col-span-2 space-y-6">
-                  
-                  {/* Task checklist */}
-                  <div className="bg-white rounded-card p-6 border border-outline-variant shadow-lg space-y-4">
-                    <h2 className="font-display text-lg font-bold text-on-surface border-b border-surface-container-high pb-2 flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-primary" /> Personalized Task Planner (Next 7 Days)
-                    </h2>
-                    
-                    <div className="space-y-3">
-                      {[
-                        { title: 'Irrigate fields for 3 hours', desc: 'Required as soil moisture is dipping. Optimal method: Drip Irrigation.', done: false },
-                        { title: 'Apply secondary Nitrogen fertilizer dose', desc: 'Based on your Soil Health report (Medium nitrogen level). Apply urea or compost.', done: false },
-                        { title: 'Monitor for stem rust symptoms', desc: 'Weather warning: High humidity favors rust outbreaks in this vegetative cycle stage.', done: false }
-                      ].map((task, idx) => (
-                        <div key={idx} className="p-4 rounded-xl border border-outline-variant flex items-start gap-3 hover:border-primary/50 transition-colors bg-white">
-                          <input type="checkbox" className="w-5 h-5 mt-0.5 rounded border-outline-variant text-primary focus:ring-primary/20" />
-                          <div>
-                            <h4 className="font-bold text-sm text-on-surface">{task.title}</h4>
-                            <p className="text-xs text-on-surface-variant mt-1">{task.desc}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* AI Crop Advisor Panel */}
-                  <div className="bg-white rounded-card p-6 border-2 border-primary/20 bg-gradient-to-br from-white to-primary/5 shadow-lg space-y-4 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-bl-full flex items-center justify-center">
-                      <Cpu className="w-10 h-10 text-primary opacity-60" />
-                    </div>
-
-                    <h2 className="font-display text-lg font-bold text-primary flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-primary" /> KisanMitra AI Crop Intelligence Advisor
-                    </h2>
-                    
-                    <div className="space-y-4 text-xs md:text-sm">
-                      <div className="bg-white/80 p-4 rounded-xl border border-outline-variant shadow-sm space-y-2">
-                        <span className="font-bold text-on-surface block">Yield Optimization Advice</span>
-                        <p className="text-on-surface-variant">
-                          Your {farms[0]?.crop.name || 'Wheat'} plot in {farms[0]?.village || 'Palampur'} has a pH of {farms[0]?.soil.ph || '7.2'} and {farms[0]?.soil.source === 'card' ? 'complete' : 'estimated'} NPK levels. 
-                          We recommend maintaining water moisture content in the soil at 65% since you are in the {farms[0]?.crop.stage || 'Sowing'} stage.
-                        </p>
-                      </div>
-
-                      <div className="bg-white/80 p-4 rounded-xl border border-outline-variant shadow-sm space-y-2">
-                        <span className="font-bold text-on-surface block">Water Budget forecast</span>
-                        <p className="text-on-surface-variant">
-                          With your irrigation method ({farms[0]?.water.irrigationMethods.join(', ') || 'drip'}) and sources ({farms[0]?.water.sources.join(', ') || 'canal'}), you are estimated to save 30% of water usage compared to flood methods.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
+            <DashboardShell
+              profile={profile}
+              language={language}
+              setLanguage={setLanguage}
+              languages={LANGUAGES}
+              seasonPlanConfirmed={seasonPlanConfirmed}
+              farms={farms}
+              selectedFarmIndex={selectedFarmIndex}
+              setSelectedFarmIndex={setSelectedFarmIndex}
+              getFarmDashboardData={farm => translatedDashboardData || getFarmDashboardData(farm)}
+              translating={translating}
+              isListening={isListening}
+              startSpeechRecognition={startSpeechRecognition}
+              voiceGuide={voiceGuide}
+              setVoiceGuide={setVoiceGuide}
+              handleVoiceCommand={handleVoiceCommand}
+              activeDashboardTab={activeDashboardTab}
+              setActiveDashboardTab={setActiveDashboardTab}
+              sidebarOpen={sidebarOpen}
+              setSidebarOpen={setSidebarOpen}
+              completedTasks={completedTasks}
+              setCompletedTasks={setCompletedTasks}
+              voiceAssistantOpen={voiceAssistantOpen}
+              setVoiceAssistantOpen={setVoiceAssistantOpen}
+              voiceReplies={voiceReplies}
+              setVoiceReplies={setVoiceReplies}
+              soilHealthCardUploaded={soilHealthCardUploaded}
+              soilCardReminderDismissed={soilCardReminderDismissed}
+              setSoilCardReminderDismissed={setSoilCardReminderDismissed}
+              handleSoilHealthCardUpload={handleSoilHealthCardUpload}
+              showAnnualPlanWizard={showAnnualPlanWizard}
+              setShowAnnualPlanWizard={setShowAnnualPlanWizard}
+              onboardingCarouselIndex={onboardingCarouselIndex}
+              setOnboardingCarouselIndex={setOnboardingCarouselIndex}
+              onboardingSlides={ONBOARDING_SLIDES}
+              wizardSelectedCrop={wizardSelectedCrop}
+              setWizardSelectedCrop={setWizardSelectedCrop}
+              activeDialogTask={activeDialogTask}
+              setActiveDialogTask={setActiveDialogTask}
+              selectedRescheduleDate={selectedRescheduleDate}
+              setSelectedRescheduleDate={setSelectedRescheduleDate}
+              selectedScheme={selectedScheme}
+              setSelectedScheme={setSelectedScheme}
+              selectedMandiDetails={selectedMandiDetails}
+              setSelectedMandiDetails={setSelectedMandiDetails}
+              selectedCommunityPost={selectedCommunityPost}
+              setSelectedCommunityPost={setSelectedCommunityPost}
+              showAllTasksModal={showAllTasksModal}
+              setShowAllTasksModal={setShowAllTasksModal}
+              startNewFarmRegistration={startNewFarmRegistration}
+              setView={setView}
+              setFarms={setFarms}
+              setMobileNumber={setMobileNumber}
+              setJwtToken={setJwtToken}
+              setDecodedToken={setDecodedToken}
+              setSeasonPlanConfirmed={setSeasonPlanConfirmed}
+              crops={CROPS}
+              setCurrentFarm={setCurrentFarm}
+              setBoundaryPoints={setBoundaryPoints}
+              setEditingFarmIndex={setEditingFarmIndex}
+            />
           )}
 
         </div>
