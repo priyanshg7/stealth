@@ -25,7 +25,9 @@ export default function FarmingDashboard({
   setVoiceAssistantOpen,
   setVoiceReplies,
   translating,
-  language
+  language,
+  weatherData,
+  weatherLoading
 }) {
   const activeFarm = farms[selectedFarmIndex];
   const dashboardData = activeFarm ? getFarmDashboardData(activeFarm) : null;
@@ -303,7 +305,7 @@ export default function FarmingDashboard({
                     if (act.type === 'disease') setActiveDashboardTab('diagnosis');
                     else if (act.type === 'weather') alert("Irrigation cycle rescheduled. System updated.");
                     else if (act.type === 'market') setActiveDashboardTab('market');
-                    else if (act.type === 'deadline') alert("Redirecting to portal verification...");
+                    else if (act.type === 'deadline' || act.type === 'scheme') setActiveDashboardTab('schemes');
                   }}
                   className="w-full bg-surface-container-low hover:bg-surface-container text-primary font-bold py-2 rounded-xl text-xs text-center border border-outline-variant/40 transition-colors"
                 >
@@ -366,31 +368,57 @@ export default function FarmingDashboard({
 
         {/* Weather Intelligence */}
         <div className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
-          <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-yellow-600 text-xl font-bold">wb_sunny</span>
-            {t("Weather Intelligence", language)}
-          </h3>
+          <div className="flex justify-between items-center">
+            <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-yellow-600 text-xl font-bold">wb_sunny</span>
+              {t("Weather Intelligence", language)}
+            </h3>
+            <button 
+              onClick={() => setActiveDashboardTab('weather')}
+              className="text-xs text-primary font-bold hover:underline"
+            >
+              {t("View Details", language)} →
+            </button>
+          </div>
 
-          <div className="flex justify-between items-center border-b border-surface-container-high pb-2">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">31°C</span>
-              <div>
-                <span className="text-xs font-extrabold text-on-surface block">Nashik</span>
-                <span className="text-[10px] text-on-surface-variant font-medium leading-none">Humidity: 65% | Wind: 8 km/h</span>
+          {weatherLoading ? (
+            <div className="h-20 bg-surface-container-low animate-pulse rounded-xl" />
+          ) : weatherData ? (
+            <>
+              <div className="flex justify-between items-center border-b border-surface-container-high pb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-black text-on-surface">{weatherData.current?.temp}°C</span>
+                  <div>
+                    <span className="text-xs font-extrabold text-on-surface block">
+                      {weatherData.current?.stationName || activeFarm?.district || 'Nashik'}
+                    </span>
+                    <span className="text-[10px] text-on-surface-variant font-medium leading-none">
+                      {t("Humidity", language)}: {weatherData.current?.humidityMorning}% | {t("Wind", language)}: {weatherData.current?.windSpeed} km/h
+                    </span>
+                  </div>
+                </div>
+                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                  weatherData.forecast?.[0]?.rainProbability > 60 
+                    ? 'bg-blue-50 text-blue-700' 
+                    : 'bg-orange-50 text-orange-700'
+                }`}>
+                  {t("Rain Chance:", language)} {weatherData.forecast?.[0]?.rainProbability || 0}%
+                </span>
               </div>
-            </div>
-            <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full">
-              {t("Rain Chance:", language)} 82%
-            </span>
-          </div>
 
-          <div className="p-3 bg-[#fcf8f0] border border-amber-100 rounded-xl text-xs flex gap-2 items-start font-semibold text-amber-900">
-            <span className="material-symbols-outlined text-amber-700 text-sm font-bold mt-0.5">tips_and_updates</span>
-            <div>
-              <span className="block font-bold text-amber-950 mb-0.5">{t("Agricultural Advisory:", language)}</span>
-              {dashboardData.weatherInterpretation}
+              <div className="p-3 bg-[#fcf8f0] border border-amber-100 rounded-xl text-xs flex gap-2 items-start font-semibold text-amber-900">
+                <span className="material-symbols-outlined text-amber-700 text-sm font-bold mt-0.5">tips_and_updates</span>
+                <div>
+                  <span className="block font-bold text-amber-950 mb-0.5">{t("Agricultural Advisory:", language)}</span>
+                  {weatherData.rainfall?.insight || dashboardData.weatherInterpretation}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="text-xs text-on-surface-variant p-4 text-center">
+              {t("Failed to load weather data. Please click refresh or verify connections.", language)}
             </div>
-          </div>
+          )}
         </div>
 
       </div>
@@ -503,7 +531,7 @@ export default function FarmingDashboard({
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-on-surface-variant font-medium">{t("Deadline:", language)} <strong className="text-on-surface">{sch.deadline}</strong></span>
                   <button
-                    onClick={() => setSelectedScheme(sch)}
+                    onClick={() => setActiveDashboardTab('schemes')}
                     className="bg-primary hover:bg-secondary text-white font-extrabold px-3.5 py-1.5 rounded-lg text-[10px] transition-all"
                   >
                     {t("Apply Now", language)}

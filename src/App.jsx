@@ -6,6 +6,7 @@ import {
   Activity, CheckCircle2, ChevronRight, RefreshCw, Upload, AlertCircle
 } from 'lucide-react';
 import DashboardShell from './components/DashboardShell';
+import { fetchWeatherIntelligence } from './utils/weatherService';
 
 // Firebase SDK Imports & Configuration
 import { initializeApp } from 'firebase/app';
@@ -299,6 +300,229 @@ const getFriendlyAuthErrorMessage = (error) => {
   };
 };
 
+// Global AI Government Scheme Matching Engine
+const evaluateScheme = (scheme, profile, farm) => {
+  const statesOfIndia = [
+    { name: 'Maharashtra', keywords: ['maharashtra', 'm.h.', 'mh '] },
+    { name: 'Rajasthan', keywords: ['rajasthan', 'raj.'] },
+    { name: 'Madhya Pradesh', keywords: ['madhya pradesh', 'm.p.', 'mp '] },
+    { name: 'Chhattisgarh', keywords: ['chhattisgarh', 'c.g.'] },
+    { name: 'Andhra Pradesh', keywords: ['andhra pradesh', 'a.p.', 'ap '] },
+    { name: 'Karnataka', keywords: ['karnataka', 'kar.'] },
+    { name: 'West Bengal', keywords: ['west bengal', 'w.b.', 'wb '] },
+    { name: 'Puducherry', keywords: ['puducherry', 'pondicherry'] },
+    { name: 'Gujarat', keywords: ['gujarat', 'guj.'] },
+    { name: 'Tamil Nadu', keywords: ['tamil nadu', 't.n.', 'tn '] },
+    { name: 'Uttar Pradesh', keywords: ['uttar pradesh', 'u.p.', 'up '] },
+    { name: 'Punjab', keywords: ['punjab', 'pb '] },
+    { name: 'Haryana', keywords: ['haryana', 'hr '] },
+    { name: 'Bihar', keywords: ['bihar'] }
+  ];
+  
+  let schemeState = null;
+  if (scheme.level === 'State') {
+    const textToSearch = (scheme.name + ' ' + scheme.details + ' ' + scheme.eligibility + ' ' + scheme.slug).toLowerCase();
+    for (const stateObj of statesOfIndia) {
+      if (stateObj.keywords.some(kw => textToSearch.includes(kw))) {
+        schemeState = stateObj.name;
+        break;
+      }
+    }
+  }
+
+  const farmerState = farm?.state || profile?.state || '';
+  const farmerCrop = farm?.crop?.name || '';
+  const farmerArea = parseFloat(farm?.area) || 0;
+  const farmerGender = profile?.gender || '';
+  const irrigationMethods = farm?.water?.irrigationMethods || [];
+  const pumpType = farm?.water?.pumpType || '';
+  const farmingMethods = profile?.farmingMethod || farm?.crop?.farmingType || [];
+  const machinery = farm?.machinery || [];
+
+  let status = 'Likely Eligible';
+  let score = 40;
+  const reasons = [];
+  const missingInfo = [];
+
+  // 1. Location Check
+  if (scheme.level === 'State' && schemeState) {
+    if (farmerState && schemeState.toLowerCase() !== farmerState.toLowerCase()) {
+      return {
+        status: 'Not Eligible',
+        score: 0,
+        explanation: `Only for residents of ${schemeState}. Your active farm is in ${farmerState}.`,
+        missingInfo: [],
+        schemeState
+      };
+    } else {
+      score += 20;
+      reasons.push(`It is a State scheme of ${schemeState}, matching your location.`);
+    }
+  } else {
+    reasons.push("It is a Central scheme open to all states.");
+  }
+
+  // 2. Crop matching
+  const textToMatch = (scheme.name + ' ' + scheme.details + ' ' + scheme.eligibility + ' ' + scheme.tags + ' ' + scheme.category).toLowerCase();
+  
+  if (farmerCrop) {
+    const cropKeywords = {
+      wheat: ['wheat', 'gehun', 'rabi'],
+      rice: ['rice', 'paddy', 'dhan', 'kharif'],
+      sugarcane: ['sugarcane', 'cane', 'ganna'],
+      cotton: ['cotton', 'kapas'],
+      soybean: ['soybean', 'soya'],
+      maize: ['maize', 'makka'],
+      tomato: ['tomato', 'tamatar', 'vegetable', 'horticulture'],
+      chilli: ['chilli', 'mirch', 'spice', 'horticulture']
+    };
+    const keywords = cropKeywords[farmerCrop.toLowerCase()] || [farmerCrop.toLowerCase()];
+    const matchesCrop = keywords.some(kw => textToMatch.includes(kw));
+    if (matchesCrop) {
+      score += 30;
+      reasons.push(`Tailored for your crop: ${farmerCrop}.`);
+    }
+  }
+
+  // 3. Landholding Matching
+  const smallFarmerKeywords = ['small farmer', 'marginal', 'small and marginal', '2 hectare', '5 acre', 'landless', 'unregistered laborer'];
+  const isSmallFarmerScheme = smallFarmerKeywords.some(kw => textToMatch.includes(kw));
+  
+  if (isSmallFarmerScheme) {
+    if (farmerArea > 0) {
+      if (farmerArea <= 5) {
+        score += 25;
+        reasons.push("Matches small/marginal landholding (under 5 acres).");
+        status = 'Eligible';
+      } else {
+        return {
+          status: 'Not Eligible',
+          score: 10,
+          explanation: `This scheme is targeted at small/marginal farmers. Your farm size is ${farmerArea} acres.`,
+          missingInfo: [],
+          schemeState
+        };
+      }
+    } else {
+      missingInfo.push("Land Ownership records");
+      status = 'Need More Information';
+    }
+  }
+
+  // 4. Irrigation/Water matching
+  const dripKeywords = ['drip', 'micro-irrigation', 'sprinkler', 'micro irrigation', 'water saving'];
+  const matchesDrip = dripKeywords.some(kw => textToMatch.includes(kw));
+  if (matchesDrip) {
+    if (irrigationMethods.includes('drip') || irrigationMethods.includes('sprinkler')) {
+      score += 25;
+      reasons.push("Matches your drip/sprinkler irrigation system.");
+      status = 'Eligible';
+    } else {
+      score += 5;
+    }
+  }
+
+  const solarKeywords = ['solar pump', 'kusum', 'solar water pump', 'solar power', 'renewable pump'];
+  const matchesSolar = solarKeywords.some(kw => textToMatch.includes(kw));
+  if (matchesSolar) {
+    if (pumpType.toLowerCase().includes('solar')) {
+      score += 30;
+      reasons.push("Matches your Solar Pump.");
+      status = 'Eligible';
+    } else {
+      score += 10;
+    }
+  }
+
+  // 5. Farming method (Organic)
+  const organicKeywords = ['organic', 'compost', 'jaivik', 'natural farming', 'chemical free'];
+  const matchesOrganic = organicKeywords.some(kw => textToMatch.includes(kw));
+  if (matchesOrganic) {
+    const isOrganic = farmingMethods.includes('Organic') || farmingMethods.includes('organic') || farm?.crop?.farmingType?.toLowerCase() === 'organic';
+    if (isOrganic) {
+      score += 30;
+      reasons.push("Matches your Organic Farming profile.");
+      status = 'Eligible';
+    } else {
+      score += 5;
+    }
+  }
+
+  // 6. Gender matching
+  const womenKeywords = ['women', 'female', 'mahila', 'girl', 'widow', 'daughter'];
+  const isWomenScheme = womenKeywords.some(kw => textToMatch.includes(kw));
+  if (isWomenScheme) {
+    if (farmerGender) {
+      if (farmerGender.toLowerCase() === 'female') {
+        score += 35;
+        reasons.push("Special priority for Women Farmers.");
+        status = 'Eligible';
+      } else {
+        return {
+          status: 'Not Eligible',
+          score: 5,
+          explanation: "This scheme is exclusively or primarily for women farmers.",
+          missingInfo: [],
+          schemeState
+        };
+      }
+    } else {
+      missingInfo.push("Gender Details");
+      status = 'Need More Information';
+    }
+  }
+
+  // Missing documents verification
+  const requiredDocsText = (scheme.documents || '').toLowerCase();
+  if (requiredDocsText.includes('aadhaar')) {
+    if (!profile.governmentId || !profile.governmentId.toUpperCase().includes('AADHAAR')) {
+      missingInfo.push('Aadhaar Card');
+    }
+  }
+  if (requiredDocsText.includes('soil')) {
+    if (!farm?.soil?.source || farm.soil.source !== 'card') {
+      missingInfo.push('Soil Health Card');
+    }
+  }
+  if (requiredDocsText.includes('bank')) {
+    if (!profile.governmentId) {
+      missingInfo.push('Bank Account Verification');
+    }
+  }
+  if (requiredDocsText.includes('caste') || requiredDocsText.includes('sc/st')) {
+    missingInfo.push('Caste Certificate');
+  }
+  if (requiredDocsText.includes('income')) {
+    missingInfo.push('Income Certificate');
+  }
+
+  if (missingInfo.length > 0 && status !== 'Not Eligible') {
+    status = 'Need More Information';
+  }
+
+  score = Math.max(15, Math.min(98, score));
+
+  // Generate explanation
+  let explanation = '';
+  if (reasons.length > 0) {
+    const cropText = farmerCrop ? `cultivate ${farmerCrop} in ${farmerState || 'India'}` : `farm in ${farmerState || 'India'}`;
+    const sizeText = farmerArea ? `own ${farmerArea} acres` : '';
+    explanation = `Recommended because you ${cropText}`;
+    if (sizeText) explanation += `, ${sizeText}`;
+    explanation += `. It matches your profile details.`;
+  } else {
+    explanation = "Recommended based on general Central and State farming benefit programs.";
+  }
+
+  return {
+    status,
+    score,
+    explanation,
+    missingInfo,
+    schemeState
+  };
+};
+
 export default function App() {
   const [view, setView] = useState('WELCOME');
   const [language, setLanguage] = useState('en');
@@ -360,6 +584,7 @@ export default function App() {
   const [seasonPlanConfirmed, setSeasonPlanConfirmed] = useState(() => localStorage.getItem('km_season_confirmed') === 'true');
   const [selectedFarmIndex, setSelectedFarmIndex] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [completedTasks, setCompletedTasks] = useState([]);
   const [voiceAssistantOpen, setVoiceAssistantOpen] = useState(false);
   const [voiceReplies, setVoiceReplies] = useState([
@@ -376,11 +601,33 @@ export default function App() {
   const [selectedMandiDetails, setSelectedMandiDetails] = useState(null);
   const [selectedCommunityPost, setSelectedCommunityPost] = useState(null);
   const [showAllTasksModal, setShowAllTasksModal] = useState(false);
+  const [weatherData, setWeatherData] = useState(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+
+  const fetchWeather = async () => {
+    const activeFarm = farms[selectedFarmIndex];
+    if (!activeFarm) return;
+    setWeatherLoading(true);
+    try {
+      const data = await fetchWeatherIntelligence(activeFarm, profile);
+      setWeatherData(data);
+    } catch (e) {
+      console.error("Failed to fetch weather:", e);
+    } finally {
+      setWeatherLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchWeather();
+  }, [selectedFarmIndex, farms.length, profile?.state, profile?.district]);
+
   // Gemini API & Speech Recognition States
   const GROQ_API_KEY = "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";
   const [isListening, setIsListening] = useState(false);
   const [translatedDashboardData, setTranslatedDashboardData] = useState(null);
   const [translating, setTranslating] = useState(false);
+  const [allSchemes, setAllSchemes] = useState([]);
 
   const languageName = {
     en: "English",
@@ -675,6 +922,9 @@ export default function App() {
   // Dynamic Dashboard Data generator based on selected farm and crop
   const getFarmDashboardData = (farm) => {
     if (!farm) return null;
+    if (farm.crop?.confirmedPlan) {
+      return farm.crop.confirmedPlan;
+    }
     const cropId = farm.crop?.name || 'wheat';
     const cropDetails = CROPS.find(c => c.id === cropId) || { name: 'Wheat', icon: '🌾' };
     const cropStage = farm.crop?.stage || 'Vegetative / Growth';
@@ -1008,6 +1258,92 @@ export default function App() {
       data.weatherInterpretation = "Heavy wind & precipitation expected: Avoid spraying pesticides and postpone irrigation.";
     }
 
+    // Dynamic AI Government Schemes Recommendation
+    const getFarmSchemes = (f) => {
+      if (!allSchemes || allSchemes.length === 0) {
+        return [
+          {
+            id: 'pm-kisan',
+            name: 'PM-Kisan Samman Nidhi',
+            status: 'Eligible',
+            benefits: '₹6,000/year (Direct Benefit Transfer)',
+            deadline: '2026-07-15',
+            progress: 80,
+            documents: 'Aadhaar Card, Land Registry (Khatauni), Bank Passbook',
+            desc: 'Income support scheme for small and marginal landholder farmer families.'
+          },
+          {
+            id: 'pmksy',
+            name: 'Pradhan Mantri Krishi Sinchayee Yojana (PMKSY)',
+            status: 'Eligible',
+            benefits: 'Up to 80% subsidy on micro-irrigation system setups',
+            deadline: '2026-07-31',
+            progress: 90,
+            documents: 'Land registry, Aadhaar, Bank Details, Pump Electricity Bill',
+            desc: 'Assistance for setting up drip or sprinkler systems to conserve water.'
+          }
+        ];
+      }
+
+      const evaluated = allSchemes.map(sch => {
+        const evaluation = evaluateScheme(sch, profile, f);
+        return {
+          scheme: sch,
+          ...evaluation
+        };
+      });
+
+      const eligible = evaluated
+        .filter(item => item.status !== 'Not Eligible')
+        .sort((a, b) => b.score - a.score);
+
+      return eligible.slice(0, 2).map(item => ({
+        id: item.scheme.slug || item.scheme.name,
+        name: item.scheme.name,
+        status: item.status,
+        benefits: item.scheme.benefits,
+        deadline: 'Apply Now',
+        progress: item.score,
+        documents: item.scheme.documents,
+        desc: item.scheme.details
+      }));
+    };
+
+    const dynamicSchemes = getFarmSchemes(farm);
+    data.schemes = dynamicSchemes;
+
+    // Inject highly relevant scheme alerts
+    if (dynamicSchemes.length > 0) {
+      const topSch = dynamicSchemes[0];
+      
+      // Inject to tasks list if not already completed
+      const taskId = `scheme_task_${topSch.id}`;
+      data.tasks.push({
+        id: taskId,
+        title: `Apply for ${topSch.name}`,
+        category: 'Government Scheme',
+        priority: 'High',
+        time: '04:30 PM',
+        duration: '20 mins',
+        why: `Highly recommended because it matches your crop and landholding profile.`,
+        benefit: topSch.benefits,
+        resources: `Required: ${topSch.documents.split('.').slice(0, 2).join(', ')}`,
+        status: 'pending'
+      });
+
+      // Inject to dynamic advisor action feed
+      data.actionFeed.push({
+        id: `scheme_alert_${topSch.id}`,
+        type: 'scheme',
+        title: `New Subsidy Alert: ${topSch.name}`,
+        problem: `KisanMitra calculated high eligibility for this scheme.`,
+        reason: `Matches your crop (${data.cropName}) in ${farm.state || 'India'} with size ${farm.area} ${farm.unit}.`,
+        action: `Open the Government Schemes tab to verify eligibility and apply.`,
+        benefit: topSch.benefits,
+        actionText: 'View Scheme Details'
+      });
+    }
+
     return data;
   };
 
@@ -1070,7 +1406,8 @@ Instructions:
       if (navToken === 'diagnosis') setActiveDashboardTab('diagnosis');
       else if (navToken === 'market') setActiveDashboardTab('market');
       else if (navToken === 'schemes') setActiveDashboardTab('schemes');
-      else if (navToken === 'farms') setActiveDashboardTab('farms');
+      else if (navToken === 'farms') setActiveDashboardTab('settings');
+      else if (navToken === 'notifications') setActiveDashboardTab('settings');
       else if (navToken === 'settings') setActiveDashboardTab('settings');
       else if (navToken === 'dashboard') setActiveDashboardTab('dashboard');
       else if (navToken === 'tasks') setActiveDashboardTab('tasks');
@@ -1099,6 +1436,16 @@ Instructions:
       setTimeout(() => setPlayingAudio(null), 4000);
     }
   };
+
+  // Load schemes at startup
+  useEffect(() => {
+    fetch('/schemes_data.json')
+      .then(res => res.json())
+      .then(data => {
+        setAllSchemes(data);
+      })
+      .catch(err => console.error("Error loading schemes:", err));
+  }, []);
 
   // Auto-save profile
   useEffect(() => {
@@ -1341,27 +1688,6 @@ Instructions:
         {/* Navigation bar */}
         <header className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-surface-container-high py-4 px-6 md:px-12 flex justify-between items-center z-50">
           <div className="flex items-center gap-3">
-            {/* JWT Inspector Button (Visible only when jwtToken is set) */}
-             {jwtToken && (
-               <button
-                 onClick={() => setShowJwtInspector(true)}
-                 className="p-2.5 rounded-xl border border-outline-variant bg-[#f0fcfc] text-[#006e2d] hover:bg-[#e0fcfc] transition-all font-semibold text-xs flex items-center gap-1.5"
-               >
-                 <Cpu className="w-4 h-4 text-primary" />
-                 <span>Inspect JWT</span>
-               </button>
-             )}
-
-             {/* Sign Out Button (Visible only when jwtToken is set) */}
-             {jwtToken && (
-               <button
-                 onClick={handleSignOut}
-                 className="p-2.5 rounded-xl border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-all font-semibold text-xs flex items-center gap-1.5"
-               >
-                 <span className="material-symbols-outlined text-sm font-bold">logout</span>
-                 <span>Sign Out</span>
-               </button>
-             )}
 
              {/* Voice toggle button */}
              <button 
@@ -3398,9 +3724,10 @@ Instructions:
 
           {/* Annual Farm Planner Dashboard */}
           {/* Annual Farm Planner Dashboard */}
-          {view === 'PLANNER' && (
+          {(view === 'PLANNER' || view === 'DASHBOARD') && (
             <DashboardShell
               profile={profile}
+              setProfile={setProfile}
               language={language}
               setLanguage={setLanguage}
               languages={LANGUAGES}
@@ -3408,6 +3735,9 @@ Instructions:
               farms={farms}
               selectedFarmIndex={selectedFarmIndex}
               setSelectedFarmIndex={setSelectedFarmIndex}
+              weatherData={weatherData}
+              weatherLoading={weatherLoading}
+              fetchWeather={fetchWeather}
               getFarmDashboardData={farm => translatedDashboardData || getFarmDashboardData(farm)}
               translating={translating}
               isListening={isListening}
@@ -3419,6 +3749,11 @@ Instructions:
               setActiveDashboardTab={setActiveDashboardTab}
               sidebarOpen={sidebarOpen}
               setSidebarOpen={setSidebarOpen}
+              sidebarCollapsed={sidebarCollapsed}
+              setSidebarCollapsed={setSidebarCollapsed}
+              jwtToken={jwtToken}
+              setShowJwtInspector={setShowJwtInspector}
+              handleSignOut={handleSignOut}
               completedTasks={completedTasks}
               setCompletedTasks={setCompletedTasks}
               voiceAssistantOpen={voiceAssistantOpen}
@@ -3459,6 +3794,7 @@ Instructions:
               setCurrentFarm={setCurrentFarm}
               setBoundaryPoints={setBoundaryPoints}
               setEditingFarmIndex={setEditingFarmIndex}
+              allSchemes={allSchemes}
             />
           )}
 
@@ -3509,14 +3845,137 @@ Instructions:
                       iat: Math.floor(Date.now() / 1000),
                       exp: Math.floor(Date.now() / 1000) + 3600
                     });
-                    // Pre-fill profile name and mock mobile
-                    setProfile(p => ({
-                      ...p,
-                      name: account.name,
-                      mobile: "1234567890"
-                    }));
+
+                    // Pre-fill full demo profile
+                    setProfile({
+                      name: "Rajesh Kumar",
+                      email: "rajesh.kumar@gmail.com",
+                      mobile: "9876543210",
+                      photo: "",
+                      gender: "Male",
+                      dob: "1985-04-12",
+                      state: "Maharashtra",
+                      district: "Nashik",
+                      village: "Pimpalgaon",
+                      pinCode: "422209",
+                      experience: "15",
+                      occupation: "Farmer",
+                      ownership: "Owner",
+                      farmingMethod: ["Conventional", "Organic"],
+                      governmentId: "AADHAAR-XXXX-7890"
+                    });
+
+                    // Seed 2 complete demo farms so FarmingDashboard renders immediately
+                    const demoFarms = [
+                      {
+                        name: "Rajesh Wheat Farm",
+                        state: "Maharashtra",
+                        district: "Nashik",
+                        village: "Pimpalgaon",
+                        pinCode: "422209",
+                        lat: "20.0059",
+                        lng: "73.7823",
+                        boundary: [],
+                        plots: 2,
+                        area: "4.5",
+                        unit: "Acres",
+                        crop: {
+                          name: "Wheat",
+                          variety: "GW 322",
+                          stage: "Growth",
+                          sowingDate: "2026-04-10",
+                          harvestDate: "2026-09-15",
+                          previousCrop: "Rice",
+                          farmingType: "Conventional"
+                        },
+                        soil: {
+                          type: "Black Clay",
+                          source: "card",
+                          ph: "6.8",
+                          carbon: "0.62",
+                          nitrogen: "High",
+                          phosphorus: "Medium",
+                          potassium: "Medium",
+                          micronutrients: "Zinc, Boron"
+                        },
+                        water: {
+                          sources: ["borewell", "canal"],
+                          irrigationMethods: ["drip"],
+                          availability: "Good",
+                          reliability: "Always Available",
+                          electricity: "Daytime Only",
+                          pumpType: "Solar",
+                          pumpCapacity: "5 HP"
+                        },
+                        machinery: ["tractor", "sprayer"],
+                        storage: ["Warehouse"],
+                        livestock: ["Cow"],
+                        labor: { type: "Both", count: "3–5" },
+                        transportation: ["Tractor"],
+                        internet: "Good",
+                        smartphone: "Farmer Uses App",
+                        nearbyRadius: "10 km",
+                        nearbyFacilities: ["Mandi", "Fertilizer Shop", "KVK"]
+                      },
+                      {
+                        name: "Sugarcane Field B",
+                        state: "Maharashtra",
+                        district: "Nashik",
+                        village: "Ozar",
+                        pinCode: "422206",
+                        lat: "20.0890",
+                        lng: "73.9120",
+                        boundary: [],
+                        plots: 1,
+                        area: "2.8",
+                        unit: "Acres",
+                        crop: {
+                          name: "Sugarcane",
+                          variety: "Co-86032",
+                          stage: "Flowering",
+                          sowingDate: "2025-12-01",
+                          harvestDate: "2026-11-20",
+                          previousCrop: "Soybean",
+                          farmingType: "Conventional"
+                        },
+                        soil: {
+                          type: "Red Loam",
+                          source: "manual",
+                          ph: "7.1",
+                          carbon: "0.48",
+                          nitrogen: "Medium",
+                          phosphorus: "High",
+                          potassium: "Medium",
+                          micronutrients: "Iron, Manganese"
+                        },
+                        water: {
+                          sources: ["canal"],
+                          irrigationMethods: ["drip", "flood"],
+                          availability: "Moderate",
+                          reliability: "Seasonal",
+                          electricity: "Daytime Only",
+                          pumpType: "Electric",
+                          pumpCapacity: "3 HP"
+                        },
+                        machinery: ["tractor", "harvester"],
+                        storage: ["Cold Storage"],
+                        livestock: [],
+                        labor: { type: "Hired", count: "5–10" },
+                        transportation: ["Tractor", "Truck"],
+                        internet: "Average",
+                        smartphone: "Farmer Uses App",
+                        nearbyRadius: "15 km",
+                        nearbyFacilities: ["Mandi", "Sugar Factory"]
+                      }
+                    ];
+
+                    setFarms(demoFarms);
+                    setSelectedFarmIndex(0);
+                    // Mark onboarding as done — go straight to the dashboard
+                    setSeasonPlanConfirmed(true);
+                    localStorage.setItem('km_season_confirmed', 'true');
                     setShowGoogleDialog(false);
-                    setView('LANGUAGE');
+                    setView('DASHBOARD');
                   }}
                   className="w-full flex items-center p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low text-left gap-3 transition-all"
                 >
@@ -3525,9 +3984,9 @@ Instructions:
                   </div>
                   <div className="flex-grow min-w-0">
                     <h4 className="font-bold text-sm text-on-surface truncate">Rajesh Kumar</h4>
-                    <p className="text-xs text-on-surface-variant truncate">rajesh.kumar@gmail.com</p>
+                    <p className="text-xs text-on-surface-variant truncate">rajesh.kumar@gmail.com · Nashik, Maharashtra</p>
                   </div>
-                  <span className="text-[10px] bg-primary-container/20 text-primary px-2.5 py-0.5 rounded-full font-bold flex-shrink-0">Test Profile</span>
+                  <span className="text-[10px] bg-primary-container/20 text-primary px-2.5 py-0.5 rounded-full font-bold flex-shrink-0">Demo Profile</span>
                 </button>
               </div>
               

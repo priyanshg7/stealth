@@ -11,9 +11,18 @@ import MarketDetails from './subviews/MarketDetails';
 import GovernmentSchemes from './subviews/GovernmentSchemes';
 import CommunityDiscussions from './subviews/CommunityDiscussions';
 import SettingsPanel from './subviews/SettingsPanel';
+import SeasonPlanner from './subviews/SeasonPlanner';
+import WeatherIntelligence from './subviews/WeatherIntelligence';
+import AnnualPlanner from './subviews/AnnualPlanner';
+import TodayTasks from './subviews/TodayTasks';
+
 
 export default function DashboardShell({
+  weatherData,
+  weatherLoading,
+  fetchWeather,
   profile,
+  setProfile,
   language,
   setLanguage,
   languages,
@@ -26,6 +35,11 @@ export default function DashboardShell({
   setActiveDashboardTab,
   sidebarOpen,
   setSidebarOpen,
+  sidebarCollapsed,
+  setSidebarCollapsed,
+  jwtToken,
+  setShowJwtInspector,
+  handleSignOut,
   completedTasks,
   setCompletedTasks,
   voiceAssistantOpen,
@@ -71,7 +85,8 @@ export default function DashboardShell({
   setVoiceGuide,
   translating,
   isListening,
-  startSpeechRecognition
+  startSpeechRecognition,
+  allSchemes
 }) {
   return (
     <div className="flex-grow w-full flex bg-background text-on-surface relative overflow-hidden min-h-[calc(100vh-68px)] font-sans">
@@ -88,6 +103,8 @@ export default function DashboardShell({
         setActiveDashboardTab={setActiveDashboardTab}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
+        sidebarCollapsed={sidebarCollapsed}
+        setSidebarCollapsed={setSidebarCollapsed}
         completedTasks={completedTasks}
         setView={setView}
         setFarms={setFarms}
@@ -95,10 +112,13 @@ export default function DashboardShell({
         setJwtToken={setJwtToken}
         setDecodedToken={setDecodedToken}
         setSeasonPlanConfirmed={setSeasonPlanConfirmed}
+        jwtToken={jwtToken}
+        setShowJwtInspector={setShowJwtInspector}
+        handleSignOut={handleSignOut}
       />
 
       {/* Main content body container */}
-      <div className="flex-grow flex flex-col min-w-0 overflow-y-auto pb-16 relative">
+      <div className={`flex-grow flex flex-col min-w-0 overflow-y-auto pb-16 relative transition-all duration-300`}>
         
         {/* Top command bar */}
         <Header 
@@ -108,6 +128,8 @@ export default function DashboardShell({
           languages={languages}
           setActiveDashboardTab={setActiveDashboardTab}
           setSidebarOpen={setSidebarOpen}
+          sidebarCollapsed={sidebarCollapsed}
+          setSidebarCollapsed={setSidebarCollapsed}
           setVoiceAssistantOpen={setVoiceAssistantOpen}
           isListening={isListening}
           startSpeechRecognition={startSpeechRecognition}
@@ -118,27 +140,7 @@ export default function DashboardShell({
         <main className="p-4 md:p-6 max-w-7xl mx-auto w-full flex-grow space-y-6">
           
           {activeDashboardTab === 'dashboard' && (
-            !seasonPlanConfirmed ? (
-              <OnboardingWorkspace 
-                profile={profile}
-                farms={farms}
-                currentFarm={farms[selectedFarmIndex]}
-                soilHealthCardUploaded={soilHealthCardUploaded}
-                soilCardReminderDismissed={soilCardReminderDismissed}
-                setSoilCardReminderDismissed={setSoilCardReminderDismissed}
-                handleSoilHealthCardUpload={handleSoilHealthCardUpload}
-                showAnnualPlanWizard={showAnnualPlanWizard}
-                setShowAnnualPlanWizard={setShowAnnualPlanWizard}
-                onboardingCarouselIndex={onboardingCarouselIndex}
-                setOnboardingCarouselIndex={setOnboardingCarouselIndex}
-                onboardingSlides={onboardingSlides}
-                wizardSelectedCrop={wizardSelectedCrop}
-                setWizardSelectedCrop={setWizardSelectedCrop}
-                setFarms={setFarms}
-                setSeasonPlanConfirmed={setSeasonPlanConfirmed}
-                crops={crops}
-              />
-            ) : (
+            profile.isOnboarded ? (
               <FarmingDashboard 
                 farms={farms}
                 selectedFarmIndex={selectedFarmIndex}
@@ -164,12 +166,70 @@ export default function DashboardShell({
                 setVoiceReplies={setVoiceReplies}
                 translating={translating}
                 language={language}
+                weatherData={weatherData}
+                weatherLoading={weatherLoading}
+              />
+            ) : (
+              <OnboardingWorkspace 
+                profile={profile}
+                farms={farms}
+                currentFarm={farms[selectedFarmIndex]}
+                soilHealthCardUploaded={soilHealthCardUploaded}
+                soilCardReminderDismissed={soilCardReminderDismissed}
+                setSoilCardReminderDismissed={setSoilCardReminderDismissed}
+                handleSoilHealthCardUpload={handleSoilHealthCardUpload}
+                showAnnualPlanWizard={showAnnualPlanWizard}
+                setShowAnnualPlanWizard={setShowAnnualPlanWizard}
+                onboardingCarouselIndex={onboardingCarouselIndex}
+                setOnboardingCarouselIndex={setOnboardingCarouselIndex}
+                onboardingSlides={onboardingSlides}
+                wizardSelectedCrop={wizardSelectedCrop}
+                setWizardSelectedCrop={setWizardSelectedCrop}
+                setFarms={setFarms}
+                setSeasonPlanConfirmed={setSeasonPlanConfirmed}
+                crops={crops}
               />
             )
           )}
 
-          {activeDashboardTab === 'farms' && (
-            <FarmsList 
+           {activeDashboardTab === 'diagnosis' && (
+            <DiseaseDiagnosis 
+              weatherData={weatherData}
+              activeFarm={farms[selectedFarmIndex]}
+            />
+          )}
+ 
+          {activeDashboardTab === 'market' && (
+            <MarketDetails 
+              farms={farms}
+              selectedFarmIndex={selectedFarmIndex}
+              getFarmDashboardData={getFarmDashboardData}
+              weatherData={weatherData}
+              mandiData={null}
+              fetchMandiData={null}
+            />
+          )}
+ 
+          {activeDashboardTab === 'schemes' && (
+            <GovernmentSchemes 
+              setSelectedScheme={setSelectedScheme}
+              profile={profile}
+              setProfile={setProfile}
+              language={language}
+              farms={farms}
+              selectedFarmIndex={selectedFarmIndex}
+              setSelectedFarmIndex={setSelectedFarmIndex}
+              setActiveDashboardTab={setActiveDashboardTab}
+              allSchemes={allSchemes}
+            />
+          )}
+ 
+          {activeDashboardTab === 'settings' && (
+            <SettingsPanel 
+              profile={profile}
+              setProfile={setProfile}
+              voiceGuide={voiceGuide}
+              setVoiceGuide={setVoiceGuide}
               farms={farms}
               setCurrentFarm={setCurrentFarm}
               setBoundaryPoints={setBoundaryPoints}
@@ -179,41 +239,61 @@ export default function DashboardShell({
             />
           )}
 
-          {activeDashboardTab === 'diagnosis' && (
-            <DiseaseDiagnosis />
+          {activeDashboardTab === 'weather' && (
+            <WeatherIntelligence 
+              profile={profile}
+              farms={farms}
+              selectedFarmIndex={selectedFarmIndex}
+              weatherData={weatherData}
+              weatherLoading={weatherLoading}
+              fetchWeather={fetchWeather}
+              setActiveDashboardTab={setActiveDashboardTab}
+              language={language}
+            />
           )}
 
-          {activeDashboardTab === 'market' && (
-            <MarketDetails 
+          {activeDashboardTab === 'season_planner' && (
+            <SeasonPlanner 
+              profile={profile}
+              farms={farms}
+              selectedFarmIndex={selectedFarmIndex}
+              setSelectedFarmIndex={setSelectedFarmIndex}
+              setFarms={setFarms}
+              seasonPlanConfirmed={seasonPlanConfirmed}
+              setSeasonPlanConfirmed={setSeasonPlanConfirmed}
+              language={language}
+              setActiveDashboardTab={setActiveDashboardTab}
+              weatherData={weatherData}
+            />
+          )}
+
+          {activeDashboardTab === 'planner' && (
+            <AnnualPlanner
+              profile={profile}
+              farms={farms}
+              selectedFarmIndex={selectedFarmIndex}
+              setSelectedFarmIndex={setSelectedFarmIndex}
+              weatherData={weatherData}
+              language={language}
+              setActiveDashboardTab={setActiveDashboardTab}
+              setFarms={setFarms}
+            />
+          )}
+
+          {activeDashboardTab === 'tasks' && (
+            <TodayTasks
               farms={farms}
               selectedFarmIndex={selectedFarmIndex}
               getFarmDashboardData={getFarmDashboardData}
-            />
-          )}
-
-          {activeDashboardTab === 'schemes' && (
-            <GovernmentSchemes 
-              setSelectedScheme={setSelectedScheme}
-            />
-          )}
-
-          {activeDashboardTab === 'community' && (
-            <CommunityDiscussions 
-              setSelectedCommunityPost={setSelectedCommunityPost}
-            />
-          )}
-
-          {activeDashboardTab === 'settings' && (
-            <SettingsPanel 
-              profile={profile}
-              setProfile={setProfile}
-              voiceGuide={voiceGuide}
-              setVoiceGuide={setVoiceGuide}
+              completedTasks={completedTasks}
+              setCompletedTasks={setCompletedTasks}
+              weatherData={weatherData}
+              language={language}
             />
           )}
 
           {/* Simple Fallbacks for other tabs to keep navigation responsive */}
-          {['planner', 'season_planner', 'tasks', 'journey', 'reports', 'notifications', 'help'].includes(activeDashboardTab) && (
+          {['journey'].includes(activeDashboardTab) && (
             <div className="bg-white border rounded-card p-6 shadow-sm text-center py-10 space-y-3">
               <span className="material-symbols-outlined text-primary text-4xl font-bold">construction</span>
               <h3 className="font-display font-extrabold text-lg text-on-surface">Module Subview Under Development</h3>

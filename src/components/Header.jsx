@@ -8,25 +8,40 @@ export default function Header({
   languages,
   setActiveDashboardTab,
   setSidebarOpen,
+  sidebarCollapsed,
+  setSidebarCollapsed,
   setVoiceAssistantOpen,
   isListening,
   startSpeechRecognition,
   handleVoiceCommand
 }) {
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-surface-container-high px-6 py-4 flex items-center justify-between gap-4 shadow-sm">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-surface-container-high px-4 py-3 flex items-center justify-between gap-4 shadow-sm">
       
-      {/* Left Side: Mobile Menu Trigger & Dynamic Greeting */}
+      {/* Left Side: Sidebar Toggle + Dynamic Greeting */}
       <div className="flex items-center gap-3">
+        {/* Mobile hamburger — opens mobile drawer */}
         <button 
           onClick={() => setSidebarOpen(true)}
           className="p-2.5 rounded-xl border border-outline-variant hover:bg-surface-container lg:hidden text-on-surface-variant"
+          title="Open navigation"
         >
           <span className="material-symbols-outlined text-xl">menu</span>
         </button>
+
+        {/* Desktop collapse/expand toggle */}
+        <button
+          onClick={() => setSidebarCollapsed(prev => !prev)}
+          className="hidden lg:flex p-2.5 rounded-xl border border-outline-variant hover:bg-surface-container text-on-surface-variant transition-colors"
+          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <span className="material-symbols-outlined text-xl">
+            {sidebarCollapsed ? 'menu_open' : 'menu'}
+          </span>
+        </button>
         
         <div>
-          <h2 className="font-display font-bold text-lg md:text-xl text-on-surface flex items-center gap-1.5">
+          <h2 className="font-display font-bold text-base md:text-lg text-on-surface flex items-center gap-1.5">
             <span>
               {(() => {
                 const hr = new Date().getHours();
@@ -47,7 +62,7 @@ export default function Header({
       </div>
 
       {/* Right Side: Lang Switcher, Voice Helper, Notifications */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 md:gap-3">
         
         {/* Language Dropdown Selector */}
         <div className="relative">
