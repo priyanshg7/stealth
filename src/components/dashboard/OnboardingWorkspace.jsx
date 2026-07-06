@@ -50,7 +50,7 @@ export default function OnboardingWorkspace({
             {[
               { label: 'Farmer Profile Completed', status: true },
               { label: 'Agricultural Plot Registered', status: true },
-              { label: 'Soil Health Metrics Added', status: soilHealthCardUploaded || currentFarm.soil?.source === 'card' },
+              { label: 'Soil Health Metrics Added', status: soilHealthCardUploaded || currentFarm?.soil?.source === 'card' },
               { label: 'Generate Annual Farm Plan', status: false },
               { label: 'Activate First Season Plan', status: false }
             ].map((step, idx) => (
@@ -106,9 +106,9 @@ export default function OnboardingWorkspace({
               </p>
             </div>
             <div className="bg-white p-2.5 rounded-xl border border-outline-variant/60 grid grid-cols-3 gap-2 text-center text-xs font-semibold">
-              <div><span className="text-[10px] text-on-surface-variant block">pH</span> {currentFarm.soil?.ph || '6.8'}</div>
-              <div><span className="text-[10px] text-on-surface-variant block">Carbon</span> {currentFarm.soil?.carbon || '0.62'}%</div>
-              <div><span className="text-[10px] text-on-surface-variant block">Nitrogen</span> {currentFarm.soil?.nitrogen || 'Medium'}</div>
+              <div><span className="text-[10px] text-on-surface-variant block">pH</span> {currentFarm?.soil?.ph || '6.8'}</div>
+              <div><span className="text-[10px] text-on-surface-variant block">Carbon</span> {currentFarm?.soil?.carbon || '0.62'}%</div>
+              <div><span className="text-[10px] text-on-surface-variant block">Nitrogen</span> {currentFarm?.soil?.nitrogen || 'Medium'}</div>
             </div>
           </div>
         )}
