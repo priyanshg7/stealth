@@ -4,7 +4,7 @@ import {
   Layers, DollarSign, RefreshCw, FileText, CheckCircle2, ChevronRight, 
   Info, Users, Shield, BookOpen, AlertCircle, TrendingUp, TrendingDown,
   ArrowLeft, Download, Share2, ClipboardList, CheckSquare, Settings, Wrench,
-  MapPin, Leaf, Activity, ChevronDown
+  MapPin, Leaf, Activity, ChevronDown, Check, CloudRain, Sun, Sprout, ShieldAlert
 } from 'lucide-react';
 import { t } from '../../utils/translations';
 import { generateRecommendations, getGeminiVarieties } from '../../utils/aiRecommendationEngine';
@@ -620,7 +620,7 @@ export default function AnnualPlanner({
             <div className="pt-6 border-t border-outline-variant/40">
               <h3 className="font-black text-sm text-on-surface mb-4 flex items-center gap-2">
                 <Check className="w-4 h-4 text-primary" />
-                Preferred Crops & Varieties (Optional)
+                Preferred Crops &amp; Varieties (Optional)
               </h3>
               <p className="text-[11px] text-on-surface-variant mb-4">
                 Know what you want to grow? Select your preferred crops and varieties for each season. Leave blank to let our AI recommend the best options.
@@ -630,37 +630,111 @@ export default function AnnualPlanner({
                 {/* Kharif */}
                 <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/40">
                   <h4 className="text-xs font-bold text-on-surface mb-3 flex items-center gap-2">
-                    <CloudRain className="w-4 h-4 text-blue-500" /> Kharif (Monsoon)
+                    <CloudRain className="w-4 h-4 text-blue-500" /> Kharif (Monsoon — June to October)
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="relative">
                       <label className="text-[10px] font-bold text-on-surface-variant block mb-1">Select Crop</label>
-                      <select 
-                        value={wizardPreferences.Kharif.crop}
-                        onChange={(e) => setWizardPreferences(prev => ({...prev, Kharif: {...prev.Kharif, crop: e.target.value, variety: ''}}))}
-                        className="w-full border border-outline-variant rounded-lg p-2 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
-                      >
-                        <option value="">AI Recommendation</option>
-                        <option value="Rice">Rice</option>
-                        <option value="Maize">Maize</option>
-                        <option value="Soybean">Soybean</option>
-                        <option value="Cotton">Cotton</option>
-                        <option value="Bajra">Bajra</option>
-                      </select>
+                      <div className="relative">
+                        <select 
+                          value={wizardPreferences.Kharif.crop}
+                          onChange={(e) => setWizardPreferences(prev => ({...prev, Kharif: {...prev.Kharif, crop: e.target.value, variety: '', customCrop: ''}}))}
+                          className="w-full border border-outline-variant rounded-lg p-2 pr-8 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
+                        >
+                          <option value="">🤖 AI Recommendation</option>
+                          <optgroup label="── Cereals ──">
+                            <option value="Rice">Rice (Dhan)</option>
+                            <option value="Maize">Maize (Makka)</option>
+                            <option value="Bajra">Bajra (Pearl Millet)</option>
+                            <option value="Jowar">Jowar (Sorghum)</option>
+                            <option value="Ragi">Ragi (Finger Millet)</option>
+                            <option value="Kodo Millet">Kodo Millet</option>
+                            <option value="Foxtail Millet">Foxtail Millet</option>
+                          </optgroup>
+                          <optgroup label="── Pulses ──">
+                            <option value="Arhar">Arhar / Tur Dal (Pigeon Pea)</option>
+                            <option value="Moong">Moong (Green Gram)</option>
+                            <option value="Urad">Urad (Black Gram)</option>
+                            <option value="Moth Bean">Moth Bean</option>
+                            <option value="Cowpea">Cowpea (Lobia)</option>
+                          </optgroup>
+                          <optgroup label="── Oilseeds ──">
+                            <option value="Soybean">Soybean</option>
+                            <option value="Groundnut">Groundnut (Mungfali)</option>
+                            <option value="Castor">Castor (Arandi)</option>
+                            <option value="Sesame">Sesame (Til)</option>
+                            <option value="Sunflower">Sunflower</option>
+                          </optgroup>
+                          <optgroup label="── Cash Crops ──">
+                            <option value="Cotton">Cotton (Kapas)</option>
+                            <option value="Sugarcane">Sugarcane (Ganna)</option>
+                            <option value="Jute">Jute</option>
+                            <option value="Tobacco">Tobacco</option>
+                          </optgroup>
+                          <optgroup label="── Vegetables ──">
+                            <option value="Brinjal">Brinjal (Baingan)</option>
+                            <option value="Okra">Okra (Bhindi)</option>
+                            <option value="Bottle Gourd">Bottle Gourd (Lauki)</option>
+                            <option value="Bitter Gourd">Bitter Gourd (Karela)</option>
+                            <option value="Tinda">Tinda (Indian Round Gourd)</option>
+                            <option value="Tomato">Tomato</option>
+                            <option value="Chilli">Chilli (Mirch)</option>
+                          </optgroup>
+                          <optgroup label="── Others ──">
+                            <option value="Other">✏️ Other (Enter custom crop)</option>
+                          </optgroup>
+                        </select>
+                        <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" />
+                      </div>
+                      {wizardPreferences.Kharif.crop === 'Other' && (
+                        <input
+                          type="text"
+                          placeholder="Type your crop name..."
+                          value={wizardPreferences.Kharif.customCrop || ''}
+                          onChange={(e) => setWizardPreferences(prev => ({...prev, Kharif: {...prev.Kharif, customCrop: e.target.value}}))}
+                          className="mt-2 w-full border border-primary/50 rounded-lg p-2 text-xs focus:outline-none focus:border-primary bg-white"
+                        />
+                      )}
                     </div>
-                    {wizardPreferences.Kharif.crop === 'Rice' && (
+                    {wizardPreferences.Kharif.crop && wizardPreferences.Kharif.crop !== 'Other' && (
                       <div className="relative">
                         <label className="text-[10px] font-bold text-on-surface-variant block mb-1">Preferred Variety</label>
-                        <select 
-                          value={wizardPreferences.Kharif.variety}
-                          onChange={(e) => setWizardPreferences(prev => ({...prev, Kharif: {...prev.Kharif, variety: e.target.value}}))}
-                          className="w-full border border-outline-variant rounded-lg p-2 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
-                        >
-                          <option value="">Let AI Decide</option>
-                          <option value="PR-126">PR-126</option>
-                          <option value="Pusa Basmati 1509">Pusa Basmati 1509</option>
-                          <option value="Arize 6444">Arize 6444 Gold</option>
-                        </select>
+                        <div className="relative">
+                          <select 
+                            value={wizardPreferences.Kharif.variety}
+                            onChange={(e) => setWizardPreferences(prev => ({...prev, Kharif: {...prev.Kharif, variety: e.target.value}}))}
+                            className="w-full border border-outline-variant rounded-lg p-2 pr-8 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
+                          >
+                            <option value="">🤖 Let AI Decide</option>
+                            {wizardPreferences.Kharif.crop === 'Rice' && (<>
+                              <option value="PR-126">PR-126</option>
+                              <option value="Pusa Basmati 1509">Pusa Basmati 1509</option>
+                              <option value="Arize 6444 Gold">Arize 6444 Gold</option>
+                              <option value="Samba Mahsuri">Samba Mahsuri</option>
+                              <option value="MTU-1010">MTU-1010</option>
+                            </>)}
+                            {wizardPreferences.Kharif.crop === 'Maize' && (<>
+                              <option value="DKC 9144">DKC 9144</option>
+                              <option value="P3401">Pioneer P3401</option>
+                              <option value="NK 6240">NK 6240</option>
+                            </>)}
+                            {wizardPreferences.Kharif.crop === 'Cotton' && (<>
+                              <option value="Bollgard II">Bollgard II (Bt)</option>
+                              <option value="RCH 134 BT">RCH 134 BT</option>
+                              <option value="MRC 7017 BT">MRC 7017 BT</option>
+                            </>)}
+                            {wizardPreferences.Kharif.crop === 'Soybean' && (<>
+                              <option value="JS 335">JS 335</option>
+                              <option value="NRC 37">NRC 37</option>
+                              <option value="MAUS 158">MAUS 158</option>
+                            </>)}
+                            {wizardPreferences.Kharif.crop === 'Arhar' && (<>
+                              <option value="Asha (UPAS 120)">Asha (UPAS 120)</option>
+                              <option value="Maruti">Maruti</option>
+                            </>)}
+                          </select>
+                          <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" />
+                        </div>
                       </div>
                     )}
                   </div>
@@ -669,36 +743,101 @@ export default function AnnualPlanner({
                 {/* Rabi */}
                 <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/40">
                   <h4 className="text-xs font-bold text-on-surface mb-3 flex items-center gap-2">
-                    <Sun className="w-4 h-4 text-orange-500" /> Rabi (Winter)
+                    <Sun className="w-4 h-4 text-orange-500" /> Rabi (Winter — November to March)
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="relative">
                       <label className="text-[10px] font-bold text-on-surface-variant block mb-1">Select Crop</label>
-                      <select 
-                        value={wizardPreferences.Rabi.crop}
-                        onChange={(e) => setWizardPreferences(prev => ({...prev, Rabi: {...prev.Rabi, crop: e.target.value, variety: ''}}))}
-                        className="w-full border border-outline-variant rounded-lg p-2 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
-                      >
-                        <option value="">AI Recommendation</option>
-                        <option value="Wheat">Wheat</option>
-                        <option value="Mustard">Mustard</option>
-                        <option value="Gram">Gram</option>
-                        <option value="Barley">Barley</option>
-                      </select>
+                      <div className="relative">
+                        <select 
+                          value={wizardPreferences.Rabi.crop}
+                          onChange={(e) => setWizardPreferences(prev => ({...prev, Rabi: {...prev.Rabi, crop: e.target.value, variety: '', customCrop: ''}}))}
+                          className="w-full border border-outline-variant rounded-lg p-2 pr-8 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
+                        >
+                          <option value="">🤖 AI Recommendation</option>
+                          <optgroup label="── Cereals ──">
+                            <option value="Wheat">Wheat (Gehun)</option>
+                            <option value="Barley">Barley (Jau)</option>
+                            <option value="Oat">Oat (Jai)</option>
+                          </optgroup>
+                          <optgroup label="── Pulses ──">
+                            <option value="Gram">Gram / Chickpea (Chana)</option>
+                            <option value="Lentil">Lentil (Masoor)</option>
+                            <option value="Pea">Field Pea (Matar)</option>
+                            <option value="Rajma">Rajma (Kidney Bean)</option>
+                          </optgroup>
+                          <optgroup label="── Oilseeds ──">
+                            <option value="Mustard">Mustard (Sarson)</option>
+                            <option value="Linseed">Linseed (Alsi)</option>
+                            <option value="Safflower">Safflower (Kardi)</option>
+                            <option value="Sunflower">Sunflower (Rabi)</option>
+                          </optgroup>
+                          <optgroup label="── Vegetables ──">
+                            <option value="Potato">Potato (Aloo)</option>
+                            <option value="Onion">Onion (Pyaaz)</option>
+                            <option value="Garlic">Garlic (Lahsun)</option>
+                            <option value="Cauliflower">Cauliflower (Phool Gobhi)</option>
+                            <option value="Cabbage">Cabbage (Patta Gobhi)</option>
+                            <option value="Spinach">Spinach (Palak)</option>
+                            <option value="Carrot">Carrot (Gajar)</option>
+                            <option value="Radish">Radish (Mooli)</option>
+                            <option value="Turnip">Turnip (Shalgam)</option>
+                            <option value="Methi">Methi (Fenugreek)</option>
+                          </optgroup>
+                          <optgroup label="── Cash Crops ──">
+                            <option value="Sugarcane">Sugarcane (Rabi planting)</option>
+                          </optgroup>
+                          <optgroup label="── Others ──">
+                            <option value="Other">✏️ Other (Enter custom crop)</option>
+                          </optgroup>
+                        </select>
+                        <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" />
+                      </div>
+                      {wizardPreferences.Rabi.crop === 'Other' && (
+                        <input
+                          type="text"
+                          placeholder="Type your crop name..."
+                          value={wizardPreferences.Rabi.customCrop || ''}
+                          onChange={(e) => setWizardPreferences(prev => ({...prev, Rabi: {...prev.Rabi, customCrop: e.target.value}}))}
+                          className="mt-2 w-full border border-primary/50 rounded-lg p-2 text-xs focus:outline-none focus:border-primary bg-white"
+                        />
+                      )}
                     </div>
-                    {wizardPreferences.Rabi.crop === 'Wheat' && (
+                    {wizardPreferences.Rabi.crop && wizardPreferences.Rabi.crop !== 'Other' && (
                       <div className="relative">
                         <label className="text-[10px] font-bold text-on-surface-variant block mb-1">Preferred Variety</label>
-                        <select 
-                          value={wizardPreferences.Rabi.variety}
-                          onChange={(e) => setWizardPreferences(prev => ({...prev, Rabi: {...prev.Rabi, variety: e.target.value}}))}
-                          className="w-full border border-outline-variant rounded-lg p-2 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
-                        >
-                          <option value="">Let AI Decide</option>
-                          <option value="HD-2967">HD-2967</option>
-                          <option value="PBW-725">PBW-725</option>
-                          <option value="DBW-187">Karan Vandana (DBW-187)</option>
-                        </select>
+                        <div className="relative">
+                          <select 
+                            value={wizardPreferences.Rabi.variety}
+                            onChange={(e) => setWizardPreferences(prev => ({...prev, Rabi: {...prev.Rabi, variety: e.target.value}}))}
+                            className="w-full border border-outline-variant rounded-lg p-2 pr-8 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
+                          >
+                            <option value="">🤖 Let AI Decide</option>
+                            {wizardPreferences.Rabi.crop === 'Wheat' && (<>
+                              <option value="HD-2967">HD-2967</option>
+                              <option value="PBW-725">PBW-725</option>
+                              <option value="DBW-187">Karan Vandana (DBW-187)</option>
+                              <option value="GW-322">Lok-1 (GW-322)</option>
+                              <option value="K-307">K-307</option>
+                            </>)}
+                            {wizardPreferences.Rabi.crop === 'Mustard' && (<>
+                              <option value="Pusa Bold">Pusa Bold</option>
+                              <option value="RH-749">RH-749</option>
+                              <option value="RH-8812">RH-8812</option>
+                            </>)}
+                            {wizardPreferences.Rabi.crop === 'Gram' && (<>
+                              <option value="JG-11">JG-11</option>
+                              <option value="Pusa 256">Pusa 256</option>
+                              <option value="KAK-2">KAK-2</option>
+                            </>)}
+                            {wizardPreferences.Rabi.crop === 'Potato' && (<>
+                              <option value="Kufri Jyoti">Kufri Jyoti</option>
+                              <option value="Kufri Pukhraj">Kufri Pukhraj</option>
+                              <option value="Kufri Chipsona">Kufri Chipsona</option>
+                            </>)}
+                          </select>
+                          <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" />
+                        </div>
                       </div>
                     )}
                   </div>
@@ -707,23 +846,85 @@ export default function AnnualPlanner({
                 {/* Zaid */}
                 <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/40">
                   <h4 className="text-xs font-bold text-on-surface mb-3 flex items-center gap-2">
-                    <Sprout className="w-4 h-4 text-green-500" /> Zaid (Summer)
+                    <Sprout className="w-4 h-4 text-green-500" /> Zaid (Summer — April to June)
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="relative">
                       <label className="text-[10px] font-bold text-on-surface-variant block mb-1">Select Crop</label>
-                      <select 
-                        value={wizardPreferences.Zaid.crop}
-                        onChange={(e) => setWizardPreferences(prev => ({...prev, Zaid: {...prev.Zaid, crop: e.target.value, variety: ''}}))}
-                        className="w-full border border-outline-variant rounded-lg p-2 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
-                      >
-                        <option value="">AI Recommendation</option>
-                        <option value="Green Gram">Green Gram</option>
-                        <option value="Watermelon">Watermelon</option>
-                        <option value="Muskmelon">Muskmelon</option>
-                        <option value="Fodder">Fodder Crops</option>
-                      </select>
+                      <div className="relative">
+                        <select 
+                          value={wizardPreferences.Zaid.crop}
+                          onChange={(e) => setWizardPreferences(prev => ({...prev, Zaid: {...prev.Zaid, crop: e.target.value, variety: '', customCrop: ''}}))}
+                          className="w-full border border-outline-variant rounded-lg p-2 pr-8 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
+                        >
+                          <option value="">🤖 AI Recommendation</option>
+                          <optgroup label="── Short Duration Pulses ──">
+                            <option value="Green Gram">Green Gram (Moong)</option>
+                            <option value="Black Gram">Black Gram (Urad)</option>
+                            <option value="Cowpea">Cowpea (Lobia)</option>
+                          </optgroup>
+                          <optgroup label="── Vegetables ──">
+                            <option value="Watermelon">Watermelon (Tarbooz)</option>
+                            <option value="Muskmelon">Muskmelon (Kharbooja)</option>
+                            <option value="Cucumber">Cucumber (Kheera)</option>
+                            <option value="Pumpkin">Pumpkin (Kaddu)</option>
+                            <option value="Sponge Gourd">Sponge Gourd (Turai)</option>
+                            <option value="Snake Gourd">Snake Gourd</option>
+                            <option value="Ridge Gourd">Ridge Gourd (Tinda)</option>
+                            <option value="Amaranth">Amaranth (Chaulai)</option>
+                            <option value="Cluster Bean">Cluster Bean (Guar)</option>
+                          </optgroup>
+                          <optgroup label="── Fodder & Cover Crops ──">
+                            <option value="Bajra Fodder">Bajra Fodder</option>
+                            <option value="Jowar Fodder">Jowar Fodder</option>
+                            <option value="Maize Fodder">Maize Fodder</option>
+                            <option value="Sunhemp">Sunhemp (Green Manure)</option>
+                            <option value="Dhaincha">Dhaincha (Green Manure)</option>
+                          </optgroup>
+                          <optgroup label="── Others ──">
+                            <option value="Sesame">Sesame (Til)</option>
+                            <option value="Sunflower">Sunflower (Summer)</option>
+                            <option value="Jute">Jute</option>
+                            <option value="Other">✏️ Other (Enter custom crop)</option>
+                          </optgroup>
+                        </select>
+                        <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" />
+                      </div>
+                      {wizardPreferences.Zaid.crop === 'Other' && (
+                        <input
+                          type="text"
+                          placeholder="Type your crop name..."
+                          value={wizardPreferences.Zaid.customCrop || ''}
+                          onChange={(e) => setWizardPreferences(prev => ({...prev, Zaid: {...prev.Zaid, customCrop: e.target.value}}))}
+                          className="mt-2 w-full border border-primary/50 rounded-lg p-2 text-xs focus:outline-none focus:border-primary bg-white"
+                        />
+                      )}
                     </div>
+                    {wizardPreferences.Zaid.crop && wizardPreferences.Zaid.crop !== 'Other' && (
+                      <div className="relative">
+                        <label className="text-[10px] font-bold text-on-surface-variant block mb-1">Preferred Variety</label>
+                        <div className="relative">
+                          <select 
+                            value={wizardPreferences.Zaid.variety}
+                            onChange={(e) => setWizardPreferences(prev => ({...prev, Zaid: {...prev.Zaid, variety: e.target.value}}))}
+                            className="w-full border border-outline-variant rounded-lg p-2 pr-8 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
+                          >
+                            <option value="">🤖 Let AI Decide</option>
+                            {wizardPreferences.Zaid.crop === 'Watermelon' && (<>
+                              <option value="Sugar Baby">Sugar Baby</option>
+                              <option value="Arka Manik">Arka Manik</option>
+                              <option value="Durgapura Meetha">Durgapura Meetha</option>
+                            </>)}
+                            {wizardPreferences.Zaid.crop === 'Green Gram' && (<>
+                              <option value="Pusa Vishal">Pusa Vishal</option>
+                              <option value="HUM 1">HUM 1</option>
+                              <option value="SML 668">SML 668</option>
+                            </>)}
+                          </select>
+                          <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

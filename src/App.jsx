@@ -3,7 +3,7 @@ import {
   Check, Volume2, Mic, MapPin, Plus, Trash2, Edit3, ArrowLeft, ArrowRight,
   Info, Cpu, Shield, Sparkles, PlusCircle, HelpCircle, Layers, Droplet,
   Smartphone, Wifi, Users, Truck, Compass, Sun, Wind, CloudRain, Calendar,
-  Activity, CheckCircle2, ChevronRight, RefreshCw, Upload, AlertCircle
+  Activity, CheckCircle2, ChevronRight, RefreshCw, Upload, AlertCircle, X
 } from 'lucide-react';
 import DashboardShell from './components/DashboardShell';
 import { fetchWeatherIntelligence } from './utils/weatherService';
@@ -107,21 +107,41 @@ const LOCALIZED_GUIDES = {
     welcome: 'किसानमित्र में आपका स्वागत है। आगे बढ़ने के लिए "शुरू करें" पर दबाएं।',
     otp: 'कृपया अपना १० अंकों का मोबाइल नंबर डालें और ओटीपी दर्ज करें।',
     lang: 'अपनी पसंदीदा भाषा चुनें और "पुष्टि करें और आगे बढ़ें" दबाएं।',
+    language: 'अपनी पसंदीदा भाषा चुनें और "पुष्टि करें और आगे बढ़ें" दबाएं।',
     profile: 'कृपया अपना नाम, राज्य, जिला और गाँव की जानकारी भरें।',
     step1: 'अपने खेत का नाम दर्ज करें और खेत की सीमा का नक्शा बनाएं।',
+    wizard_step1: 'अपने खेत का नाम दर्ज करें और खेत की सीमा का नक्शा बनाएं।',
     step2: 'अपनी वर्तमान फसल और मिट्टी का विवरण चुनें।',
+    wizard_step2: 'अपनी वर्तमान फसल और मिट्टी का विवरण चुनें।',
     step3: 'अपने पानी के स्रोत, सिंचाई विधि और उपलब्ध संसाधनों का चयन करें।',
-    review: 'खेत के विवरण की समीक्षा करें और इसे सहेजें।'
+    wizard_step3: 'अपने पानी के स्रोत, सिंचाई विधि और उपलब्ध संसाधनों का चयन करें।',
+    review: 'खेत के विवरण की समीक्षा करें और इसे सहेजें।',
+    dashboard: 'यह आपका कृषि डैशबोर्ड है। यहाँ आप अपने खेत की सेहत, फसल की वृद्धि और आज के कृषि कार्यों को देख सकते हैं।',
+    market: 'मंडी डिस्कवरी में आपका स्वागत है। यहाँ आप अपनी फसल के मंडी भाव, न्यूनतम समर्थन मूल्य (MSP) और नज़दीकी मंडियों की जानकारी पा सकते हैं।',
+    planner: 'यह फसल योजनाकार है। यहाँ आप पूरे साल का फसल चक्र और बीमारी का पूर्वानुमान देख सकते हैं।',
+    weather: 'यहाँ मौसम का पूर्वानुमान और चेतावनी देख सकते हैं ताकि फसल को नुकसान से बचाया जा सके।',
+    schemes: 'यह सरकारी योजनाएं हैं। यहाँ आप कृषि योजनाओं और अनुदान के लिए पात्रता देख सकते हैं।',
+    soil: 'यह मिट्टी का स्वास्थ्य कार्ड है। यहाँ आप अपनी मिट्टी की जांच और पोषक तत्वों की स्थिति देख सकते हैं।'
   },
   en: {
     welcome: 'Welcome to KisanMitra. Tap "Get Started" to personalize your digital companion.',
     otp: 'Please enter your 10-digit mobile number and verify using the OTP sent.',
     lang: 'Select your preferred language for text and voice guidance.',
+    language: 'Select your preferred language for text and voice guidance.',
     profile: 'Fill in your profile details. Location coordinates can be detected automatically.',
     step1: 'Give your farm a name and draw its boundary directly on the map.',
+    wizard_step1: 'Give your farm a name and draw its boundary directly on the map.',
     step2: 'Select your current crop cycle, sowing dates, and specify your soil properties.',
+    wizard_step2: 'Select your current crop cycle, sowing dates, and specify your soil properties.',
     step3: 'Select all water sources, irrigation equipment, and machinery you use.',
-    review: 'Review your complete farm profile before registering it.'
+    wizard_step3: 'Select all water sources, irrigation equipment, and machinery you use.',
+    review: 'Review your complete farm profile before registering it.',
+    dashboard: 'This is your farming dashboard. Here you can monitor farm health, crop progress, and your daily schedule.',
+    market: 'Welcome to Mandi Discovery. Here you can check crop prices, government Minimum Support Price (MSP), and find nearby mandis.',
+    planner: 'This is your crop planner. Check seasonal timelines, crop calendars, and disease risk forecasts here.',
+    weather: 'Here you can view hourly weather forecasts and local crop alerts to safeguard your harvest.',
+    schemes: 'This is schemes page. Discover government agricultural programs, subsidies, and verify your eligibility.',
+    soil: 'This is soil health card. Inspect soil nutrients, organic carbon levels, and expert corrective measures.'
   }
 };
 
@@ -526,7 +546,7 @@ const evaluateScheme = (scheme, profile, farm) => {
 export default function App() {
   const [view, setView] = useState('WELCOME');
   const [language, setLanguage] = useState('en');
-  const [voiceGuide, setVoiceGuide] = useState(true);
+  const [voiceGuide, setVoiceGuide] = useState(false);
   const [playingAudio, setPlayingAudio] = useState(null);
   
   // Auth state
@@ -1431,12 +1451,17 @@ Instructions:
     if (voiceGuide) {
       speakGuide();
     }
-  }, [view, language, voiceGuide]);
+  }, [view, activeDashboardTab, language, voiceGuide]);
 
   const speakGuide = () => {
-    const guideText = LOCALIZED_GUIDES[language]?.[view.toLowerCase()] || LOCALIZED_GUIDES['en']?.[view.toLowerCase()];
+    let key = view.toLowerCase();
+    if (view === 'DASHBOARD') {
+      key = activeDashboardTab.toLowerCase();
+    }
+    const guideText = LOCALIZED_GUIDES[language]?.[key] || LOCALIZED_GUIDES['en']?.[key];
     if (guideText) {
       setPlayingAudio(view);
+      speakText(guideText, language);
       setTimeout(() => setPlayingAudio(null), 4000);
     }
   };
@@ -1664,25 +1689,38 @@ Instructions:
       
       {/* TTS voice guide floating overlay */}
       {voiceGuide && (
-        <div className="fixed top-20 right-4 z-[100] max-w-xs md:max-w-sm bg-primary-container text-on-primary-container border-2 border-primary rounded-2xl shadow-2xl p-4 flex gap-3 items-start animate-bounce">
+        <div className="fixed bottom-24 right-4 z-[99] max-w-xs md:max-w-sm bg-primary-container text-on-primary-container border-2 border-primary rounded-2xl shadow-2xl p-4 flex gap-3 items-start animate-fade-in">
           <div className="p-2 rounded-full bg-primary/10 text-primary flex-shrink-0">
             <Volume2 className={`w-6 h-6 ${playingAudio ? 'animate-pulse' : ''}`} />
           </div>
-          <div>
+          <div className="flex-grow min-w-0">
             <div className="text-xs font-semibold text-primary uppercase tracking-wider mb-0.5 flex justify-between items-center">
               <span>Voice Guide Active</span>
               {playingAudio && <span className="h-1.5 w-1.5 bg-red-600 rounded-full animate-ping"></span>}
             </div>
-            <p className="text-sm font-medium">
-              {LOCALIZED_GUIDES[language]?.[view.toLowerCase()] || LOCALIZED_GUIDES['en']?.[view.toLowerCase()]}
+            <p className="text-sm font-medium leading-relaxed">
+              {(() => {
+                let key = view.toLowerCase();
+                if (view === 'DASHBOARD') {
+                  key = activeDashboardTab.toLowerCase();
+                }
+                return LOCALIZED_GUIDES[language]?.[key] || LOCALIZED_GUIDES['en']?.[key];
+              })()}
             </p>
             <button 
               onClick={speakGuide}
-              className="mt-2 text-xs font-bold text-primary flex items-center gap-1 hover:underline"
+              className="mt-2 text-xs font-bold text-primary flex items-center gap-1 hover:underline min-h-[36px]"
             >
               <RefreshCw className="w-3.5 h-3.5" /> Replay Voice Guidance
             </button>
           </div>
+          <button 
+            onClick={() => setVoiceGuide(false)}
+            className="p-1 rounded-xl hover:bg-primary/10 text-on-primary-container/70 hover:text-on-primary-container flex items-center justify-center min-h-[36px] min-w-[36px]"
+            title="Dismiss Guide"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
 

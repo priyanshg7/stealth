@@ -3,8 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
   body {
-    @apply bg-background text-on-surface font-sans antialiased;
+    @apply bg-background text-on-surface font-sans antialiased text-[15px] md:text-base leading-relaxed;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Form elements optimization for mobile */
+  input, textarea, select {
+    @apply text-[16px]; /* Prevents iOS Safari zoom */
   }
 }
 

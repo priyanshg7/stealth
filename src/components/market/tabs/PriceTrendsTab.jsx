@@ -381,8 +381,8 @@ export default function PriceTrendsTab({ mandi, activeFarm, liveMandiData }) {
       <div className="flex-1 space-y-6">
         
         {/* Title Block */}
-        <div className="bg-white p-5 rounded-3xl border border-outline-variant shadow-sm flex items-center justify-between gap-3">
-          <div className="min-w-0">
+        <div className="bg-white p-5 rounded-3xl border border-outline-variant shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="min-w-0 w-full">
             <h3 className="font-display font-extrabold text-xl text-on-surface flex items-center gap-2">
               <Activity className="text-primary flex-shrink-0" size={22} />
               MSP Time Series
@@ -396,16 +396,16 @@ export default function PriceTrendsTab({ mandi, activeFarm, liveMandiData }) {
             </p>
           </div>
           
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex flex-wrap items-center gap-2 flex-shrink-0 w-full md:w-auto">
             <button 
               onClick={() => setIsFiltersExpanded(!isFiltersExpanded)}
-              className="flex items-center gap-1.5 bg-surface-container-low text-primary border border-outline-variant hover:bg-surface-container px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm"
+              className="flex items-center gap-1.5 bg-surface-container-low text-primary border border-outline-variant hover:bg-surface-container px-3 py-2 md:px-2.5 md:py-1.5 rounded-lg text-sm md:text-xs font-bold transition-all shadow-sm min-h-[44px] md:min-h-0"
             >
               <Filter size={12} />
               {isFiltersExpanded ? 'Hide Filters' : 'Show Filters'}
             </button>
-            <div className="flex items-center gap-2 text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 px-3 py-1 rounded-md">
-              <ShieldCheck size={14} />
+            <div className="flex items-center gap-2 text-xs md:text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 px-3 py-2 md:py-1 rounded-md min-h-[44px] md:min-h-0">
+              <ShieldCheck size={16} className="md:w-3.5 md:h-3.5" />
               Official MSP Data
             </div>
           </div>

@@ -372,6 +372,40 @@ export default function FarmJourney({
                )}
              </div>
            </div>
+
+           {/* Farmer Notes & Diary — moved to left column for symmetry */}
+           <div className="bg-white rounded-card shadow-sm border border-outline-variant/60 p-6">
+             <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-primary"/> Farmer Notes & Diary</h3>
+             
+             {isHistorical ? (
+               <div className="space-y-3">
+                 <div className="p-3 bg-amber-50/50 border border-amber-100 rounded-xl relative">
+                   <div className="text-[10px] text-amber-800 font-bold mb-1">July 15, 2025</div>
+                   <p className="text-xs text-amber-900">Used a different weedicide (Bispyribac Sodium) this time. Results seem better than last year. Will monitor.</p>
+                 </div>
+                 <div className="p-3 bg-surface-container-lowest border border-outline-variant/40 rounded-xl relative">
+                   <div className="text-[10px] text-on-surface-variant font-bold mb-1">Sept 10, 2025</div>
+                   <p className="text-xs text-on-surface">Flowering started beautifully. Weather has been highly supportive this week.</p>
+                 </div>
+               </div>
+             ) : (
+               <div className="space-y-3">
+                 <textarea 
+                   className="w-full bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none placeholder:text-on-surface-variant/50"
+                   rows="3"
+                   placeholder="Record an observation, yield estimate, or note for future reference..."
+                 ></textarea>
+                 <div className="flex justify-between items-center">
+                   <button className="text-primary p-2 hover:bg-primary/10 rounded-lg transition-colors">
+                     <UploadCloud className="w-5 h-5" />
+                   </button>
+                   <button className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-xl text-xs transition-colors">
+                     Save Note
+                   </button>
+                 </div>
+               </div>
+             )}
+           </div>
         </div>
 
         {/* Right Column (Upcoming, Analytics, Notes) - Takes 1/3 space */}
@@ -494,39 +528,7 @@ export default function FarmJourney({
             </div>
           )}
 
-          {/* Notes & Media */}
-          <div className="bg-white rounded-card shadow-sm border border-outline-variant/60 p-6">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-primary"/> Farmer Notes & Diary</h3>
-            
-            {isHistorical ? (
-              <div className="space-y-3">
-                <div className="p-3 bg-amber-50/50 border border-amber-100 rounded-xl relative">
-                  <div className="text-[10px] text-amber-800 font-bold mb-1">July 15, 2025</div>
-                  <p className="text-xs text-amber-900">Used a different weedicide (Bispyribac Sodium) this time. Results seem better than last year. Will monitor.</p>
-                </div>
-                <div className="p-3 bg-surface-container-lowest border border-outline-variant/40 rounded-xl relative">
-                  <div className="text-[10px] text-on-surface-variant font-bold mb-1">Sept 10, 2025</div>
-                  <p className="text-xs text-on-surface">Flowering started beautifully. Weather has been highly supportive this week.</p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <textarea 
-                  className="w-full bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none placeholder:text-on-surface-variant/50"
-                  rows="3"
-                  placeholder="Record an observation, yield estimate, or note for future reference..."
-                ></textarea>
-                <div className="flex justify-between items-center">
-                  <button className="text-primary p-2 hover:bg-primary/10 rounded-lg transition-colors">
-                    <UploadCloud className="w-5 h-5" />
-                  </button>
-                  <button className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-xl text-xs transition-colors">
-                    Save Note
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Notes moved to left column — removed from right column */}
         </div>
       </div>
     </div>

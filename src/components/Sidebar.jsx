@@ -151,10 +151,10 @@ export default function Sidebar({
                 onClick={() => handleNavClick(item.id)}
                 title={sidebarCollapsed ? tr(item.label, language) : undefined}
                 className={`
-                  w-full flex items-center font-semibold text-sm transition-all duration-300 whitespace-nowrap overflow-hidden
+                  w-full flex items-center font-semibold text-[15px] transition-all duration-300 whitespace-nowrap overflow-hidden
                   ${sidebarCollapsed
-                    ? 'lg:justify-center px-4 py-3 justify-start gap-3'
-                    : 'px-4 py-3 gap-3'
+                    ? 'lg:justify-center px-4 py-3.5 justify-start gap-4'
+                    : 'px-4 py-3.5 gap-4'
                   }
                   ${isActive 
                     ? 'bg-primary/10 text-primary border-l-4 border-primary' 

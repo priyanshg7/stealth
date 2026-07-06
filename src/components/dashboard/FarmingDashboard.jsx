@@ -1,5 +1,12 @@
 import { t } from '../../utils/translations';
 import React from 'react';
+import { 
+  Check, Volume2, Mic, MapPin, Plus, Trash2, Edit3, ArrowLeft, ArrowRight,
+  Info, Cpu, Shield, Sparkles, PlusCircle, HelpCircle, Layers, Droplet,
+  Smartphone, Wifi, Users, Truck, Compass, Sun, Wind, CloudRain, Calendar,
+  Activity, CheckCircle2, ChevronRight, RefreshCw, Upload, AlertCircle, X,
+  TrendingUp, ShieldAlert, BadgeInfo, Clock, Leaf, Droplets, BarChart3
+} from 'lucide-react';
 
 export default function FarmingDashboard({
   farms,
@@ -27,15 +34,36 @@ export default function FarmingDashboard({
   translating,
   language,
   weatherData,
-  weatherLoading
+  weatherLoading,
+  seasonPlanConfirmed,
+  setSeasonPlanConfirmed,
+  profile
 }) {
   const activeFarm = farms[selectedFarmIndex];
   const dashboardData = activeFarm ? getFarmDashboardData(activeFarm) : null;
 
-  if (!dashboardData) return null;
+  // Compute time-of-day greeting
+  const hour = new Date().getHours();
+  const timeGreeting = hour < 12 ? t('Good Morning', language) : hour < 17 ? t('Good Afternoon', language) : t('Good Evening', language);
+  const farmerName = profile?.name || activeFarm?.owner || 'Farmer';
+
+  // Onboarding Wizard triggers
+  const handleStartAnnualPlan = () => {
+    setSeasonPlanConfirmed(true);
+    localStorage.setItem('km_season_confirmed', 'true');
+    setActiveDashboardTab('planner');
+  };
+
+  const handleStartSeasonPlan = () => {
+    setSeasonPlanConfirmed(true);
+    localStorage.setItem('km_season_confirmed', 'true');
+    setActiveDashboardTab('season_planner');
+  };
+
+  if (!dashboardData && farms.length > 0) return null;
 
   return (
-    <div className="space-y-6 animate-fade-in-up font-sans">
+    <div className="space-y-5 animate-fade-in-up font-sans pb-10">
       {translating && (
         <div className="bg-primary/10 text-primary border border-primary/20 rounded-xl p-3 text-xs font-bold flex items-center gap-2 animate-pulse">
           <span className="material-symbols-outlined text-sm font-bold animate-spin">sync</span>
@@ -43,105 +71,162 @@ export default function FarmingDashboard({
         </div>
       )}
 
-      {/* 1. Horizontal Farm Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-surface-container-high pb-4">
+      {/* ──── 1. GREETING & FARM SWITCHER ──── */}
+      <div className="space-y-3">
         <div>
-          <span className="text-xs text-on-surface-variant font-bold uppercase tracking-wider">{t("Select Active Farm Profile", language)}</span>
-          <div className="flex items-center gap-2 mt-1 overflow-x-auto no-scrollbar py-1">
+          <h1 className="text-xl md:text-2xl font-extrabold text-on-surface tracking-tight leading-tight">
+            {timeGreeting}, <span className="text-primary">{farmerName}</span> 🌾
+          </h1>
+          <p className="text-xs font-semibold text-on-surface-variant/80 mt-0.5">
+            {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            {activeFarm && <> · <strong>{activeFarm.name}</strong> ({activeFarm.area} {activeFarm.unit})</>}
+          </p>
+        </div>
+
+        {/* Horizontal Farm Swapper */}
+        <div className="space-y-2">
+          <span className="text-[11px] text-on-surface-variant font-bold uppercase tracking-wider block">My Farm Profiles</span>
+          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-1">
             {farms.map((f, i) => (
               <button
                 key={i}
                 onClick={() => setSelectedFarmIndex(i)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 ${
+                className={`p-4 rounded-card border transition-all text-left shrink-0 min-w-[200px] w-64 shadow-xs relative ${
                   selectedFarmIndex === i
-                    ? 'bg-primary text-white border-primary shadow-md'
-                    : 'bg-white hover:bg-surface-container-low border-outline-variant text-on-surface-variant'
+                    ? 'bg-white border-2 border-primary ring-2 ring-primary/10'
+                    : 'bg-white border-outline-variant/60 hover:border-primary/45'
                 }`}
               >
-                🚜 {f.name} ({f.area} {f.unit})
+                <div className="flex justify-between items-start mb-2">
+                  <span className="font-extrabold text-sm text-on-surface flex items-center gap-1">
+                    🚜 {f.name}
+                  </span>
+                  <span className="text-[10px] bg-primary/10 text-primary font-black px-2 py-0.5 rounded-full">
+                    {f.area} {f.unit}
+                  </span>
+                </div>
+                <div className="text-[11px] text-on-surface-variant/90 font-bold space-y-0.5">
+                  <div>Crop: <span className="text-primary">{f.crop?.name}</span></div>
+                  <div>Stage: <span className="text-on-surface">{f.crop?.stage || 'Sowing'}</span></div>
+                  <div className="flex justify-between items-center mt-2 border-t pt-1.5 border-outline-variant/30">
+                    <span>Farm Health</span>
+                    <span className="text-primary font-extrabold">{f.crop?.confirmedPlan ? '92%' : '88%'}</span>
+                  </div>
+                </div>
               </button>
             ))}
             <button
               onClick={startNewFarmRegistration}
-              className="px-3 py-2 rounded-xl text-xs font-bold border-2 border-dashed border-primary/50 text-primary bg-primary/5 hover:bg-primary/10 shrink-0"
+              className="p-4 rounded-card border-2 border-dashed border-primary/50 text-primary bg-primary/5 hover:bg-primary/10 flex flex-col justify-center items-center text-center shrink-0 min-w-[180px] h-[106px] transition-colors"
             >
-              + {t("Add Farm", language)}
+              <PlusCircle className="w-6 h-6 mb-1" />
+              <span className="text-xs font-bold">{t("Add New Farm", language)}</span>
             </button>
           </div>
         </div>
-
-        <div className="text-xs text-on-surface-variant font-semibold flex items-center gap-1.5 shrink-0 bg-white border p-2 rounded-xl">
-          <span className="material-symbols-outlined text-primary text-sm font-bold animate-spin-slow">sync</span>
-          <span>{t("All details sync with:", language)} <strong>{activeFarm?.crop?.name?.toUpperCase()}</strong></span>
-        </div>
       </div>
 
-      {/* 2. Farm Digital Twin Card */}
-      <div className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-44 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-
-          {/* Visual illustration / Ring */}
-          <div className="flex items-center gap-4 border-b lg:border-b-0 lg:border-r border-surface-container-high pb-4 lg:pb-0 lg:pr-6">
-            <div className="relative flex-shrink-0">
-              <svg width="90" height="90" className="progress-ring">
-                <circle stroke="#e9f0e5" strokeWidth="8" fill="transparent" r="36" cx="45" cy="45" />
-                <circle
-                  stroke="#006b2c"
-                  strokeWidth="8"
-                  fill="transparent"
-                  r="36"
-                  cx="45"
-                  cy="45"
-                  className="progress-ring__circle"
-                  strokeDasharray="226"
-                  strokeDashoffset={226 - (226 * (dashboardData.growthProgress || 0) / 100)}
-                />
-              </svg>
-              <span className="absolute inset-0 flex items-center justify-center text-3xl animate-bounce">
-                {dashboardData.cropIcon}
-              </span>
+      {/* 2. Start Your Farming Journey (Onboarding Hero) */}
+      {!seasonPlanConfirmed && (
+        <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-white border border-primary/30 rounded-card p-6 shadow-md space-y-5 animate-fade-in-up">
+          <div className="flex gap-4 items-start">
+            <div className="p-3 rounded-2xl bg-primary text-white shadow-md">
+              <Sparkles className="w-6 h-6" />
             </div>
-
             <div>
-              <span className="text-xs text-on-surface-variant font-bold uppercase block">{t("Active Digital Twin", language)}</span>
-              <h3 className="font-display font-extrabold text-xl text-on-surface">
-                {activeFarm?.name}
-              </h3>
-              <p className="text-xs text-on-surface-variant font-bold mt-0.5">
-                Crop: <span className="text-primary">{dashboardData.cropName} ({activeFarm?.crop?.variety})</span>
+              <h2 className="text-lg font-black text-on-surface">Start Your Farming Journey</h2>
+              <p className="text-xs text-on-surface-variant font-semibold mt-1">
+                Plan your seasons before you sow! Let AI guide your farm's schedule, predict diseases, analyze market prices, and optimize watering cycles.
               </p>
             </div>
           </div>
 
-          {/* Center parameters */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-4 lg:col-span-2">
-            {[
-              { label: t('Crop Growth Stage', language), val: activeFarm?.crop?.stage, icon: 'psychology' },
-              { label: t('Health Score', language), val: `${dashboardData.healthScore} / 100`, icon: 'favorite', color: 'text-red-600' },
-              { label: t('Growth Progress', language), val: `${dashboardData.growthProgress}%`, icon: 'donut_large' },
-              { label: t('Expected Yield', language), val: dashboardData.expectedYield, icon: 'inventory_2' },
-              { label: t('Harvest Countdown', language), val: `${dashboardData.harvestDays} ${t('Days left', language)}`, icon: 'schedule' },
-              { label: t('Estimated Profit', language), val: `₹${dashboardData.estimatedProfit.toLocaleString('en-IN')}`, icon: 'payments', color: 'text-green-700' },
-              { label: t('Disease Risk', language), val: dashboardData.diseaseRisk, icon: 'pest_control', color: dashboardData.diseaseRisk === 'Low' ? 'text-primary' : 'text-amber-600' },
-              { label: t('Water Status', language), val: dashboardData.waterStatus, icon: 'water_drop', color: 'text-blue-600' }
-            ].map((param, idx) => (
-              <div key={idx} className="bg-surface-container-low/60 rounded-xl p-3 border border-outline-variant/30 flex items-start gap-2.5">
-                <span className={`material-symbols-outlined text-sm mt-0.5 ${param.color || 'text-on-surface-variant'}`}>{param.icon}</span>
-                <div>
-                  <span className="text-[10px] text-on-surface-variant block font-medium leading-none mb-1">{param.label}</span>
-                  <span className="text-xs font-extrabold text-on-surface">{param.val}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+            {/* Annual Plan Card */}
+            <div className="bg-white p-5 rounded-2xl border border-outline-variant hover:border-primary/50 transition-all shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] text-primary font-black uppercase tracking-wider">Recommended workflow</span>
+                <h3 className="font-extrabold text-base text-on-surface mt-1">Create Annual Farm Plan</h3>
+                <p className="text-xs text-on-surface-variant font-medium mt-1">
+                  Plan your entire year across Kharif, Rabi, and Zaid seasons. Auto-calculates optimal crop rotations to replenish soil nutrients.
+                </p>
+                <div className="flex gap-2 items-center text-[10px] text-on-surface-variant font-bold mt-3">
+                  <span className="bg-surface-container-high px-2 py-0.5 rounded">Takes 3-5 min</span>
+                  <span className="text-green-700">✓ Full rotation benefits</span>
                 </div>
               </div>
-            ))}
+              <button 
+                onClick={handleStartAnnualPlan}
+                className="w-full bg-primary hover:bg-secondary text-white font-extrabold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all mt-4"
+              >
+                Create Annual Plan <ArrowRight size={14} />
+              </button>
+            </div>
+
+            {/* Seasonal Plan Card */}
+            <div className="bg-white p-5 rounded-2xl border border-outline-variant hover:border-primary/50 transition-all shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] text-on-surface-variant font-black uppercase tracking-wider">Single crop cycle</span>
+                <h3 className="font-extrabold text-base text-on-surface mt-1">Create Seasonal Plan</h3>
+                <p className="text-xs text-on-surface-variant font-medium mt-1">
+                  Quickly set up a schedule for a single season. Generates localized irrigation alerts, weather advisory, and weekly diagnostics.
+                </p>
+                <div className="flex gap-2 items-center text-[10px] text-on-surface-variant font-bold mt-3">
+                  <span className="bg-surface-container-high px-2 py-0.5 rounded">Takes 2 min</span>
+                  <span className="text-primary">✓ Quick setup</span>
+                </div>
+              </div>
+              <button 
+                onClick={handleStartSeasonPlan}
+                className="w-full bg-white border-2 border-primary text-primary hover:bg-primary/5 font-extrabold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all mt-4"
+              >
+                Create Seasonal Plan <ArrowRight size={14} />
+              </button>
+            </div>
           </div>
 
+          {/* Onboarding Checklist & Pre-fill Option */}
+          <div className="pt-4 border-t border-outline-variant/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-on-surface-variant">
+              <span>Setup Progress:</span>
+              <span className="flex items-center gap-1 text-green-700"><CheckCircle2 size={14} /> Profile Setup</span>
+              <span className="flex items-center gap-1 text-green-700"><CheckCircle2 size={14} /> Saved Farm</span>
+              <span className="flex items-center gap-1 text-on-surface-variant/40">○ Annual Plan</span>
+              <span className="flex items-center gap-1 text-on-surface-variant/40">○ Seasonal Plan</span>
+            </div>
+            {farms.length > 0 && (
+              <button 
+                onClick={handleStartSeasonPlan}
+                className="text-xs font-extrabold text-primary flex items-center gap-1 hover:underline min-h-[36px]"
+              >
+                <RefreshCw size={12} /> Use Existing Farm Data to Pre-fill
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* 3. Today's Work Schedule */}
-      <div className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
+      {/* 3. Farm Status Summary (Human-readable text summary block) */}
+      {dashboardData && (
+        <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-xs space-y-2">
+          <h2 className="text-sm font-extrabold text-on-surface uppercase tracking-wider text-primary flex items-center gap-1.5">
+            <BadgeInfo size={16} /> Daily Farm Advisor Overview
+          </h2>
+          <p className="text-sm font-medium leading-relaxed text-on-surface-variant">
+            Your crop is progressing <strong className="text-primary">normally</strong> and is healthy. 
+            {dashboardData.diseaseRisk === 'Low' ? ' No urgent disease threat exists today.' : ' A minor disease advisory is active for your area.'}
+            {weatherData?.forecast?.[0]?.rainProbability > 40 
+              ? ' Expected rainfall soon may cover current watering cycles.' 
+              : ' Your soil moisture is stable, but plan next watering in 3 days.'}
+            {dashboardData.market?.recommendation === 'Sell' 
+              ? ' Mandi rates are exceptionally favorable; it is a good time to transport.' 
+              : ' Mandi prices are currently stable; recommend holding for better wholesale returns.'}
+          </p>
+        </div>
+      )}
+
+      {/* 4. Today's Work Schedule (TIMELINE & CHECKLIST) */}
+      <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-4">
         <div className="flex justify-between items-center border-b border-surface-container-high pb-3">
           <div>
             <h3 className="font-display font-extrabold text-lg text-on-surface flex items-center gap-2">
@@ -152,7 +237,7 @@ export default function FarmingDashboard({
           </div>
           <button
             onClick={() => setShowAllTasksModal(true)}
-            className="text-xs font-bold text-primary hover:underline"
+            className="text-xs font-bold text-primary hover:underline min-h-[36px]"
           >
             {t("View Next 7 Days", language)}
           </button>
@@ -160,7 +245,7 @@ export default function FarmingDashboard({
 
         <div className="space-y-4">
           {(() => {
-            const tasks = dashboardData.tasks || [];
+            const tasks = dashboardData?.tasks || [];
             const pending = tasks.filter(task => !completedTasks.includes(task.id));
 
             if (pending.length === 0) {
@@ -174,7 +259,7 @@ export default function FarmingDashboard({
                   {completedTasks.length > 0 && (
                     <button
                       onClick={() => setCompletedTasks([])}
-                      className="text-xs font-bold text-primary border border-primary/20 rounded-lg px-3 py-1 bg-white hover:bg-primary/5"
+                      className="text-xs font-bold text-primary border border-primary/20 rounded-lg px-3 py-1.5 bg-white hover:bg-primary/5 min-h-[36px]"
                     >
                       {t("Undo Completed Tasks", language)}
                     </button>
@@ -183,151 +268,138 @@ export default function FarmingDashboard({
               );
             }
 
-            return (
-              <div className="space-y-3">
-                {pending.map(task => (
-                  <div
-                    key={task.id}
-                    className="p-4 rounded-2xl border border-outline-variant/80 bg-white hover:border-primary/40 shadow-xs hover:shadow-sm transition-all flex flex-col md:flex-row gap-4 items-start"
-                  >
-                    {/* Left side: Time, category */}
-                    <div className="md:w-36 flex-shrink-0 flex md:flex-col justify-between md:justify-start gap-2">
-                      <div>
-                        <span className="text-xs text-primary font-bold bg-primary/10 rounded-md px-2 py-0.5 block w-max">
-                          {task.category}
-                        </span>
-                        <span className="text-sm font-extrabold text-on-surface mt-1.5 block">
-                          ⏰ {task.time}
-                        </span>
-                      </div>
-                      <div className="flex md:flex-col items-center md:items-start gap-1">
-                        <span className="text-[10px] text-on-surface-variant font-medium">{t("Duration:", language)} {task.duration}</span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          task.priority === 'High' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-800 border border-amber-200'
-                        }`}>
-                          {task.priority === 'High' ? t("High Priority", language) : t("Medium Priority", language)}
-                        </span>
-                      </div>
-                    </div>
+            // Group tasks by priority
+            const highPriority = pending.filter(t => t.priority === 'High');
+            const medPriority = pending.filter(t => t.priority === 'Medium');
+            const lowPriority = pending.filter(t => t.priority === 'Low');
 
-                    {/* Center: Details */}
-                    <div className="flex-1 space-y-2">
-                      <h4 className="font-bold text-base text-on-surface">{task.title}</h4>
-                      <div className="text-xs text-on-surface-variant space-y-1 bg-surface-container-low/40 p-3 rounded-xl border border-outline-variant/30">
-                        <p>💡 <strong>Why:</strong> {task.why}</p>
-                        <p>📈 <strong>Expected Benefit:</strong> <span className="text-primary font-semibold">{task.benefit}</span></p>
-                        <p className="mt-1 text-[11px] text-on-surface-variant">🎒 <strong>Required inputs:</strong> {task.resources}</p>
-                      </div>
-                    </div>
-
-                    {/* Right side: Action CTA */}
-                    <div className="w-full md:w-auto flex md:flex-col justify-end gap-2.5 self-center">
-                      <button
-                        onClick={() => setCompletedTasks([...completedTasks, task.id])}
-                        className="flex-grow md:flex-grow-0 bg-primary hover:bg-secondary text-white font-extrabold px-5 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
+            const renderTaskList = (list, label, colorClass) => {
+              if (list.length === 0) return null;
+              return (
+                <div className="space-y-2">
+                  <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${colorClass} w-fit block`}>
+                    {label} Priority Tasks
+                  </span>
+                  <div className="space-y-2.5">
+                    {list.map(task => (
+                      <div
+                        key={task.id}
+                        className="p-4 rounded-2xl border border-outline-variant/80 bg-white hover:border-primary/45 shadow-xs hover:shadow-sm transition-all flex flex-col md:flex-row gap-4 justify-between items-start md:items-center"
                       >
-                        <span className="material-symbols-outlined text-sm font-bold">check</span>
-                        <span>{t("Complete", language)}</span>
-                      </button>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => {
-                            setActiveDialogTask(task);
-                            setSelectedRescheduleDate('');
-                          }}
-                          className="flex-1 p-2 rounded-xl border border-outline-variant/60 hover:bg-surface-container text-xs text-on-surface-variant font-bold flex items-center justify-center gap-1"
-                        >
-                          <span className="material-symbols-outlined text-xs">calendar_today</span>
-                          {t("Reschedule", language)}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setVoiceAssistantOpen(true);
-                            setVoiceReplies(prev => [
-                              ...prev,
-                              { sender: 'user', text: `Tell me about task: ${task.title}` },
-                              { sender: 'ai', text: `Sure. The task "${task.title}" is scheduled at ${task.time}. It is recommended because: ${task.why}. Benefit: ${task.benefit}.` }
-                            ]);
-                          }}
-                          className="p-2 rounded-xl border border-outline-variant/60 hover:bg-surface-container text-primary flex items-center justify-center"
-                          title={t("Ask Voice Assistant", language)}
-                        >
-                          <span className="material-symbols-outlined text-sm font-bold">mic</span>
-                        </button>
+                        <div className="space-y-1.5 flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-primary font-bold bg-primary/10 rounded px-2 py-0.5">
+                              {task.category}
+                            </span>
+                            <span className="text-xs text-on-surface-variant font-semibold">
+                              ⏰ {task.time} ({task.duration})
+                            </span>
+                          </div>
+                          <h4 className="font-bold text-sm text-on-surface">{task.title}</h4>
+                          <p className="text-[11px] text-on-surface-variant font-medium">
+                            💡 <strong>Why:</strong> {task.why} | 📈 <strong>Expected Benefit:</strong> <span className="text-primary font-bold">{task.benefit}</span>
+                          </p>
+                        </div>
+                        <div className="w-full md:w-auto flex gap-2 pt-2 md:pt-0 shrink-0">
+                          <button
+                            onClick={() => setCompletedTasks([...completedTasks, task.id])}
+                            className="flex-grow md:flex-grow-0 bg-primary hover:bg-secondary text-white font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
+                          >
+                            <Check size={14} /> Complete
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActiveDialogTask(task);
+                              setSelectedRescheduleDate('');
+                            }}
+                            className="flex-grow md:flex-grow-0 border border-outline-variant/60 hover:bg-surface-container text-on-surface-variant font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
+                          >
+                            Reschedule
+                          </button>
+                        </div>
                       </div>
-                    </div>
-
+                    ))}
                   </div>
-                ))}
+                </div>
+              );
+            };
+
+            return (
+              <div className="space-y-4">
+                {renderTaskList(highPriority, 'High', 'bg-red-50 text-red-700 border border-red-200')}
+                {renderTaskList(medPriority, 'Medium', 'bg-amber-50 text-amber-800 border border-amber-200')}
+                {renderTaskList(lowPriority, 'Low', 'bg-slate-50 text-slate-700 border border-outline-variant')}
               </div>
             );
           })()}
         </div>
       </div>
 
-      {/* 4. Intelligent Action Feed */}
-      <div className="space-y-3">
-        <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 px-1">
-          <span className="material-symbols-outlined text-amber-600 font-bold">bolt</span>
-          {t("Dynamic Advisor Action Feed", language)}
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {(() => {
-            const actions = dashboardData.actionFeed || [];
-            if (actions.length === 0) {
-              return (
-                <div className="md:col-span-2 p-4 bg-white rounded-2xl border text-center text-xs font-semibold text-on-surface-variant">
-                  No immediate warnings. Your fields are running smoothly!
-                </div>
-              );
-            }
-
-            return actions.map(act => (
-              <div key={act.id} className="bg-white border-l-4 border-l-amber-500 border border-outline-variant/60 rounded-card p-5 shadow-xs space-y-3">
-                <div className="flex justify-between items-start">
-                  <h4 className="font-bold text-sm text-on-surface flex items-center gap-1.5">
-                    <span className={`h-2.5 w-2.5 rounded-full ${act.type === 'disease' ? 'bg-red-500' : 'bg-amber-500'}`} />
-                    {act.title}
-                  </h4>
-                  <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full uppercase">{t("Actionable", language)}</span>
-                </div>
-
-                <div className="text-xs space-y-1.5 leading-relaxed text-on-surface-variant">
-                  <p>⚠️ <strong>Problem:</strong> {act.problem}</p>
-                  <p>🔬 <strong>Reason:</strong> {act.reason}</p>
-                  <p>🚜 <strong>Recommendation:</strong> <span className="font-semibold text-on-surface">{act.action}</span></p>
-                  <p>📈 <strong>Benefit:</strong> <span className="text-primary font-bold">{act.benefit}</span></p>
-                </div>
-
-                <button
-                  onClick={() => {
-                    if (act.type === 'disease') setActiveDashboardTab('diagnosis');
-                    else if (act.type === 'weather') alert("Irrigation cycle rescheduled. System updated.");
-                    else if (act.type === 'market') setActiveDashboardTab('market');
-                    else if (act.type === 'deadline' || act.type === 'scheme') setActiveDashboardTab('schemes');
-                  }}
-                  className="w-full bg-surface-container-low hover:bg-surface-container text-primary font-bold py-2 rounded-xl text-xs text-center border border-outline-variant/40 transition-colors"
-                >
-                  {act.actionText}
-                </button>
+      {/* 5. Farm Snapshot (Unified Farm Progress & Status indicators) */}
+      {dashboardData && (
+        <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-4">
+          <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-xl font-bold">analytics</span>
+            Active Farm Snapshot
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* Visual twin & growth progress */}
+            <div className="bg-surface-container-low/40 rounded-2xl p-4 border border-outline-variant/30 flex items-center gap-4">
+              <div className="relative flex-shrink-0">
+                <svg width="72" height="72" className="progress-ring">
+                  <circle stroke="#e9f0e5" strokeWidth="6" fill="transparent" r="28" cx="36" cy="36" />
+                  <circle
+                    stroke="#006b2c"
+                    strokeWidth="6"
+                    fill="transparent"
+                    r="28"
+                    cx="36"
+                    cy="36"
+                    className="progress-ring__circle"
+                    strokeDasharray="176"
+                    strokeDashoffset={176 - (176 * (dashboardData.growthProgress || 0) / 100)}
+                  />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-xl">
+                  {dashboardData.cropIcon}
+                </span>
               </div>
-            ));
-          })()}
+              <div className="min-w-0">
+                <span className="text-[10px] text-on-surface-variant font-bold uppercase block">{activeFarm?.crop?.stage} Stage</span>
+                <h4 className="font-extrabold text-base text-on-surface truncate">{activeFarm?.crop?.name?.toUpperCase()} ({activeFarm?.crop?.variety})</h4>
+                <span className="text-xs text-primary font-bold block mt-0.5">{dashboardData.growthProgress}% Growth Progress</span>
+              </div>
+            </div>
+
+            {/* Quick Farm indicators */}
+            <div className="bg-surface-container-low/40 rounded-2xl p-4 border border-outline-variant/30 grid grid-cols-2 gap-3 md:col-span-2">
+              {[
+                { label: 'Farm Health', val: `${dashboardData.healthScore}%`, color: 'text-primary' },
+                { label: 'Days since sowing', val: '45 days', color: 'text-on-surface' },
+                { label: 'Expected harvest', val: 'In 75 days', color: 'text-on-surface' },
+                { label: 'Soil Moisture', val: '32% (Stable)', color: 'text-blue-600' },
+                { label: 'Irrigation Status', val: dashboardData.waterStatus, color: 'text-blue-600 font-extrabold' },
+                { label: 'Disease Risk', val: dashboardData.diseaseRisk, color: dashboardData.diseaseRisk === 'Low' ? 'text-primary' : 'text-amber-600' }
+              ].map((ind, i) => (
+                <div key={i} className="flex justify-between items-center text-xs py-0.5 border-b border-outline-variant/20 last:border-b-0">
+                  <span className="text-on-surface-variant/90 font-medium">{ind.label}</span>
+                  <span className={`font-extrabold ${ind.color}`}>{ind.val}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* 5. Farm Progress Timeline & Weather Intelligence */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        {/* Progress Timeline */}
-        <div className="lg:col-span-2 bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
+      {/* 6. Farm Journey Progress Stepper */}
+      {dashboardData && (
+        <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-4">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
             <span className="material-symbols-outlined text-primary text-xl">route</span>
-            {t("Farm Journey Timeline", language)}
+            {t("Farm Journey Progress", language)}
           </h3>
 
-          <div className="grid grid-cols-6 gap-2 text-center text-[10px] font-bold py-2">
+          <div className="grid grid-cols-6 gap-2 text-center text-[10px] font-bold py-2 overflow-x-auto no-scrollbar">
             {[
               { name: t('Planning', language), idx: 0 },
               { name: t('Land Prep', language), idx: 1 },
@@ -341,8 +413,8 @@ export default function FarmingDashboard({
               const isActive = step.idx === currentIdx;
 
               return (
-                <div key={step.idx} className="space-y-2 flex flex-col items-center">
-                  <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs ${
+                <div key={step.idx} className="space-y-1.5 flex flex-col items-center min-w-[70px]">
+                  <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
                     isCompleted
                       ? 'bg-primary text-white'
                       : isActive
@@ -351,252 +423,247 @@ export default function FarmingDashboard({
                   }`}>
                     {isCompleted ? '✓' : step.idx + 1}
                   </div>
-                  <span className={`block leading-none truncate max-w-[50px] ${isActive ? 'text-primary font-black' : 'text-on-surface-variant font-medium'}`}>
+                  <span className={`block leading-none truncate max-w-[65px] ${isActive ? 'text-primary font-black' : 'text-on-surface-variant font-medium'}`}>
                     {step.name}
                   </span>
                 </div>
               );
             })}
           </div>
-          <div className="p-3 bg-primary/5 rounded-xl border border-primary/20 text-xs font-semibold text-on-surface flex items-start gap-2">
-            <span className="material-symbols-outlined text-primary text-sm font-bold mt-0.5">info</span>
-            <div className="leading-relaxed">
-              Currently in <strong>{activeFarm?.crop?.stage} Stage</strong>. Sowing was done on {activeFarm?.crop?.sowingDate}. Estimated remaining days to Flowering: <strong>18 days</strong>.
+        </div>
+      )}
+
+      {/* 7. Market Snapshot */}
+      {dashboardData && (
+        <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
+          <div className="flex justify-between items-center border-b border-outline-variant/30 pb-2">
+            <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-xl font-bold">store</span>
+              Market Snapshot
+            </h3>
+            <button 
+              onClick={() => setActiveDashboardTab('market')}
+              className="text-xs text-primary font-bold hover:underline min-h-[36px]"
+            >
+              Discover Mandis →
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1">
+              <span className="text-[10px] text-on-surface-variant uppercase font-black tracking-wider">Best Nearby Mandi</span>
+              <span className="font-bold text-sm block">{dashboardData.market?.recommendedMandi || 'Nashik APMC'}</span>
+              <span className="text-xs font-semibold text-primary">{dashboardData.market?.adjustedEarnings || '₹2,250 / Qtl'}</span>
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] text-on-surface-variant uppercase font-black tracking-wider">Minimum Support Price (MSP)</span>
+              <span className="font-bold text-sm block">MSP Target: ₹2,425</span>
+              <span className="text-xs font-semibold text-green-700 font-extrabold flex items-center gap-0.5">
+                ★ Mandi price is {dashboardData.market?.recommendation === 'Hold' ? 'above' : 'near'} MSP
+              </span>
+            </div>
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex flex-col justify-between items-start">
+              <span className="text-[10px] text-primary uppercase font-black tracking-wider">Recommendation</span>
+              <span className="text-xs font-black text-on-surface-variant mt-1">
+                Recommendation: <strong className="text-primary">{dashboardData.market?.recommendation === 'Hold' ? 'Monitor / Hold Prices' : 'Good Day to Sell'}</strong>
+              </span>
             </div>
           </div>
         </div>
+      )}
 
-        {/* Weather Intelligence */}
-        <div className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
-          <div className="flex justify-between items-center">
+      {/* 8. Weather Impact */}
+      {dashboardData && (
+        <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
+          <div className="flex justify-between items-center border-b border-outline-variant/30 pb-2">
             <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
               <span className="material-symbols-outlined text-yellow-600 text-xl font-bold">wb_sunny</span>
-              {t("Weather Intelligence", language)}
+              Weather Impact Advisory
             </h3>
             <button 
               onClick={() => setActiveDashboardTab('weather')}
-              className="text-xs text-primary font-bold hover:underline"
+              className="text-xs text-primary font-bold hover:underline min-h-[36px]"
             >
-              {t("View Details", language)} →
+              Weather details →
             </button>
           </div>
-
           {weatherLoading ? (
-            <div className="h-20 bg-surface-container-low animate-pulse rounded-xl" />
+            <div className="h-14 bg-surface-container-low animate-pulse rounded-xl" />
           ) : weatherData ? (
-            <>
-              <div className="flex justify-between items-center border-b border-surface-container-high pb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-black text-on-surface">{weatherData.current?.temp}°C</span>
-                  <div>
-                    <span className="text-xs font-extrabold text-on-surface block">
-                      {weatherData.current?.stationName || activeFarm?.district || 'Nashik'}
-                    </span>
-                    <span className="text-[10px] text-on-surface-variant font-medium leading-none">
-                      {t("Humidity", language)}: {weatherData.current?.humidityMorning}% | {t("Wind", language)}: {weatherData.current?.windSpeed} km/h
-                    </span>
-                  </div>
-                </div>
-                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
-                  weatherData.forecast?.[0]?.rainProbability > 60 
-                    ? 'bg-blue-50 text-blue-700' 
-                    : 'bg-orange-50 text-orange-700'
-                }`}>
-                  {t("Rain Chance:", language)} {weatherData.forecast?.[0]?.rainProbability || 0}%
-                </span>
-              </div>
-
-              <div className="p-3 bg-[#fcf8f0] border border-amber-100 rounded-xl text-xs flex gap-2 items-start font-semibold text-amber-900">
-                <span className="material-symbols-outlined text-amber-700 text-sm font-bold mt-0.5">tips_and_updates</span>
+            <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl font-black text-on-surface">{weatherData.current?.temp}°C</span>
                 <div>
-                  <span className="block font-bold text-amber-950 mb-0.5">{t("Agricultural Advisory:", language)}</span>
-                  {weatherData.rainfall?.insight || dashboardData.weatherInterpretation}
+                  <span className="text-xs font-extrabold text-on-surface block">
+                    {weatherData.forecast?.[0]?.rainProbability > 50 ? '🌦️ Expected Rain soon' : '☀️ Sunny & Warm'}
+                  </span>
+                  <span className="text-[10px] text-on-surface-variant font-semibold">
+                    Humidity: {weatherData.current?.humidityMorning}% | Wind: {weatherData.current?.windSpeed} km/h
+                  </span>
                 </div>
               </div>
-            </>
+              <div className="p-3 bg-amber-50/50 border border-amber-100 rounded-xl text-xs font-semibold text-amber-900 leading-relaxed max-w-md">
+                <strong>Spray Advisory:</strong> {weatherData.rainfall?.insight || dashboardData.weatherInterpretation}
+              </div>
+            </div>
           ) : (
-            <div className="text-xs text-on-surface-variant p-4 text-center">
-              {t("Failed to load weather data. Please click refresh or verify connections.", language)}
+            <div className="text-xs text-on-surface-variant py-2">Weather details currently unavailable.</div>
+          )}
+        </div>
+      )}
+
+      {/* 9. Disease Alert (CONDITIONAL - moderate/high only, else collapsed) */}
+      {dashboardData && (
+        <div className={`p-4 rounded-card border transition-all ${
+          dashboardData.diseaseRisk === 'High' || dashboardData.diseaseRisk === 'Medium'
+            ? 'bg-red-50/40 border-red-200 shadow-xs'
+            : 'bg-white border-outline-variant/60 shadow-xs'
+        }`}>
+          {dashboardData.diseaseRisk === 'High' || dashboardData.diseaseRisk === 'Medium' ? (
+            <div className="flex gap-3 justify-between items-start">
+              <div className="flex gap-2.5 items-start">
+                <ShieldAlert className="text-red-700 shrink-0 mt-0.5" size={18} />
+                <div>
+                  <h4 className="text-sm font-black text-red-950">Active Disease Risk Alert!</h4>
+                  <p className="text-xs text-red-900/90 font-semibold mt-0.5">
+                    Weather conditions indicate elevated risk of {activeFarm?.crop?.name === 'wheat' ? 'Stripe Rust' : 'Blast disease'} in your area.
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setActiveDashboardTab('diagnosis')}
+                className="bg-red-700 hover:bg-red-800 text-white font-extrabold px-3 py-1.5 rounded-lg text-xs shrink-0 min-h-[36px]"
+              >
+                Scan Leaf
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between text-xs font-bold text-on-surface-variant">
+              <span className="flex items-center gap-1.5 text-green-700 font-extrabold">
+                <CheckCircle2 size={16} /> No major disease risk detected today.
+              </span>
+              <button 
+                onClick={() => setActiveDashboardTab('diagnosis')}
+                className="text-primary hover:underline min-h-[36px]"
+              >
+                Run Scan
+              </button>
             </div>
           )}
         </div>
+      )}
 
-      </div>
-
-      {/* 6. Health Gauges & Market Intelligence */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        {/* Health Gauges */}
-        <div className="lg:col-span-2 bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
+      {/* 10. Eligible Government Schemes */}
+      <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
+        <div className="flex justify-between items-center border-b border-outline-variant/30 pb-2">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-xl font-bold">monitoring</span>
-            {t("Apple Health-style Farm Indicators", language)}
+            <span className="material-symbols-outlined text-primary text-xl font-bold">auto_awesome</span>
+            Eligible Benefits ({activeFarm?.state || 'Maharashtra'})
           </h3>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-2">
-            {[
-              { name: t('Water Health', language), val: dashboardData.healthMetrics.water, color: '#0ea5e9' },
-              { name: t('Nutrient Health', language), val: dashboardData.healthMetrics.nutrient, color: '#eab308' },
-              { name: t('Disease Prevention', language), val: 100 - (dashboardData.healthMetrics.disease || 0), color: '#ef4444' },
-              { name: t('Market Readiness', language), val: dashboardData.healthMetrics.readiness, color: '#22c55e' }
-            ].map((gauge, idx) => (
-              <div key={idx} className="flex flex-col items-center text-center space-y-2 bg-surface-container-low/40 rounded-xl p-3 border border-outline-variant/30">
-                <div className="relative">
-                  <svg width="64" height="64" className="progress-ring">
-                    <circle stroke="#e9f0e5" strokeWidth="5" fill="transparent" r="26" cx="32" cy="32" />
-                    <circle
-                      stroke={gauge.color}
-                      strokeWidth="5"
-                      fill="transparent"
-                      r="26"
-                      cx="32"
-                      cy="32"
-                      className="progress-ring__circle"
-                      strokeDasharray="163"
-                      strokeDashoffset={163 - (163 * gauge.val / 100)}
-                    />
-                  </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-on-surface">
-                    {gauge.val}%
-                  </span>
-                </div>
-                <span className="text-[10px] font-bold text-on-surface-variant">{gauge.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Market Intelligence */}
-        <div className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
-          <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-green-700 text-xl font-bold">trending_up</span>
-            {t("Market Intelligence", language)}
-          </h3>
-
-          <div className="p-3.5 bg-[#f0fcf4] rounded-xl border border-primary/20 space-y-2">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-on-surface-variant font-semibold">{t("Should I Sell Today?", language)}</span>
-              <span className={`font-extrabold px-2.5 py-0.5 rounded-full text-[10px] ${
-                dashboardData.market.recommendation === 'Sell' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
-              }`}>
-                {dashboardData.market.recommendation.toUpperCase()}
-              </span>
-            </div>
-            <div className="flex justify-between items-baseline mt-1">
-              <span className="text-xl font-black text-on-surface">
-                {dashboardData.market.adjustedEarnings}
-              </span>
-              <span className="text-[10px] text-green-700 font-bold">
-                📈 {t("Trend: Rising", language)} ({dashboardData.market.confidence}% confidence)
-              </span>
-            </div>
-            <p className="text-[11px] text-on-surface-variant leading-relaxed">
-              {dashboardData.market.reasoning}
-            </p>
-          </div>
-
-          <button
-            onClick={() => setSelectedMandiDetails(dashboardData.market)}
-            className="w-full bg-primary hover:bg-secondary text-white font-bold py-2.5 rounded-xl text-xs text-center shadow-sm transition-all"
+          <button 
+            onClick={() => setActiveDashboardTab('schemes')}
+            className="text-xs text-primary font-bold hover:underline min-h-[36px]"
           >
-            {t("View Mandi & Transport Analysis", language)}
+            All Schemes →
           </button>
         </div>
-
-      </div>
-
-      {/* 7. Government Benefits & Community */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {/* Government Benefits */}
-        <div className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
-          <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 border-b border-surface-container-high pb-3">
-            <span className="material-symbols-outlined text-primary text-xl">assignment_ind</span>
-            {t("Customized Government Schemes", language)}
-          </h3>
-
-          <div className="space-y-3">
-            {dashboardData.schemes.map(sch => (
-              <div key={sch.id} className="p-3.5 rounded-xl border border-outline-variant/60 bg-surface-container-low/30 space-y-2.5">
-                <div className="flex justify-between items-start gap-4">
-                  <div>
-                    <h4 className="font-bold text-sm text-on-surface leading-tight">{sch.name}</h4>
-                    <span className="text-[10px] text-primary font-bold mt-1 block">Benefit: {sch.benefits}</span>
-                  </div>
-                  <span className="text-[10px] font-bold text-green-800 bg-green-50 px-2 py-0.5 rounded-full shrink-0 border border-green-200">
-                    {sch.status}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-on-surface-variant font-medium">{t("Deadline:", language)} <strong className="text-on-surface">{sch.deadline}</strong></span>
-                  <button
-                    onClick={() => setActiveDashboardTab('schemes')}
-                    className="bg-primary hover:bg-secondary text-white font-extrabold px-3.5 py-1.5 rounded-lg text-[10px] transition-all"
-                  >
-                    {t("Apply Now", language)}
-                  </button>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          {[
+            { id: 1, name: 'PM Kisan Samman Nidhi', benefits: '₹6,000 / year direct subsidy', deadline: 'Apply by July 15' },
+            { id: 2, name: 'Subsidized Fertilizers Distribution', benefits: 'Up to 50% discount on Urea bags', deadline: 'Ongoing at APMC Coop' }
+          ].map(scheme => (
+            <div 
+              key={scheme.id}
+              className="p-3.5 rounded-xl border border-outline-variant bg-surface-container-low/40 flex justify-between items-center gap-3"
+            >
+              <div>
+                <h4 className="font-bold text-xs text-on-surface">{scheme.name}</h4>
+                <p className="text-[10px] text-primary font-black mt-1">{scheme.benefits}</p>
+                <span className="text-[9px] text-amber-800 font-extrabold block mt-0.5">⚠️ {scheme.deadline}</span>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Community Highlights */}
-        <div className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
-          <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 border-b border-surface-container-high pb-3">
-            <span className="material-symbols-outlined text-primary text-xl">groups</span>
-            {t("Nearby Regional Bulletins", language)}
-          </h3>
-
-          <div className="space-y-3">
-            {dashboardData.community.map(post => (
-              <div
-                key={post.id}
-                onClick={() => setSelectedCommunityPost(post)}
-                className="p-3.5 rounded-xl border border-outline-variant/60 hover:border-primary/40 bg-white shadow-xs cursor-pointer transition-colors space-y-2"
+              <button 
+                onClick={() => setSelectedScheme(scheme)}
+                className="bg-primary/5 hover:bg-primary/10 border border-primary/20 text-primary font-extrabold text-[11px] px-3 py-1.5 rounded-lg shrink-0 min-h-[36px]"
               >
-                <div className="flex justify-between items-center text-xs font-semibold">
-                  <span className="text-primary">{post.author} ({post.location})</span>
-                  <span className="text-on-surface-variant text-[10px]">{post.date}</span>
-                </div>
-                <h4 className="font-bold text-xs text-on-surface leading-tight">{post.title}</h4>
-                <p className="text-[11px] text-on-surface-variant truncate leading-relaxed">
-                  {post.content}
-                </p>
-                <div className="flex gap-3 text-[10px] text-on-surface-variant font-bold mt-1">
-                  <span>💬 {post.replies} {t("Replies", language)}</span>
-                  <span>👍 {post.likes} {t("Likes", language)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+                Apply
+              </button>
+            </div>
+          ))}
         </div>
-
       </div>
 
-      {/* 8. Reschedule Modal */}
+      {/* 11. Insights & Reminders */}
+      <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
+        <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+          <span className="material-symbols-outlined text-primary text-xl">notifications_active</span>
+          Insights & Upcoming Reminders
+        </h3>
+        <div className="space-y-2.5">
+          {[
+            { msg: 'Expected flowering milestone begins next week. Monitor moisture levels.', icon: 'water_drop', color: 'text-blue-500' },
+            { msg: 'N-P-K fertilizer application due in 3 days based on crop stage planner.', icon: 'agriculture', color: 'text-primary' },
+            { msg: 'Government schemes registry deadline approaching soon.', icon: 'campaign', color: 'text-amber-600' }
+          ].map((rem, i) => (
+            <div key={i} className="flex gap-2.5 items-start text-xs font-semibold text-on-surface-variant p-2.5 rounded-xl bg-slate-50/50 border border-outline-variant/30">
+              <span className={`material-symbols-outlined text-sm mt-0.5 ${rem.color}`}>{rem.icon}</span>
+              <span className="leading-normal">{rem.msg}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 12. Quick Actions */}
+      <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
+        <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+          <span className="material-symbols-outlined text-primary text-xl font-bold">bolt</span>
+          Quick Actions Control Grid
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { label: 'Scan Disease', icon: 'photo_camera', tab: 'diagnosis' },
+            { label: 'View Tasks', icon: 'task_alt', tab: 'tasks' },
+            { label: 'Check Market Prices', icon: 'local_mall', tab: 'market' },
+            { label: 'Ask AI Helper', icon: 'voice_chat', action: () => setVoiceAssistantOpen(true) },
+            { label: 'Add Farm', icon: 'add_location', action: startNewFarmRegistration },
+            { label: 'Switch Farm', icon: 'swap_horiz', action: () => setSelectedFarmIndex((selectedFarmIndex + 1) % farms.length) },
+            { label: 'Crop Planner', icon: 'event_note', tab: 'season_planner' },
+            { label: 'Farm Journey', icon: 'timeline', tab: 'journey' }
+          ].map((act, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                if (act.tab) setActiveDashboardTab(act.tab);
+                if (act.action) act.action();
+              }}
+              className="p-3.5 rounded-2xl border border-outline-variant/60 bg-white hover:border-primary/50 flex flex-col justify-center items-center text-center gap-2 transition-all shadow-xs hover:shadow-sm group min-h-[96px]"
+            >
+              <span className="material-symbols-outlined text-primary text-2xl group-hover:scale-110 transition-transform">{act.icon}</span>
+              <span className="text-[11px] font-black text-on-surface-variant leading-none">{t(act.label, language)}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Reschedule Task Modal Dialog */}
       {activeDialogTask && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-sm border border-outline-variant shadow-2xl overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
-              <h3 className="font-display text-sm font-bold text-on-surface">{t("Reschedule", language)} Task</h3>
-              <button onClick={() => setActiveDialogTask(null)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1 rounded-full hover:bg-surface-container">
+              <h3 className="font-display text-sm font-bold text-primary flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-primary text-lg">calendar_today</span>
+                Reschedule task
+              </h3>
+              <button onClick={() => setActiveDialogTask(null)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1">
                 <span className="material-symbols-outlined text-lg">close</span>
               </button>
             </div>
-            <div className="py-4 space-y-4">
-              <div className="text-xs">
-                <span className="font-semibold text-on-surface-variant block">Task:</span>
-                <span className="font-bold text-on-surface">{activeDialogTask.title}</span>
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-xs text-on-surface">Select New Date & Time</label>
-                <input
+            <div className="py-4 space-y-4 text-xs leading-relaxed">
+              <div>
+                <span className="font-bold text-on-surface block mb-1">Select Reschedule Date:</span>
+                <input 
                   type="date"
                   value={selectedRescheduleDate}
                   onChange={(e) => setSelectedRescheduleDate(e.target.value)}
-                  className="bg-surface-container-low border border-outline-variant rounded-xl h-11 px-3 text-sm font-semibold"
+                  className="w-full p-2.5 border border-outline-variant rounded-xl bg-surface-container-lowest text-xs font-bold text-on-surface outline-none focus:border-primary min-h-[44px]"
                 />
               </div>
               <div className="text-[10px] text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-100 font-semibold leading-relaxed">
@@ -604,10 +671,10 @@ export default function FarmingDashboard({
               </div>
             </div>
             <div className="border-t border-surface-container-high pt-4 flex justify-end gap-3">
-              <button onClick={() => setActiveDialogTask(null)} className="px-4 py-2 border rounded-xl text-xs font-semibold">Cancel</button>
+              <button onClick={() => setActiveDialogTask(null)} className="px-4 py-2 border rounded-xl text-xs font-semibold min-h-[40px]">Cancel</button>
               <button
                 onClick={() => { alert(`Task "${activeDialogTask.title}" rescheduled.`); setActiveDialogTask(null); }}
-                className="bg-primary hover:bg-secondary text-white font-extrabold px-5 py-2 rounded-xl text-xs shadow-sm"
+                className="bg-primary hover:bg-secondary text-white font-extrabold px-5 py-2 rounded-xl text-xs shadow-sm min-h-[40px]"
               >
                 {t("Reschedule", language)}
               </button>
@@ -616,7 +683,7 @@ export default function FarmingDashboard({
         </div>
       )}
 
-      {/* 9. Mandi Analysis Modal */}
+      {/* Mandi Analysis Modal */}
       {selectedMandiDetails && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md border border-outline-variant shadow-2xl overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in duration-200">
@@ -651,7 +718,7 @@ export default function FarmingDashboard({
               </div>
             </div>
             <div className="border-t border-surface-container-high pt-4 flex justify-end">
-              <button onClick={() => setSelectedMandiDetails(null)} className="bg-primary hover:bg-secondary text-white font-bold py-2.5 px-6 rounded-xl text-sm">
+              <button onClick={() => setSelectedMandiDetails(null)} className="bg-primary hover:bg-secondary text-white font-bold py-2.5 px-6 rounded-xl text-sm min-h-[40px]">
                 Close Analysis
               </button>
             </div>
@@ -659,7 +726,7 @@ export default function FarmingDashboard({
         </div>
       )}
 
-      {/* 10. Government Scheme Modal */}
+      {/* Government Scheme Modal */}
       {selectedScheme && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-sm border border-outline-variant shadow-2xl overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in duration-200">
@@ -688,10 +755,10 @@ export default function FarmingDashboard({
               </div>
             </div>
             <div className="border-t border-surface-container-high pt-4 flex justify-end gap-3">
-              <button onClick={() => setSelectedScheme(null)} className="px-4 py-2 border rounded-xl text-xs font-semibold">Cancel</button>
+              <button onClick={() => setSelectedScheme(null)} className="px-4 py-2 border rounded-xl text-xs font-semibold min-h-[40px]">Cancel</button>
               <button
                 onClick={() => { alert(`Application drafted. Verification in 48 hours.`); setSelectedScheme(null); }}
-                className="bg-primary hover:bg-secondary text-white font-extrabold px-5 py-2 rounded-xl text-xs"
+                className="bg-primary hover:bg-secondary text-white font-extrabold px-5 py-2 rounded-xl text-xs min-h-[40px]"
               >
                 {t("Apply Now", language)}
               </button>
@@ -700,7 +767,7 @@ export default function FarmingDashboard({
         </div>
       )}
 
-      {/* 11. Community Post Modal */}
+      {/* Community Post Modal */}
       {selectedCommunityPost && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md border border-outline-variant shadow-2xl overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in duration-200">
@@ -732,7 +799,7 @@ export default function FarmingDashboard({
               </div>
             </div>
             <div className="border-t border-surface-container-high pt-4 flex justify-end">
-              <button onClick={() => setSelectedCommunityPost(null)} className="bg-primary hover:bg-secondary text-white font-extrabold px-6 py-2.5 rounded-xl text-xs">
+              <button onClick={() => setSelectedCommunityPost(null)} className="bg-primary hover:bg-secondary text-white font-extrabold px-6 py-2.5 rounded-xl text-xs min-h-[40px]">
                 Close Discussions
               </button>
             </div>
@@ -740,7 +807,7 @@ export default function FarmingDashboard({
         </div>
       )}
 
-      {/* 12. 7-Day Calendar Modal */}
+      {/* 7-Day Calendar Modal */}
       {showAllTasksModal && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg border border-outline-variant shadow-2xl overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in duration-200">
@@ -770,7 +837,7 @@ export default function FarmingDashboard({
               ))}
             </div>
             <div className="border-t border-surface-container-high pt-4 flex justify-end">
-              <button onClick={() => setShowAllTasksModal(false)} className="bg-primary hover:bg-secondary text-white font-extrabold px-6 py-2.5 rounded-xl text-xs">
+              <button onClick={() => setShowAllTasksModal(false)} className="bg-primary hover:bg-secondary text-white font-extrabold px-6 py-2.5 rounded-xl text-xs min-h-[40px]">
                 Close Calendar
               </button>
             </div>

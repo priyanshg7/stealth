@@ -23,7 +23,7 @@ export default function Header({
         {/* Mobile hamburger — opens mobile drawer */}
         <button 
           onClick={() => setSidebarOpen(true)}
-          className="p-2.5 rounded-xl border border-outline-variant hover:bg-surface-container lg:hidden text-on-surface-variant"
+          className="p-3 rounded-xl border border-outline-variant hover:bg-surface-container lg:hidden text-on-surface-variant flex items-center justify-center min-h-[44px] min-w-[44px]"
           title="Open navigation"
         >
           <span className="material-symbols-outlined text-xl">menu</span>
@@ -32,7 +32,7 @@ export default function Header({
         {/* Desktop collapse/expand toggle */}
         <button
           onClick={() => setSidebarCollapsed(prev => !prev)}
-          className="hidden lg:flex p-2.5 rounded-xl border border-outline-variant hover:bg-surface-container text-on-surface-variant transition-colors"
+          className="hidden lg:flex p-3 rounded-xl border border-outline-variant hover:bg-surface-container text-on-surface-variant transition-colors min-h-[44px] min-w-[44px] items-center justify-center"
           title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           <span className="material-symbols-outlined text-xl">
@@ -69,7 +69,7 @@ export default function Header({
           <select 
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 rounded-xl h-10 px-3 pr-8 text-xs font-bold text-on-surface appearance-none cursor-pointer"
+            className="bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 rounded-xl h-11 px-3 pr-8 text-[13px] md:text-sm font-bold text-on-surface appearance-none cursor-pointer min-w-[100px]"
           >
             {languages.map(l => (
               <option key={l.id} value={l.id}>{l.native}</option>
@@ -81,11 +81,11 @@ export default function Header({
         {/* Notification Button */}
         <button 
           onClick={() => setActiveDashboardTab('notifications')}
-          className="p-2.5 rounded-xl border border-outline-variant/60 hover:bg-surface-container text-on-surface-variant relative"
+          className="p-3 rounded-xl border border-outline-variant/60 hover:bg-surface-container text-on-surface-variant relative min-h-[44px] min-w-[44px] flex items-center justify-center"
         >
           <span className="material-symbols-outlined text-lg">notifications</span>
-          <span className="absolute top-1 right-1 h-2 w-2 bg-red-600 rounded-full animate-ping" />
-          <span className="absolute top-1 right-1 h-2 w-2 bg-red-600 rounded-full" />
+          <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-red-600 rounded-full animate-ping" />
+          <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-red-600 rounded-full" />
         </button>
 
         {/* Microphone shortcut */}
@@ -99,7 +99,7 @@ export default function Header({
               (err) => console.error("Mic error:", err)
             );
           }}
-          className={`bg-primary hover:bg-secondary text-white p-2.5 rounded-xl flex items-center justify-center shadow-md ${isListening ? 'bg-red-600 animate-pulse' : 'animate-pulse-ring'}`}
+          className={`bg-primary hover:bg-secondary text-white p-3 rounded-xl flex items-center justify-center shadow-md min-h-[44px] min-w-[44px] ${isListening ? 'bg-red-600 animate-pulse' : 'animate-pulse-ring'}`}
         >
           <span className="material-symbols-outlined text-lg font-bold">{isListening ? 'settings_voice' : 'mic'}</span>
         </button>

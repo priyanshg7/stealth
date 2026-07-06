@@ -138,10 +138,10 @@ export default function DashboardShell({
         />
 
         {/* Dynamic content subviews routing based on active tab state */}
-        <main className="p-4 md:p-6 max-w-7xl mx-auto w-full flex-grow space-y-6">
+        <main className="p-4 md:p-6 pb-32 max-w-7xl mx-auto w-full flex-grow space-y-6">
           
           {activeDashboardTab === 'dashboard' && (
-            profile.isOnboarded ? (
+            (farms.length > 0) ? (
               <FarmingDashboard 
                 farms={farms}
                 selectedFarmIndex={selectedFarmIndex}
@@ -165,10 +165,13 @@ export default function DashboardShell({
                 setActiveDashboardTab={setActiveDashboardTab}
                 setVoiceAssistantOpen={setVoiceAssistantOpen}
                 setVoiceReplies={setVoiceReplies}
-                translating={translating}
-                language={language}
                 weatherData={weatherData}
                 weatherLoading={weatherLoading}
+                seasonPlanConfirmed={seasonPlanConfirmed}
+                setSeasonPlanConfirmed={setSeasonPlanConfirmed}
+                translating={translating}
+                language={language}
+                profile={profile}
               />
             ) : (
               <OnboardingWorkspace 

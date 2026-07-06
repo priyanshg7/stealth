@@ -254,7 +254,7 @@ export default function MandiDiscovery({
             <button
               onClick={() => handleSearch('state')}
               disabled={isSearching}
-              className="w-full bg-primary text-white font-bold py-2.5 rounded-xl hover:bg-secondary transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-75 h-[42px]"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-secondary disabled:opacity-50 transition-colors shadow-sm min-h-[48px] text-[15px] md:text-sm"
             >
               {isSearching ? <><Loader2 size={16} className="animate-spin" /> Searching...</> : <><Search size={16} /> Find Mandis</>}
             </button>
@@ -425,7 +425,7 @@ export default function MandiDiscovery({
 
                         <button 
                           onClick={() => onSelectMandi(mandi)}
-                          className="w-full md:w-auto px-6 py-2.5 bg-white border-2 border-primary text-primary text-sm font-bold rounded-xl hover:bg-primary hover:text-white transition-colors shadow-sm"
+                          className="w-full md:w-auto px-6 py-3 bg-white border-2 border-primary text-primary text-[15px] md:text-sm font-bold rounded-xl hover:bg-primary hover:text-white transition-colors shadow-sm min-h-[48px]"
                         >
                           View Details
                         </button>
