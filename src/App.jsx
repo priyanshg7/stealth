@@ -1728,6 +1728,7 @@ Instructions:
       <div className="flex-1 flex flex-col">
         
         {/* Navigation bar */}
+        {view !== 'DASHBOARD' && (
         <header className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-surface-container-high py-4 px-6 md:px-12 flex justify-between items-center z-50">
           <div className="flex items-center gap-3">
 
@@ -1752,9 +1753,10 @@ Instructions:
           <div className="flex items-center gap-4">
           </div>
         </header>
+        )}
 
         {/* View Routing */}
-        <div className="flex-1 flex justify-center items-center py-6 px-4 md:px-8">
+        <div className={`flex-1 flex ${view === 'DASHBOARD' ? 'flex-col w-full h-full' : 'justify-center items-center py-6 px-4 md:px-8'}`}>
           
           {/* Welcome Screen */}
           {view === 'WELCOME' && (
@@ -4095,6 +4097,7 @@ Instructions:
         )}
 
         {/* Universal Footer */}
+        {view !== 'DASHBOARD' && (
         <footer className="bg-white border-t border-surface-container-high py-4 text-center text-xs text-on-surface-variant">
           <div className="max-w-[1440px] mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-2">
             <span>© 2026 KisanMitra Inc. Designed for Indian Farmers.</span>
@@ -4105,6 +4108,7 @@ Instructions:
             </div>
           </div>
         </footer>
+        )}
 
       </div>
     </div>

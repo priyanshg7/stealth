@@ -325,7 +325,7 @@ export default function DashboardShell({
       {/* Floating Voice Assistant MIC button overlay for mobile devices */}
       <button
         onClick={() => setVoiceAssistantOpen(true)}
-        className="fixed bottom-20 left-4 z-40 bg-primary hover:bg-secondary text-white h-14 w-14 rounded-full flex items-center justify-center shadow-2xl animate-pulse-ring border-2 border-white lg:hidden"
+        className="fixed bottom-6 left-4 z-40 bg-primary hover:bg-secondary text-white h-14 w-14 rounded-full flex items-center justify-center shadow-2xl animate-pulse-ring border-2 border-white lg:hidden"
         title="Voice Assistant"
       >
         <span className="material-symbols-outlined text-2xl font-bold">mic</span>

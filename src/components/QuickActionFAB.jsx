@@ -5,7 +5,7 @@ export default function QuickActionFAB({
   setVoiceAssistantOpen
 }) {
   return (
-    <div className="fixed bottom-20 right-4 z-40 group font-sans">
+    <div className="fixed bottom-6 right-4 z-40 group font-sans">
       {/* Expandable options menu */}
       <div className="flex flex-col gap-2.5 mb-3.5 scale-0 group-hover:scale-100 origin-bottom transition-all duration-200 pointer-events-none group-hover:pointer-events-auto">
         {[
