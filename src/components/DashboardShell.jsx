@@ -1,4 +1,5 @@
 import React from 'react';
+import ErrorBoundary from './ErrorBoundary';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import VoiceAssistant from './VoiceAssistant';
@@ -140,7 +141,8 @@ export default function DashboardShell({
 
         {/* Dynamic content subviews routing based on active tab state */}
         <main className="p-4 md:p-6 pb-48 md:pb-32 max-w-7xl mx-auto w-full flex-grow space-y-6">
-          
+          <ErrorBoundary>
+
           {activeDashboardTab === 'dashboard' && (
             (farms.length > 0) ? (
               <FarmingDashboard 
@@ -308,7 +310,7 @@ export default function DashboardShell({
               language={language}
             />
           )}
-
+          </ErrorBoundary>
         </main>
       </div>
 

@@ -545,8 +545,8 @@ const evaluateScheme = (scheme, profile, farm) => {
 
 export default function App() {
   const [view, setView] = useState(() => localStorage.getItem('km_jwt') ? 'DASHBOARD' : 'WELCOME');
-  const [language, setLanguage] = useState('en');
-  const [voiceGuide, setVoiceGuide] = useState(false);
+  const [language, setLanguage] = useState(() => localStorage.getItem('km_language') || 'en');
+  const [voiceGuide, setVoiceGuide] = useState(() => localStorage.getItem('km_voice_guide') === 'true');
   const [playingAudio, setPlayingAudio] = useState(null);
   
   // Auth state
@@ -585,7 +585,10 @@ export default function App() {
   const [locationStatus, setLocationStatus] = useState('idle'); // idle | loading | success | denied | error
 
   // Farms state
-  const [farms, setFarms] = useState([]);
+  const [farms, setFarms] = useState(() => {
+    const saved = localStorage.getItem('km_farms');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [currentFarm, setCurrentFarm] = useState(DEFAULT_FARM);
   const [editingFarmIndex, setEditingFarmIndex] = useState(null);
 
@@ -597,15 +600,18 @@ export default function App() {
   const [boundaryPoints, setBoundaryPoints] = useState([]);
 
   // OCR card status
-  const [soilHealthCardUploaded, setSoilHealthCardUploaded] = useState(false);
+  const [soilHealthCardUploaded, setSoilHealthCardUploaded] = useState(() => localStorage.getItem('km_soil_card_uploaded') === 'true');
   const [soilOCRProcessing, setSoilOCRProcessing] = useState(false);
 
   // Redesigned Dashboard State Variables
   const [seasonPlanConfirmed, setSeasonPlanConfirmed] = useState(() => localStorage.getItem('km_season_confirmed') === 'true');
-  const [selectedFarmIndex, setSelectedFarmIndex] = useState(0);
+  const [selectedFarmIndex, setSelectedFarmIndex] = useState(() => parseInt(localStorage.getItem('km_selected_farm_index') || '0', 10));
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [completedTasks, setCompletedTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState(() => {
+    const saved = localStorage.getItem('km_completed_tasks');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [voiceAssistantOpen, setVoiceAssistantOpen] = useState(false);
   const [voiceReplies, setVoiceReplies] = useState([
     { sender: 'ai', text: 'Namaste! I am KisanMitra Voice Assistant. Ask me anything about your farm today.' }
@@ -615,7 +621,7 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('km_active_tab', activeDashboardTab);
   }, [activeDashboardTab]);
-  const [soilCardReminderDismissed, setSoilCardReminderDismissed] = useState(false);
+  const [soilCardReminderDismissed, setSoilCardReminderDismissed] = useState(() => localStorage.getItem('km_soil_card_reminder_dismissed') === 'true');
   const [onboardingCarouselIndex, setOnboardingCarouselIndex] = useState(0);
   const [showAnnualPlanWizard, setShowAnnualPlanWizard] = useState(false);
   const [wizardSelectedCrop, setWizardSelectedCrop] = useState('wheat');
@@ -627,6 +633,15 @@ export default function App() {
   const [showAllTasksModal, setShowAllTasksModal] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
+
+  // Sync state to localStorage
+  useEffect(() => { localStorage.setItem('km_language', language); }, [language]);
+  useEffect(() => { localStorage.setItem('km_voice_guide', voiceGuide); }, [voiceGuide]);
+  useEffect(() => { localStorage.setItem('km_farms', JSON.stringify(farms)); }, [farms]);
+  useEffect(() => { localStorage.setItem('km_selected_farm_index', selectedFarmIndex); }, [selectedFarmIndex]);
+  useEffect(() => { localStorage.setItem('km_completed_tasks', JSON.stringify(completedTasks)); }, [completedTasks]);
+  useEffect(() => { localStorage.setItem('km_soil_card_uploaded', soilHealthCardUploaded); }, [soilHealthCardUploaded]);
+  useEffect(() => { localStorage.setItem('km_soil_card_reminder_dismissed', soilCardReminderDismissed); }, [soilCardReminderDismissed]);
 
   const fetchWeather = async () => {
     const activeFarm = farms[selectedFarmIndex];
