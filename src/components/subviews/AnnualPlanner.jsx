@@ -32,6 +32,14 @@ export default function AnnualPlanner({
   // 'setup' | 'wizard' | 'strategy'
   const [step, setStep] = useState('setup');
   
+  // Preferred Crops & Varieties (Hybrid Planning)
+  const [wizardPreferences, setWizardPreferences] = useState({
+    Kharif: { crop: '', variety: '' },
+    Rabi: { crop: '', variety: '' },
+    Zaid: { crop: '', variety: '' }
+  });
+
+  
   // Setup Options
   const [setupMode, setSetupMode] = useState('saved'); // 'saved' | 'manual'
   const [selectedFarmId, setSelectedFarmId] = useState(selectedFarmIndex);
@@ -181,18 +189,67 @@ export default function AnnualPlanner({
 
   // ── Handlers ────────────────────────────────────────────────────────
   const handleStartWizard = () => {
-    setWizardSeasonIndex(0);
-    setWizardCrops({ Kharif: null, Rabi: null, Zaid: null });
-    setStep('wizard');
+    // Build initial wizardCrops from preferences
+    const initialWizardCrops = { Kharif: null, Rabi: null, Zaid: null };
+    let firstEmptySeasonIndex = -1;
+
+    SEASONS.forEach((season, index) => {
+      const pref = wizardPreferences[season];
+      if (pref && pref.crop) {
+        initialWizardCrops[season] = {
+          id: `pref-${pref.crop.toLowerCase()}`,
+          name: pref.variety || pref.crop,
+          description: `Farmer preferred selection for ${season}.`,
+          cropName: pref.crop,
+          isFarmerSelected: true,
+          yieldPotential: 25,
+          livePrice: 2200,
+          seedRate: 40,
+          waterRequirement: 500,
+          duration: 120,
+          badges: ['Farmer Selected']
+        };
+      } else if (firstEmptySeasonIndex === -1) {
+        firstEmptySeasonIndex = index;
+      }
+    });
+
+    setWizardCrops(initialWizardCrops);
+
+    // If all seasons are selected, jump straight to strategy
+    if (firstEmptySeasonIndex === -1) {
+      const targetFarm = farms[selectedFarmId] || {
+        name: 'Manual Strategy Farm',
+        state: setupForm.state,
+        district: setupForm.district,
+        soil: { type: setupForm.soilType },
+        water: { sources: [setupForm.irrigationSource.toLowerCase()] },
+        area: setupForm.area,
+        unit: setupForm.unit
+      };
+      
+      const strategy = generateAnnualStrategy(initialWizardCrops, targetFarm, setupForm.farmingMethod.toLowerCase());
+      setStrategyData(strategy);
+      setStep('strategy');
+    } else {
+      setWizardSeasonIndex(firstEmptySeasonIndex);
+      setStep('wizard');
+    }
   };
 
   const handleSelectCrop = (crop) => {
     const currentSeason = SEASONS[wizardSeasonIndex];
     setWizardCrops(prev => ({ ...prev, [currentSeason]: crop }));
 
+    // Find next empty season
+    let nextIndex = wizardSeasonIndex + 1;
+    while (nextIndex < 3 && wizardPreferences[SEASONS[nextIndex]]?.crop) {
+      nextIndex++;
+    }
+
     // Advance wizard or generate strategy
-    if (wizardSeasonIndex < 2) {
-      setWizardSeasonIndex(prev => prev + 1);
+    if (nextIndex < 3) {
+      setWizardSeasonIndex(nextIndex);
     } else {
       // Complete selection -> Generate strategy
       const targetFarm = farms[selectedFarmId] || {
@@ -205,11 +262,13 @@ export default function AnnualPlanner({
         unit: setupForm.unit
       };
       
-      const strategy = generateAnnualStrategy({
-        Kharif: wizardCrops.Kharif,
-        Rabi: wizardCrops.Rabi,
-        Zaid: crop // Last selected
-      }, targetFarm, setupForm.farmingMethod.toLowerCase());
+      const finalCrops = {
+        Kharif: wizardCrops.Kharif || (wizardSeasonIndex === 0 ? crop : null),
+        Rabi: wizardCrops.Rabi || (wizardSeasonIndex === 1 ? crop : null),
+        Zaid: wizardCrops.Zaid || (wizardSeasonIndex === 2 ? crop : null)
+      };
+
+      const strategy = generateAnnualStrategy(finalCrops, targetFarm, setupForm.farmingMethod.toLowerCase());
 
       setStrategyData(strategy);
       setStep('strategy');
@@ -557,9 +616,122 @@ export default function AnnualPlanner({
               </div>
             </div>
 
+            {/* Preferred Crops & Varieties (Hybrid Planning) */}
+            <div className="pt-6 border-t border-outline-variant/40">
+              <h3 className="font-black text-sm text-on-surface mb-4 flex items-center gap-2">
+                <Check className="w-4 h-4 text-primary" />
+                Preferred Crops & Varieties (Optional)
+              </h3>
+              <p className="text-[11px] text-on-surface-variant mb-4">
+                Know what you want to grow? Select your preferred crops and varieties for each season. Leave blank to let our AI recommend the best options.
+              </p>
+              
+              <div className="space-y-4">
+                {/* Kharif */}
+                <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/40">
+                  <h4 className="text-xs font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <CloudRain className="w-4 h-4 text-blue-500" /> Kharif (Monsoon)
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="relative">
+                      <label className="text-[10px] font-bold text-on-surface-variant block mb-1">Select Crop</label>
+                      <select 
+                        value={wizardPreferences.Kharif.crop}
+                        onChange={(e) => setWizardPreferences(prev => ({...prev, Kharif: {...prev.Kharif, crop: e.target.value, variety: ''}}))}
+                        className="w-full border border-outline-variant rounded-lg p-2 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
+                      >
+                        <option value="">AI Recommendation</option>
+                        <option value="Rice">Rice</option>
+                        <option value="Maize">Maize</option>
+                        <option value="Soybean">Soybean</option>
+                        <option value="Cotton">Cotton</option>
+                        <option value="Bajra">Bajra</option>
+                      </select>
+                    </div>
+                    {wizardPreferences.Kharif.crop === 'Rice' && (
+                      <div className="relative">
+                        <label className="text-[10px] font-bold text-on-surface-variant block mb-1">Preferred Variety</label>
+                        <select 
+                          value={wizardPreferences.Kharif.variety}
+                          onChange={(e) => setWizardPreferences(prev => ({...prev, Kharif: {...prev.Kharif, variety: e.target.value}}))}
+                          className="w-full border border-outline-variant rounded-lg p-2 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
+                        >
+                          <option value="">Let AI Decide</option>
+                          <option value="PR-126">PR-126</option>
+                          <option value="Pusa Basmati 1509">Pusa Basmati 1509</option>
+                          <option value="Arize 6444">Arize 6444 Gold</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Rabi */}
+                <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/40">
+                  <h4 className="text-xs font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <Sun className="w-4 h-4 text-orange-500" /> Rabi (Winter)
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="relative">
+                      <label className="text-[10px] font-bold text-on-surface-variant block mb-1">Select Crop</label>
+                      <select 
+                        value={wizardPreferences.Rabi.crop}
+                        onChange={(e) => setWizardPreferences(prev => ({...prev, Rabi: {...prev.Rabi, crop: e.target.value, variety: ''}}))}
+                        className="w-full border border-outline-variant rounded-lg p-2 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
+                      >
+                        <option value="">AI Recommendation</option>
+                        <option value="Wheat">Wheat</option>
+                        <option value="Mustard">Mustard</option>
+                        <option value="Gram">Gram</option>
+                        <option value="Barley">Barley</option>
+                      </select>
+                    </div>
+                    {wizardPreferences.Rabi.crop === 'Wheat' && (
+                      <div className="relative">
+                        <label className="text-[10px] font-bold text-on-surface-variant block mb-1">Preferred Variety</label>
+                        <select 
+                          value={wizardPreferences.Rabi.variety}
+                          onChange={(e) => setWizardPreferences(prev => ({...prev, Rabi: {...prev.Rabi, variety: e.target.value}}))}
+                          className="w-full border border-outline-variant rounded-lg p-2 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
+                        >
+                          <option value="">Let AI Decide</option>
+                          <option value="HD-2967">HD-2967</option>
+                          <option value="PBW-725">PBW-725</option>
+                          <option value="DBW-187">Karan Vandana (DBW-187)</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Zaid */}
+                <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/40">
+                  <h4 className="text-xs font-bold text-on-surface mb-3 flex items-center gap-2">
+                    <Sprout className="w-4 h-4 text-green-500" /> Zaid (Summer)
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="relative">
+                      <label className="text-[10px] font-bold text-on-surface-variant block mb-1">Select Crop</label>
+                      <select 
+                        value={wizardPreferences.Zaid.crop}
+                        onChange={(e) => setWizardPreferences(prev => ({...prev, Zaid: {...prev.Zaid, crop: e.target.value, variety: ''}}))}
+                        className="w-full border border-outline-variant rounded-lg p-2 text-xs focus:outline-none focus:border-primary appearance-none bg-white"
+                      >
+                        <option value="">AI Recommendation</option>
+                        <option value="Green Gram">Green Gram</option>
+                        <option value="Watermelon">Watermelon</option>
+                        <option value="Muskmelon">Muskmelon</option>
+                        <option value="Fodder">Fodder Crops</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <button
               onClick={handleStartWizard}
-              className="w-full bg-primary hover:bg-primary-dark text-white font-extrabold h-16 rounded-2xl text-sm shadow-[0_8px_16px_rgba(33,197,93,0.25)] hover:shadow-[0_12px_24px_rgba(33,197,93,0.3)] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 mt-4"
+              className="w-full bg-primary hover:bg-primary-dark text-white font-extrabold h-16 rounded-2xl text-sm shadow-[0_8px_16px_rgba(33,197,93,0.25)] hover:shadow-[0_12px_24px_rgba(33,197,93,0.3)] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 mt-6"
             >
               <span>Generate AI Plan & Select Crops</span>
               <ArrowRight className="w-5 h-5" />
@@ -807,6 +979,39 @@ export default function AnnualPlanner({
                     <span className="text-xs text-on-surface-variant font-bold block mt-1">
                       {item.variety !== 'N/A' ? `${item.variety} • ${item.duration}` : 'Soil rest & recovery'}
                     </span>
+                    
+                    {/* Badges */}
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {wizardPreferences[item.season]?.crop ? (
+                        <span className="text-[10px] bg-blue-100 text-blue-800 font-extrabold py-1 px-2 rounded border border-blue-200 flex items-center gap-1">
+                          <Check className="w-3 h-3" /> Farmer Selected
+                        </span>
+                      ) : item.cropName !== 'Fallow' ? (
+                        <span className="text-[10px] bg-primary/10 text-primary font-extrabold py-1 px-2 rounded border border-primary/20 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3" /> AI Recommended
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {/* Mismatch Warning */}
+                    {wizardPreferences[item.season]?.crop && item.waterRequirement && item.waterRequirement > 700 && setupForm.irrigationSource.toLowerCase() === 'rainfed' && (
+                      <div className="mt-3 text-[10px] bg-orange-50 text-orange-800 border border-orange-200 rounded p-2">
+                        <div className="font-bold flex items-center gap-1 mb-1">
+                          <ShieldAlert className="w-3 h-3" /> Condition Mismatch
+                        </div>
+                        Requires high water. Rainfed may be risky.
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setWizardPreferences(prev => ({...prev, [item.season]: {crop: '', variety: ''}}));
+                            setStep('setup');
+                          }}
+                          className="text-orange-900 underline font-bold mt-1 block hover:text-orange-700"
+                        >
+                          Use AI Recommendation Instead
+                        </button>
+                      </div>
+                    )}
                   </div>
                 );
               })}

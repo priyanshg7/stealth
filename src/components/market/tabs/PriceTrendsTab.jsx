@@ -56,7 +56,7 @@ export default function PriceTrendsTab({ mandi, activeFarm, liveMandiData }) {
   const [filterYear, setFilterYear] = useState('2026');
   const [filterCommodity, setFilterCommodity] = useState(initialCrop);
   const [filterSource, setFilterSource] = useState('Agmarknet');
-  const [isFiltersExpanded, setIsFiltersExpanded] = useState(true);
+  const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
   
   // Data State — starts empty; filled by live API only
   const [currentCommodity, setCurrentCommodity] = useState(initialCrop);
@@ -375,9 +375,9 @@ export default function PriceTrendsTab({ mandi, activeFarm, liveMandiData }) {
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col lg:flex-row gap-6">
+    <div className="flex flex-col gap-6">
       
-      {/* ── Left Side: Chart + Table ── */}
+      {/* ── Main Content: Chart + Table ── */}
       <div className="flex-1 space-y-6">
         
         {/* Title Block */}
@@ -411,6 +411,52 @@ export default function PriceTrendsTab({ mandi, activeFarm, liveMandiData }) {
           </div>
         </div>
 
+        {/* Collapsible Filters */}
+        {isFiltersExpanded && (
+          <div className="bg-white rounded-3xl p-6 border border-outline-variant shadow-sm animate-fade-in">
+            <h4 className="font-display font-extrabold text-lg text-on-surface mb-4">Advanced Filters</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">Commodity</label>
+                <input 
+                  type="text" 
+                  value={filterCommodity}
+                  onChange={(e) => setFilterCommodity(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs font-bold text-on-surface"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">Ending Month</label>
+                <select 
+                  value={filterMonth}
+                  onChange={(e) => setFilterMonth(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs font-bold text-on-surface"
+                >
+                  <option>May</option>
+                  <option>July</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">Reporting Year</label>
+                <input 
+                  type="text" 
+                  value={filterYear}
+                  onChange={(e) => setFilterYear(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs font-bold text-on-surface"
+                />
+              </div>
+              <div className="flex items-end">
+                <button 
+                  onClick={() => { setIsFiltersExpanded(false); handleApplyFilters(); }}
+                  className="w-full bg-primary text-white font-bold py-2.5 rounded-xl shadow-sm hover:bg-secondary transition-colors"
+                >
+                  Apply Filter
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Loading */}
         {loading && <LoadingCard />}
 
@@ -420,6 +466,21 @@ export default function PriceTrendsTab({ mandi, activeFarm, liveMandiData }) {
         {/* Chart Card — only shown when data is present */}
         {!loading && !dataError && chartData.length > 0 && (
           <>
+            {/* MSP Advisory */}
+            {chartData[chartData.length - 1]?.msp && chartData[chartData.length - 1]?.price && (
+              <div className={`p-4 rounded-2xl border flex items-start gap-3 ${chartData[chartData.length - 1].price > chartData[chartData.length - 1].msp ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-blue-50 border-blue-200 text-blue-900'}`}>
+                <div className="shrink-0"><Info size={20} className={chartData[chartData.length - 1].price > chartData[chartData.length - 1].msp ? 'text-emerald-600' : 'text-blue-600'} /></div>
+                <div>
+                  <div className="font-bold text-sm">MSP Comparison Advisory</div>
+                  <p className="text-xs mt-1 leading-relaxed opacity-90">
+                    {chartData[chartData.length - 1].price > chartData[chartData.length - 1].msp 
+                      ? `The current market price (₹${chartData[chartData.length - 1].price}) is higher than the Government MSP (₹${chartData[chartData.length - 1].msp}). You will earn more by selling in the open market.`
+                      : `The current market price (₹${chartData[chartData.length - 1].price}) is below the Government MSP (₹${chartData[chartData.length - 1].msp}). Consider selling at official procurement centers if you meet the quality criteria to maximize your profit.`}
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="bg-white rounded-3xl p-6 border border-outline-variant shadow-sm relative overflow-hidden">
               
               {/* Legend */}
@@ -647,122 +708,6 @@ export default function PriceTrendsTab({ mandi, activeFarm, liveMandiData }) {
         )}
 
       </div>
-
-      {/* ── Right Side: UPAg Filters Sidebar ── */}
-      {isFiltersExpanded && (
-        <div className="w-full lg:w-72 shrink-0">
-          <div className="bg-white rounded-3xl p-6 border border-outline-variant shadow-sm sticky top-24">
-            <div className="flex items-center gap-2 mb-6 border-b border-outline-variant/50 pb-3">
-              <Filter size={18} className="text-primary" />
-              <h4 className="font-display font-extrabold text-base text-on-surface">
-                UPAg Portal Filters
-              </h4>
-            </div>
-
-            <div className="space-y-4">
-              
-              {/* Source */}
-              <div>
-                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">
-                  Data Source (डेटा स्रोत)
-                </label>
-                <select 
-                  value={filterSource}
-                  onChange={(e) => setFilterSource(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant rounded-xl text-xs font-bold text-on-surface outline-none focus:border-primary appearance-none bg-white"
-                >
-                  <option value="Agmarknet">Agmarknet</option>
-                  <option value="UPAg-Share">UPAg Share</option>
-                  <option value="FPO-Direct">FPO Direct</option>
-                </select>
-              </div>
-
-              {/* Commodity */}
-              <div>
-                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">
-                  Commodity (फसल का प्रकार)
-                </label>
-                <select 
-                  value={filterCommodity}
-                  onChange={(e) => setFilterCommodity(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant rounded-xl text-xs font-bold text-on-surface outline-none focus:border-primary appearance-none bg-white"
-                >
-                  <option value="Wheat">Wheat (गेंहू)</option>
-                  <option value="Paddy">Paddy/Rice (धान/चावल)</option>
-                  <option value="Tomato">Tomato (टमाटर)</option>
-                  <option value="Moong">Moong (मूंग)</option>
-                  <option value="Soyabean">Soyabean (सोयाबीन)</option>
-                  <option value="Tur">Tur (अरहर दाल)</option>
-                  <option value="Copra (Milling)">Copra (Milling) (खोपरा - मिलिंग)</option>
-                  <option value="Copra (Ball)">Copra (Ball) (खोपरा - गोला)</option>
-                </select>
-              </div>
-
-              {/* Month */}
-              <div>
-                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">
-                  Ending Month (महीना)
-                </label>
-                <select 
-                  value={filterMonth}
-                  onChange={(e) => setFilterMonth(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant rounded-xl text-xs font-bold text-on-surface outline-none focus:border-primary appearance-none bg-white"
-                >
-                  {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(m => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Year */}
-              <div>
-                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">
-                  Reporting Year (वर्ष)
-                </label>
-                <select 
-                  value={filterYear}
-                  onChange={(e) => setFilterYear(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant rounded-xl text-xs font-bold text-on-surface outline-none focus:border-primary appearance-none bg-white"
-                >
-                  <option value="2026">2026</option>
-                  <option value="2025">2025</option>
-                  <option value="2024">2024</option>
-                </select>
-              </div>
-
-              {/* Apply Button */}
-              <button 
-                onClick={handleApplyFilters}
-                disabled={loading}
-                className="w-full mt-4 bg-primary text-white py-3 rounded-xl font-bold text-xs hover:bg-secondary transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <>
-                    <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Loading…
-                  </>
-                ) : (
-                  <>
-                    Apply Filter
-                    <ChevronRight size={14} />
-                  </>
-                )}
-              </button>
-
-              {/* Data source note */}
-              <div className="mt-2 p-3 rounded-xl bg-blue-50 border border-blue-200">
-                <div className="flex items-start gap-2">
-                  <Info size={13} className="text-blue-500 flex-shrink-0 mt-0.5" />
-                  <p className="text-[10px] text-blue-700 font-semibold leading-relaxed">
-                    All data is sourced exclusively from <strong>data.gov.in</strong> Government of India APIs. No AI-generated or simulated prices are shown.
-                  </p>
-                </div>
-              </div>
-              
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );

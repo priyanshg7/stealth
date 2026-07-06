@@ -251,12 +251,15 @@ export default function SeasonPlanner({
     targetMarket: 'Mandi',
     yieldObjective: '28',
     machinery: ['tractor', 'rotavator'],
-    laborResource: '3 Helpers Available'
+    laborResource: '3 Helpers Available',
+    preferredVariety: ''
   });
 
   const [gpsLoading, setGpsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
   const [selectedVariety, setSelectedVariety] = useState(null);
+  const [isFarmerSelected, setIsFarmerSelected] = useState(false);
+  const [varietyMismatchWarning, setVarietyMismatchWarning] = useState(null);
   
   // Custom calculator expenses
   const [costs, setCosts] = useState({
@@ -397,9 +400,64 @@ export default function SeasonPlanner({
       district: profile?.district || 'Nashik'
     };
 
+    const areaVal = parseFloat(formFields.area) || 5.0;
+
+    if (formFields.preferredVariety) {
+      // Farmer Preferred Variety Workflow
+      setIsFarmerSelected(true);
+      const varietyData = CROP_VARIETIES[crop]?.find(v => v.id === formFields.preferredVariety);
+      
+      if (varietyData) {
+        // Simple mismatch detection logic
+        let warning = null;
+        if (activeFarm.water?.sources?.[0]?.toLowerCase() === 'rainfed' && varietyData.water && parseInt(varietyData.water) > 800) {
+          warning = `Warning: ${varietyData.name} requires high water (${varietyData.water}). Your rainfed system may not be sufficient, risking crop stress.`;
+        } else if (varietyData.suitableSoil && !varietyData.suitableSoil.toLowerCase().includes(activeFarm.soil?.type?.toLowerCase().split(' ')[0] || 'none')) {
+          warning = `Notice: ${varietyData.name} is ideally suited for ${varietyData.suitableSoil}, but your soil is ${activeFarm.soil?.type}. Consider extra soil conditioning.`;
+        }
+        
+        setVarietyMismatchWarning(warning);
+        
+        const mappedVariety = {
+          ...varietyData,
+          yieldPotential: parseFloat(varietyData.yield) || 24,
+          livePrice: parseFloat(varietyData.price?.replace(/[^0-9]/g, '')) || 2275,
+          seedRate: 40
+        };
+        
+        setRecommendations([mappedVariety]);
+        setSelectedVariety(mappedVariety);
+        
+        const baseYield = mappedVariety.yieldPotential || 24;
+        const basePrice = mappedVariety.livePrice || mappedVariety.msp || 2275;
+
+        setCosts({
+          seed: Math.round(areaVal * (mappedVariety.seedRate * 45 || 1500)),
+          fertilizer: Math.round(areaVal * 2500),
+          pesticide: Math.round(areaVal * 1200),
+          irrigation: Math.round(areaVal * 1000),
+          labor: Math.round(areaVal * 3200),
+          machinery: Math.round(areaVal * 2000),
+          transportation: Math.round(areaVal * 800),
+          misc: Math.round(areaVal * 600),
+          expectedPrice: basePrice,
+          expectedYield: baseYield
+        });
+        
+        // Skip recommendations list and go directly to blueprint
+        setStep('blueprint');
+        setViewingActivePlan(false);
+        return;
+      }
+    }
+
+    // AI Recommended Workflow
+    setIsFarmerSelected(false);
+    setVarietyMismatchWarning(null);
+
     // Calculate ranked AI recommendations
     const rankedRaw = generateRecommendations(crop, activeFarm, profile, weatherData, null);
-    const ranked = mapRecommendationsToUi(rankedRaw, parseFloat(formFields.area) || 5.0);
+    const ranked = mapRecommendationsToUi(rankedRaw, areaVal);
     setRecommendations(ranked);
     
     const selected = ranked[0] || DEFAULT_VARIETY_DATA[0];
@@ -407,7 +465,6 @@ export default function SeasonPlanner({
     setStep('recommendations');
     setViewingActivePlan(false);
 
-    const areaVal = parseFloat(formFields.area) || 5.0;
     const baseYield = selected.yieldPotential || 24;
     const basePrice = selected.livePrice || selected.msp || 2275;
 
@@ -424,6 +481,7 @@ export default function SeasonPlanner({
       expectedYield: baseYield
     });
   };
+
 
   // Select variety
   const handleSelectVariety = (v) => {
@@ -877,7 +935,7 @@ export default function SeasonPlanner({
               
               {/* Crop Name */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-on-surface-variant">Crop Name (Optional)</label>
+                <label className="block text-xs font-bold text-on-surface-variant">Crop Name</label>
                 <div className="relative">
                   <select
                     value={formFields.cropName}
@@ -892,7 +950,28 @@ export default function SeasonPlanner({
                     <Mic className="w-4 h-4" />
                   </div>
                 </div>
-                <span className="block text-[10px] text-on-surface-variant font-medium">If you enter a crop, we will recommend specific varieties for it.</span>
+                <span className="block text-[10px] text-on-surface-variant font-medium">Select the crop you wish to plan.</span>
+              </div>
+
+              {/* Preferred Variety */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-on-surface-variant">Preferred Variety (Optional)</label>
+                <div className="relative">
+                  <select
+                    value={formFields.preferredVariety}
+                    onChange={(e) => handleInputChange('preferredVariety', e.target.value)}
+                    className="w-full bg-[#f0f4f9] border border-transparent rounded-xl p-3 pr-10 text-xs font-semibold focus:outline-none focus:bg-white focus:border-primary appearance-none cursor-pointer text-on-surface"
+                  >
+                    <option value="">Let AI Recommend Best Variety</option>
+                    {CROP_VARIETIES[formFields.cropName]?.map(variety => (
+                      <option key={variety.id} value={variety.id}>{variety.name}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-3 pointer-events-none text-on-surface-variant/80">
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </div>
+                <span className="block text-[10px] text-on-surface-variant font-medium">Select a specific variety to bypass recommendations, or leave blank for AI guidance.</span>
               </div>
 
               {/* Land Area */}
@@ -1289,6 +1368,43 @@ export default function SeasonPlanner({
               <span className="text-xs bg-yellow-100 text-yellow-800 font-extrabold py-1.5 px-3 rounded-full border border-yellow-200">
                 New Plan Draft (Not Yet Implemented)
               </span>
+            )}
+          </div>
+
+          {/* Badges and Warnings */}
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-2">
+              {isFarmerSelected ? (
+                <span className="text-xs bg-blue-100 text-blue-800 font-extrabold py-1.5 px-3 rounded-full border border-blue-200 flex items-center gap-1">
+                  <Check className="w-3.5 h-3.5" /> Farmer Selected
+                </span>
+              ) : (
+                <span className="text-xs bg-primary/10 text-primary font-extrabold py-1.5 px-3 rounded-full border border-primary/20 flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5" /> AI Recommended
+                </span>
+              )}
+            </div>
+            
+            {varietyMismatchWarning && (
+              <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                <div className="flex gap-3">
+                  <ShieldAlert className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-bold text-orange-900 text-sm">Condition Mismatch</h4>
+                    <p className="text-xs text-orange-800 mt-1">{varietyMismatchWarning}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setFormFields(prev => ({...prev, preferredVariety: ''}));
+                    setStep('recommendations');
+                    handleGenerateRecommendations();
+                  }}
+                  className="bg-white border border-orange-300 text-orange-700 hover:bg-orange-100 font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-colors"
+                >
+                  Show Better Alternatives
+                </button>
+              </div>
             )}
           </div>
 

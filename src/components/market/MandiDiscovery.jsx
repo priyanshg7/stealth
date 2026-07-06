@@ -1,8 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { 
   MapPin, Search, Navigation, Filter, Map, Clock, 
-  IndianRupee, ArrowRight, Activity, ShieldCheck, CheckCircle2, AlertTriangle, Truck
+  IndianRupee, ArrowRight, Activity, ShieldCheck, CheckCircle2, AlertTriangle, Truck, Compass, Loader2, Info, RefreshCw
 } from 'lucide-react';
+
+const ALL_STATES = [
+  'Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 
+  'Chandigarh', 'Chhattisgarh', 'Dadra and Nagar Haveli', 'Daman and Diu', 'Delhi', 'Goa', 
+  'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand', 'Karnataka', 
+  'Kerala', 'Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 
+  'Mizoram', 'Nagaland', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'
+];
+
+const COMMON_DISTRICTS = {
+  'Maharashtra': ['Nashik', 'Pune', 'Nagpur', 'Satara', 'Ahmednagar'],
+  'Karnataka': ['Raichur', 'Dharwad', 'Belagavi', 'Mandya'],
+  'Gujarat': ['Amreli', 'Rajkot', 'Junagadh', 'Ahmedabad'],
+  'Rajasthan': ['Chittorgarh', 'Jaipur', 'Kota', 'Udaipur'],
+  'Uttar Pradesh': ['Lucknow', 'Kanpur', 'Varanasi', 'Agra'],
+  'Madhya Pradesh': ['Indore', 'Bhopal', 'Ujjain', 'Jabalpur'],
+  'Bihar': ['Patna', 'Sheikhpura', 'Gaya', 'Muzaffarpur'],
+  'Punjab': ['Ludhiana', 'Amritsar', 'Patiala', 'Jalandhar'],
+  'Haryana': ['Hisar', 'Karnal', 'Rohtak', 'Gurugram']
+};
 
 export default function MandiDiscovery({ 
   farms = [], 
@@ -11,38 +32,89 @@ export default function MandiDiscovery({
   onSelectMandi 
 }) {
   const activeFarm = farms[selectedFarmIndex];
-  const hasActiveCrop = !!activeFarm?.crop?.name;
   
-  // Auto-fill states
-  const [crop, setCrop] = useState(activeFarm?.crop?.name || 'Wheat');
-  const [quantity, setQuantity] = useState(activeFarm?.crop?.expectedYield || '20');
-  const [period, setPeriod] = useState('Today');
-  const [radius, setRadius] = useState('50');
-  const [vehicleType, setVehicleType] = useState('Medium Truck');
-  
-  // Location States
+  // Search Panel States
   const [farmState, setFarmState] = useState(activeFarm?.state || 'Maharashtra');
   const [farmDistrict, setFarmDistrict] = useState(activeFarm?.district || 'Nashik');
   const [farmVillage, setFarmVillage] = useState(activeFarm?.village || 'Pimpalgaon');
-
-  const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
+  const [crop, setCrop] = useState(activeFarm?.crop?.name || 'Wheat');
+  const [variety, setVariety] = useState('All Varieties');
+  const [quantity, setQuantity] = useState(activeFarm?.crop?.expectedYield || '20');
+  
+  // Advanced Settings
+  const [vehicleType, setVehicleType] = useState('Medium Truck');
   const [sortBy, setSortBy] = useState('net_realization'); // 'price', 'distance', 'net_realization'
-  const [isFiltersExpanded, setIsFiltersExpanded] = useState(true);
+  const [isAdvancedExpanded, setIsAdvancedExpanded] = useState(false);
+  const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
+  
+  // Data State
+  const [localMandiData, setLocalMandiData] = useState(mandiData);
+  const [isSearching, setIsSearching] = useState(false);
+  const [lastSearchScope, setLastSearchScope] = useState('district'); // 'district' or 'state'
 
   useEffect(() => {
-    if (activeFarm) {
-      setCrop(activeFarm?.crop?.name || 'Wheat');
-      setQuantity(activeFarm?.crop?.expectedYield || '20');
-      setFarmState(activeFarm?.state || 'Maharashtra');
-      setFarmDistrict(activeFarm?.district || 'Nashik');
-      setFarmVillage(activeFarm?.village || 'Pimpalgaon');
-    }
-  }, [activeFarm]);
+    setLocalMandiData(mandiData);
+  }, [mandiData]);
 
-  const periods = ['Today', 'Within 3 Days', 'Within 7 Days'];
-  const radiuses = ['25', '50', '100', '200', 'Custom'];
-  
-  // Standard Transport Rates
+  const handleSearch = async (scope = 'state') => {
+    setIsSearching(true);
+    setLastSearchScope(scope);
+    try {
+      const { fetchMandiPrices } = await import('../../utils/mandiService');
+      // Fetch prices for the entire state because API district data is often sparse.
+      // We always pass empty string for district to get maximum results, then sort locally by distance.
+      const data = await fetchMandiPrices(crop, farmState, '');
+      setLocalMandiData(data);
+    } catch (err) {
+      console.error("Mandi discovery search failed:", err);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const detectLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
+            if (res.ok) {
+              const data = await res.json();
+              if (data.principalSubdivision) {
+                const stateMatch = ALL_STATES.find(s => data.principalSubdivision.includes(s) || s.includes(data.principalSubdivision));
+                if (stateMatch) setFarmState(stateMatch);
+                else setFarmState(data.principalSubdivision);
+              }
+              if (data.city || data.locality) {
+                setFarmDistrict(data.city || data.locality);
+                setFarmVillage('Detected Location');
+              }
+            }
+          } catch (e) {
+            console.error("Geocoding failed", e);
+            setFarmState('Uttar Pradesh'); // Fallback to a state with good data
+            setFarmDistrict('Kanpur');
+          }
+        },
+        () => {
+          // Fallback if denied
+          setFarmState('Uttar Pradesh');
+          setFarmDistrict('Kanpur');
+        }
+      );
+    }
+  };
+
+  const useSavedFarm = () => {
+    if (activeFarm) {
+      setFarmState(activeFarm.state || 'Maharashtra');
+      setFarmDistrict(activeFarm.district || 'Nashik');
+      setFarmVillage(activeFarm.village || 'Pimpalgaon');
+      setCrop(activeFarm.crop?.name || 'Wheat');
+    }
+  };
+
   const vehicleRates = {
     'Tractor Trolley': { ratePerKm: 12, fixedCost: 250 },
     'Small Pickup': { ratePerKm: 15, fixedCost: 300 },
@@ -50,11 +122,24 @@ export default function MandiDiscovery({
     'Heavy Truck': { ratePerKm: 35, fixedCost: 1000 },
   };
 
-  // Processed mandi data
-  const processedMandis = (mandiData || []).map((m, index) => {
-    const deterministicDistance = parseFloat(m.distance) || (10 + ((m.market.length * 7 + index * 13) % 90));
+  // Derive unique varieties from fetched data
+  const availableVarieties = ['All Varieties', ...new Set((localMandiData || []).map(m => m.variety).filter(Boolean))];
+
+  // Process data
+  const filteredData = (localMandiData || []).filter(m => {
+    if (variety !== 'All Varieties' && m.variety !== variety) return false;
+    return true;
+  });
+
+  const processedMandis = filteredData.map((m, index) => {
+    // If we have actual distance data, use it. Otherwise, estimate distance based on whether it's in the same district.
+    let deterministicDistance;
+    if (m.district && m.district.toLowerCase() === farmDistrict.toLowerCase()) {
+      deterministicDistance = parseFloat(m.distance) || (5 + ((m.market.length * 3) % 15)); // 5-20 km
+    } else {
+      deterministicDistance = parseFloat(m.distance) || (30 + ((m.market.length * 7 + index * 13) % 90)); // 30-120 km
+    }
     
-    // Transport Calculation based on vehicle and quantity
     const rateInfo = vehicleRates[vehicleType] || vehicleRates['Medium Truck'];
     const qtl = parseFloat(quantity) || 1;
     const totalTransportCost = Math.round((deterministicDistance * rateInfo.ratePerKm * 2) + rateInfo.fixedCost);
@@ -71,302 +156,284 @@ export default function MandiDiscovery({
   }).sort((a, b) => {
     if (sortBy === 'price') return b.modalPrice - a.modalPrice;
     if (sortBy === 'distance') return a.distance - b.distance;
-    return b.netExpected - a.netExpected;
+    return b.netExpected - a.netExpected; // net_realization
   });
 
   const topMandis = processedMandis.slice(0, 5);
 
-  // Factual "Should I Visit Another Mandi?" Recommendation Logic
-  const getMandiRecommendation = () => {
-    if (topMandis.length === 0) return null;
-    
-    const nearest = topMandis.reduce((prev, curr) => curr.distance < prev.distance ? curr : prev, topMandis[0]);
-    const best = topMandis.reduce((prev, curr) => curr.netExpected > prev.netExpected ? curr : prev, topMandis[0]);
-    
-    const profitDiff = best.netExpected - nearest.netExpected;
-    
-    if (best.market !== nearest.market && profitDiff > 20) {
-      return {
-        recommend: 'YES_ALT',
-        title: `Recommended: Sell at ${best.market} (वैकल्पिक मंडी में बेचें)`,
-        desc: `By traveling an extra ${Math.round(best.distance - nearest.distance)} km to ${best.market}, your net earnings will increase by ₹${Math.round(profitDiff)}/Qtl after transport costs (₹${Math.round(best.netExpected)}/Qtl vs ₹${Math.round(nearest.netExpected)}/Qtl at the nearest mandi).`,
-        colorClass: 'bg-indigo-50 border-indigo-200 text-indigo-900'
-      };
-    }
-    
-    return {
-      recommend: 'STAY_NEAREST',
-      title: `Recommended: Sell at Nearest Mandi - ${nearest.market}`,
-      desc: `${nearest.market} is the closest market (${nearest.distance} km) and offers the most optimal net realization (₹${Math.round(nearest.netExpected)}/Qtl) after transport costs today.`,
-      colorClass: 'bg-emerald-50 border-emerald-200 text-emerald-900'
-    };
-  };
+  // Identify badges
+  let nearestMandi = null;
+  let highestPriceMandi = null;
+  let bestNetMandi = null;
+  
+  if (topMandis.length > 0) {
+    nearestMandi = [...topMandis].sort((a,b) => a.distance - b.distance)[0];
+    highestPriceMandi = [...topMandis].sort((a,b) => b.modalPrice - a.modalPrice)[0];
+    bestNetMandi = [...topMandis].sort((a,b) => b.netExpected - a.netExpected)[0];
+  }
 
-  const advice = getMandiRecommendation();
+  const districtsOptions = COMMON_DISTRICTS[farmState] || [];
 
   return (
-    <div className="animate-fade-in-up flex flex-col lg:flex-row gap-6 items-start">
-      
-      {/* ── Collapsible Discovery Form Sidebar ── */}
-      {isFiltersExpanded && (
-        <div className="w-full lg:w-80 shrink-0 space-y-6 transition-all duration-300 animate-slide-in-left">
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-outline-variant">
-            <div className="flex items-center gap-2 mb-6 border-b border-outline-variant/60 pb-3">
-              <Search className="text-primary" size={20} />
-              <h4 className="font-display font-extrabold text-base text-on-surface">Find Buyers</h4>
-            </div>
+    <div className="animate-fade-in-up flex flex-col gap-6 items-start w-full">
+      {/* ── Search Panel (Top) ── */}
+      <div className="w-full bg-white rounded-3xl p-6 shadow-sm border border-outline-variant">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-outline-variant/60 pb-4">
+          <div className="flex items-center gap-2">
+            <Search className="text-primary" size={24} />
+            <h4 className="font-display font-extrabold text-lg text-on-surface">Find Nearby Mandis</h4>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button 
+              onClick={useSavedFarm}
+              className="px-3 py-1.5 bg-surface-container-low text-primary text-xs font-bold rounded-lg hover:bg-surface-container transition-colors"
+            >
+              Use Saved Farm
+            </button>
+            <button 
+              onClick={detectLocation}
+              className="px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-lg hover:bg-primary/20 transition-colors flex items-center gap-1.5"
+            >
+              <Navigation size={14} /> Use My Location
+            </button>
+          </div>
+        </div>
 
-            <div className="space-y-4">
-              
-              {/* Crop Selector */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* State */}
+          <div>
+            <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">State (राज्य)</label>
+            <select 
+              value={farmState}
+              onChange={(e) => {
+                setFarmState(e.target.value);
+                const dists = COMMON_DISTRICTS[e.target.value];
+                setFarmDistrict(dists ? dists[0] : '');
+              }}
+              className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-bold text-on-surface outline-none focus:border-primary appearance-none bg-white"
+            >
+              {ALL_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          {/* District */}
+          <div>
+            <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">District (जिला)</label>
+            {districtsOptions.length > 0 ? (
+              <select 
+                value={farmDistrict}
+                onChange={(e) => setFarmDistrict(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-bold text-on-surface outline-none focus:border-primary appearance-none bg-white"
+              >
+                {districtsOptions.map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
+            ) : (
+              <input 
+                type="text" 
+                value={farmDistrict}
+                onChange={(e) => setFarmDistrict(e.target.value)}
+                placeholder="Enter district"
+                className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-bold text-on-surface outline-none focus:border-primary"
+              />
+            )}
+          </div>
+
+          {/* Crop */}
+          <div>
+            <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Crop (फसल)</label>
+            <input 
+              type="text" 
+              value={crop}
+              onChange={(e) => setCrop(e.target.value)}
+              className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-bold text-on-surface outline-none focus:border-primary"
+            />
+          </div>
+
+          {/* Search Button */}
+          <div className="flex items-end">
+            <button
+              onClick={() => handleSearch('state')}
+              disabled={isSearching}
+              className="w-full bg-primary text-white font-bold py-2.5 rounded-xl hover:bg-secondary transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-75 h-[42px]"
+            >
+              {isSearching ? <><Loader2 size={16} className="animate-spin" /> Searching...</> : <><Search size={16} /> Find Mandis</>}
+            </button>
+          </div>
+        </div>
+
+        {/* Advanced Filters Toggle */}
+        <div className="mt-4 pt-4 border-t border-outline-variant/40">
+          <button 
+            onClick={() => setIsAdvancedExpanded(!isAdvancedExpanded)}
+            className="flex items-center gap-1.5 text-xs font-bold text-on-surface-variant hover:text-primary transition-colors"
+          >
+            <Filter size={14} /> {isAdvancedExpanded ? 'Hide Advanced Filters' : 'Show Advanced Filters'}
+          </button>
+          
+          {isAdvancedExpanded && (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 animate-fade-in">
               <div>
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">Crop (फसल)</label>
-                {hasActiveCrop ? (
-                  <div className="w-full px-3.5 py-2.5 bg-slate-50 border border-outline-variant rounded-xl text-xs font-extrabold text-primary flex items-center justify-between">
-                    <span>{crop}</span>
-                    <span className="text-[9px] text-green-700 bg-green-50 px-2 py-0.5 rounded-full font-bold">Planned Crop</span>
-                  </div>
-                ) : (
-                  <input 
-                    type="text" 
-                    value={crop}
-                    onChange={(e) => setCrop(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs font-bold text-on-surface outline-none focus:border-primary"
-                  />
-                )}
+                <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Variety filter</label>
+                <select 
+                  value={variety}
+                  onChange={(e) => setVariety(e.target.value)}
+                  className="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-xs font-bold text-on-surface outline-none focus:border-primary"
+                >
+                  {availableVarieties.map(v => <option key={v} value={v}>{v}</option>)}
+                </select>
               </div>
-
-              {/* Expected Selling Quantity */}
               <div>
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">Quantity (मात्रा) (Qtl)</label>
+                <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Quantity (Qtl)</label>
                 <input 
                   type="number" 
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs font-bold text-on-surface outline-none focus:border-primary"
+                  className="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-xs font-bold text-on-surface outline-none focus:border-primary"
                 />
               </div>
-
-              {/* State override */}
               <div>
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">State (राज्य)</label>
-                <input 
-                  type="text" 
-                  value={farmState}
-                  onChange={(e) => setFarmState(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs font-bold text-on-surface outline-none focus:border-primary"
-                />
+                <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Sort By</label>
+                <select 
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-xs font-bold text-on-surface outline-none focus:border-primary"
+                >
+                  <option value="net_realization">Best Net Earnings</option>
+                  <option value="price">Highest Price</option>
+                  <option value="distance">Nearest</option>
+                </select>
               </div>
-
-              {/* District override */}
               <div>
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">District (जिला)</label>
-                <input 
-                  type="text" 
-                  value={farmDistrict}
-                  onChange={(e) => setFarmDistrict(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs font-bold text-on-surface outline-none focus:border-primary"
-                />
-              </div>
-
-              {/* Village override */}
-              <div>
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">Village/Town (गाँव/शहर)</label>
-                <input 
-                  type="text" 
-                  value={farmVillage}
-                  onChange={(e) => setFarmVillage(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs font-bold text-on-surface outline-none focus:border-primary"
-                />
-              </div>
-
-              {/* Transport Vehicle selection */}
-              <div>
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 block">Transport Vehicle</label>
+                <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Transport Vehicle</label>
                 <select 
                   value={vehicleType}
                   onChange={(e) => setVehicleType(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs font-bold text-on-surface outline-none focus:border-primary appearance-none bg-white"
+                  className="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-xs font-bold text-on-surface outline-none focus:border-primary"
                 >
-                  {Object.keys(vehicleRates).map(v => (
-                    <option key={v} value={v}>{v}</option>
-                  ))}
+                  {Object.keys(vehicleRates).map(v => <option key={v} value={v}>{v}</option>)}
                 </select>
               </div>
-
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* ── Results Area ── */}
       <div className="flex-1 w-full flex flex-col space-y-4">
         
         {/* Results Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-outline-variant shadow-sm">
-          <div className="flex items-center gap-3">
-            {/* Sidebar Toggle Button */}
-            <button 
-              onClick={() => setIsFiltersExpanded(!isFiltersExpanded)}
-              className="flex items-center gap-1.5 px-3 py-2 bg-surface-container-low text-primary border border-outline-variant hover:bg-surface-container rounded-xl text-xs font-bold transition-all shadow-sm"
-              title="Toggle Filters"
-            >
-              <Filter size={14} />
-              {isFiltersExpanded ? 'Hide Filters (फ़िल्टर छिपाएं)' : 'Show Filters (फ़िल्टर दिखाएं)'}
-            </button>
-            
-            <div>
-              <h3 className="font-bold text-on-surface flex items-center gap-2 text-sm">
-                <Activity size={18} className="text-green-600 animate-pulse" />
-                Mandi Discovery Listings
-              </h3>
-              <p className="text-[10px] text-on-surface-variant font-bold">Location: {farmVillage}, {farmDistrict}, {farmState}</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <select 
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="text-xs font-bold bg-surface-container-low px-3 py-2 rounded-lg border border-outline-variant outline-none"
-            >
-              <option value="net_realization">Sort by Net Profit</option>
-              <option value="price">Sort by Highest Price</option>
-              <option value="distance">Sort by Nearest</option>
-            </select>
-            
+        <div className="flex items-center justify-between pb-2">
+          <h3 className="font-bold text-on-surface flex items-center gap-2 text-base">
+            <Activity size={18} className="text-green-600 animate-pulse" />
+            Top Nearby Mandis
+          </h3>
+          {topMandis.length > 0 && (
             <div className="flex bg-surface-container-low rounded-lg p-1 border border-outline-variant">
-              <button 
-                onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white shadow text-primary' : 'text-on-surface-variant'}`}
-              >
-                <Filter size={16} />
-              </button>
-              <button 
-                onClick={() => setViewMode('map')}
-                className={`p-1.5 rounded-md transition-all ${viewMode === 'map' ? 'bg-white shadow text-primary' : 'text-on-surface-variant'}`}
-              >
-                <Map size={16} />
-              </button>
+              <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white shadow text-primary' : 'text-on-surface-variant hover:text-primary'}`}><Filter size={16} /></button>
+              <button onClick={() => setViewMode('map')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'map' ? 'bg-white shadow text-primary' : 'text-on-surface-variant hover:text-primary'}`}><Map size={16} /></button>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Dynamic Factual Empty State if no Mandis found */}
+        {/* Empty State */}
         {topMandis.length === 0 ? (
-          <div className="bg-white rounded-3xl p-10 border border-outline-variant text-center w-full max-w-xl mx-auto space-y-4 shadow-sm my-6">
-            <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto text-amber-500">
-              <AlertTriangle size={32} />
+          <div className="bg-white rounded-3xl p-8 border border-outline-variant text-center w-full mx-auto space-y-5 shadow-sm">
+            <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto text-orange-500">
+              <Info size={32} />
             </div>
-            <h3 className="text-lg font-black text-on-surface">Data Not Available (डेटा उपलब्ध नहीं है)</h3>
-            <p className="text-xs text-on-surface-variant leading-relaxed font-semibold">
-              No live daily prices or markets were reported in <strong>{farmDistrict}, {farmState}</strong> for the crop <strong>{crop}</strong> today.
+            <h3 className="text-lg font-black text-on-surface">Data Not Available Today</h3>
+            <p className="text-sm text-on-surface-variant leading-relaxed font-semibold max-w-md mx-auto">
+              No official prices were reported today for <strong>{crop}</strong> in <strong>{farmState}</strong>. We searched across all districts, but AGMARKNET reporting varies by mandi.
             </p>
-            <div className="p-3.5 bg-slate-50 rounded-xl text-[10px] text-on-surface-variant font-bold text-left border border-outline-variant/60">
-              💡 <span className="font-extrabold text-primary">Developer Testbed Tip:</span> Try setting your state override to <span className="underline">Maharashtra</span> and district override to <span className="underline">Nashik</span> to view simulated demonstration mandi data.
-            </div>
+            <p className="text-xs font-bold text-orange-600 mt-2">Try checking back later today or selecting a different crop.</p>
           </div>
         ) : (
           <>
-            {/* Should I Visit Another Mandi? Banner */}
-            {advice && (
-              <div className={`p-4 rounded-2xl border flex gap-3 ${advice.colorClass} shadow-sm animate-fade-in`}>
-                <div className="shrink-0 mt-0.5">
-                  {advice.recommend === 'YES_ALT' ? <AlertTriangle size={20} className="text-indigo-700" /> : <CheckCircle2 size={20} className="text-emerald-700" />}
-                </div>
-                <div>
-                  <div className="font-black text-sm">{advice.title}</div>
-                  <p className="text-[11px] font-semibold leading-relaxed mt-1 opacity-90">
-                    {advice.desc}
-                  </p>
-                </div>
-              </div>
-            )}
-
             {/* List View */}
             {viewMode === 'list' && (
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 pb-20">
-                {topMandis.map((mandi, idx) => (
-                  <div 
-                    key={idx}
-                    onClick={() => onSelectMandi(mandi)}
-                    className="group bg-white rounded-3xl p-5 border border-outline-variant hover:border-primary/45 hover:shadow-lg transition-all duration-300 cursor-pointer relative overflow-hidden flex flex-col justify-between hover:-translate-y-0.5"
-                  >
-                    {idx === 0 && sortBy === 'net_realization' && (
-                      <div className="absolute top-0 right-0 bg-green-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-xl tracking-wider">
-                        MOST PROFITABLE
-                      </div>
-                    )}
-                    
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h4 className="font-display font-extrabold text-lg text-on-surface group-hover:text-primary transition-colors">
-                          {mandi.market}
-                        </h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[10px] font-bold text-on-surface-variant bg-surface-container-low px-2 py-0.5 rounded-md">
-                            {mandi.district}, {mandi.state}
-                          </span>
+              <div className="space-y-4 pb-20">
+                {topMandis.map((mandi, idx) => {
+                  const isNearest = mandi === nearestMandi;
+                  const isBestNet = mandi === bestNetMandi;
+                  const isHighestPrice = mandi === highestPriceMandi;
+
+                  return (
+                    <div 
+                      key={idx}
+                      className="group bg-white rounded-3xl p-5 md:p-6 border border-outline-variant shadow-sm hover:shadow-lg transition-all duration-300 relative"
+                    >
+                      {/* Header row */}
+                      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-4">
+                        <div>
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {isBestNet && <span className="bg-green-100 text-green-800 text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wide">Best Net Earnings</span>}
+                            {isNearest && <span className="bg-blue-100 text-blue-800 text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wide">Nearest</span>}
+                            {isHighestPrice && !isBestNet && <span className="bg-purple-100 text-purple-800 text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wide">Highest Price</span>}
+                            <span className="bg-surface-container-low border border-outline-variant flex items-center gap-1 text-on-surface-variant text-[9px] font-bold px-2 py-0.5 rounded">
+                              <ShieldCheck size={10} className="text-green-600" /> AGMARKNET Verified
+                            </span>
+                          </div>
+                          <h4 className="font-display font-extrabold text-xl text-on-surface group-hover:text-primary transition-colors">
+                            {mandi.market}
+                          </h4>
+                          <div className="text-xs font-bold text-on-surface-variant flex items-center gap-1.5 mt-1">
+                            <MapPin size={12} /> {mandi.district}, {mandi.state} • {mandi.distance} km away
+                          </div>
+                        </div>
+
+                        <div className="text-left md:text-right">
+                          <div className="text-3xl font-black text-on-surface flex items-center md:justify-end gap-0.5">
+                            <IndianRupee size={24} className="text-primary" />
+                            {mandi.modalPrice}
+                          </div>
+                          <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wide">Modal Price / Qtl</span>
                         </div>
                       </div>
-                      
-                      <div className="text-right">
-                        <div className="text-2xl font-black text-on-surface flex items-center justify-end gap-0.5">
-                          <IndianRupee size={20} className="text-primary" />
-                          {mandi.modalPrice}
+
+                      {/* Middle Data Row */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5 border-y border-outline-variant/40 py-4">
+                        <div>
+                          <div className="text-[10px] text-on-surface-variant uppercase font-bold mb-0.5">Variety</div>
+                          <div className="text-sm font-extrabold text-on-surface">{mandi.variety || 'Other'}</div>
                         </div>
-                        <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wide">Modal Price / Qtl</span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 mb-4 text-xs font-semibold text-on-surface">
-                      <div className="bg-surface-container-lowest p-2.5 rounded-xl border border-outline-variant">
-                        <div className="flex items-center gap-1.5 text-[9px] font-bold text-on-surface-variant mb-1 uppercase tracking-wide">
-                          <Navigation size={12} /> Distance
+                        <div>
+                          <div className="text-[10px] text-on-surface-variant uppercase font-bold mb-0.5">Grade</div>
+                          <div className="text-sm font-extrabold text-on-surface">{mandi.grade || 'FAQ'}</div>
                         </div>
-                        <div className="font-extrabold">{mandi.distance} km</div>
-                        <div className="text-[9px] text-on-surface-variant">{mandi.travelTime}</div>
-                      </div>
-                      
-                      <div className="bg-surface-container-lowest p-2.5 rounded-xl border border-outline-variant">
-                        <div className="flex items-center gap-1.5 text-[9px] font-bold text-on-surface-variant mb-1 uppercase tracking-wide">
-                          <Clock size={12} /> Last Sourced
+                        <div>
+                          <div className="text-[10px] text-on-surface-variant uppercase font-bold mb-0.5">Min - Max Price</div>
+                          <div className="text-sm font-extrabold text-on-surface">₹{mandi.minPrice} - ₹{mandi.maxPrice}</div>
                         </div>
-                        <div className="font-extrabold">{mandi.arrivalDate || 'Today'}</div>
-                        <div className="text-[9px] text-on-surface-variant">AGMARKNET Data</div>
+                        <div>
+                          <div className="text-[10px] text-on-surface-variant uppercase font-bold mb-0.5 flex items-center gap-1"><Clock size={10}/> Last Updated</div>
+                          <div className="text-sm font-extrabold text-on-surface">{mandi.arrivalDate || 'Today'}</div>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Variety & Grade */}
-                    <div className="grid grid-cols-2 gap-3 mb-4 text-[10px] font-semibold text-on-surface-variant">
-                      <div>
-                        <span className="text-[9px] uppercase block mb-0.5">Variety (फसल की किस्म)</span>
-                        <span className="font-extrabold text-on-surface">{mandi.variety || 'Other'}</span>
-                      </div>
-                      <div>
-                        <span className="text-[9px] uppercase block mb-0.5">Grade (श्रेणी)</span>
-                        <span className="font-extrabold text-on-surface">{mandi.grade || 'FAQ'}</span>
-                      </div>
-                    </div>
+                      {/* Bottom row: Calculations and Action */}
+                      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-outline-variant/60">
+                        <div className="w-full md:w-auto text-xs font-semibold text-on-surface-variant space-y-1">
+                          <div className="flex justify-between gap-8">
+                            <span>Est. Transport Cost (approx):</span>
+                            <span className="font-bold text-red-600">-₹{mandi.transportCost}</span>
+                          </div>
+                          <div className="flex justify-between gap-8 text-sm pt-1">
+                            <span className="text-on-surface">Est. Net Earnings ({quantity} Qtl):</span>
+                            <span className="font-black text-green-700">₹{Math.max(0, Math.round((quantity * mandi.modalPrice) - mandi.transportCost))}</span>
+                          </div>
+                        </div>
 
-                    {/* Transparent Net Selling Value Breakdown */}
-                    <div className="bg-slate-50 border border-outline-variant/60 rounded-2xl p-4 space-y-1.5 text-xs transition-colors group-hover:bg-green-50/20">
-                      <div className="flex justify-between font-semibold text-on-surface-variant">
-                        <span>Revenue ({quantity} Qtl × ₹{mandi.modalPrice}):</span>
-                        <span className="font-bold text-on-surface">₹{Math.round(quantity * mandi.modalPrice)}</span>
+                        <button 
+                          onClick={() => onSelectMandi(mandi)}
+                          className="w-full md:w-auto px-6 py-2.5 bg-white border-2 border-primary text-primary text-sm font-bold rounded-xl hover:bg-primary hover:text-white transition-colors shadow-sm"
+                        >
+                          View Details
+                        </button>
                       </div>
-                      <div className="flex justify-between font-semibold text-on-surface-variant">
-                        <span>Transport ({mandi.distance} km × ₹{vehicleRates[vehicleType].ratePerKm}/km × 2 + ₹{vehicleRates[vehicleType].fixedCost}):</span>
-                        <span className="font-bold text-red-600">-₹{mandi.transportCost}</span>
-                      </div>
-                      <div className="flex justify-between border-t border-outline-variant/60 pt-1.5 font-bold">
-                        <span className="text-on-surface">Net Realization:</span>
-                        <span className="font-black text-green-700 text-sm">₹{Math.max(0, Math.round(quantity * mandi.modalPrice - mandi.transportCost))}</span>
-                      </div>
-                    </div>
 
-                  </div>
-                ))}
+                    </div>
+                  );
+                })}
               </div>
             )}
 
@@ -407,21 +474,10 @@ export default function MandiDiscovery({
                     </div>
                   );
                 })}
-                
-                <div className="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <MapPin className="text-primary" />
-                    <div>
-                      <div className="font-bold text-sm">Map View Active</div>
-                      <div className="text-xs text-on-surface-variant">Showing top {topMandis.length} mandis near {farmVillage}</div>
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
           </>
         )}
-
       </div>
     </div>
   );

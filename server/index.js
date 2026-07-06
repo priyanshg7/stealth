@@ -44,7 +44,7 @@ app.get('/api/mandi/prices', async (req, res) => {
 
     // Build filter params
     const filters = [];
-    if (state) filters.push(`filters[state]=${encodeURIComponent(state)}`);
+    if (state) filters.push(`filters[state.keyword]=${encodeURIComponent(state)}`);
     if (district) filters.push(`filters[district]=${encodeURIComponent(district)}`);
     if (commodity) filters.push(`filters[commodity]=${encodeURIComponent(commodity)}`);
     if (market) filters.push(`filters[market]=${encodeURIComponent(market)}`);

@@ -1,5 +1,5 @@
 import { t as tr } from '../utils/translations';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Cpu } from 'lucide-react';
 
 export default function Sidebar({
@@ -36,8 +36,31 @@ export default function Sidebar({
   const handleNavClick = (tabId) => {
     setActiveDashboardTab(tabId);
     setSidebarOpen(false);       // close mobile drawer
-    setSidebarCollapsed(true);   // collapse desktop sidebar to icon-only
+    // We do not force collapse on desktop anymore so user can leave it open
   };
+
+  const navRef = useRef(null);
+
+  // Close mobile drawer on Escape key
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape' && sidebarOpen) {
+        setSidebarOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [sidebarOpen, setSidebarOpen]);
+
+  // Scroll active item into view
+  useEffect(() => {
+    if (navRef.current) {
+      const activeEl = navRef.current.querySelector('[data-active="true"]');
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }, [activeDashboardTab, sidebarCollapsed]);
 
   const NAV_ITEMS = [
     { id: 'dashboard', label: 'Dashboard', icon: 'grid_view' },
@@ -58,27 +81,26 @@ export default function Sidebar({
       {sidebarOpen && (
         <div 
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-[90] bg-black/40 backdrop-blur-xs lg:hidden transition-opacity duration-300"
         />
       )}
 
       {/* ─── SIDEBAR ─── */}
       <aside
         className={`
-          fixed inset-y-0 left-0 z-50 flex flex-col
+          fixed inset-y-0 left-0 z-[100] flex flex-col
           bg-white border-r border-outline-variant/60 shadow-2xl
-          sidebar-transition transform
-          transition-[width,transform] duration-300 ease-in-out
+          transform transition-[width,transform] duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:static lg:translate-x-0
-          ${sidebarCollapsed ? 'lg:w-20 overflow-hidden h-screen' : 'lg:w-72'}
+          lg:static lg:translate-x-0 flex-shrink-0 h-screen
+          ${sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'}
           w-72
         `}
       >
         {/* ── HEADER: Logo / Profile ── */}
         <div
-          className={`flex items-center border-b border-surface-container-high bg-gradient-to-br from-primary/5 to-transparent transition-all duration-300
-            ${sidebarCollapsed ? 'lg:justify-center lg:px-2 lg:py-4 p-4' : 'p-4 gap-3'}`}
+          className={`flex items-center border-b border-surface-container-high bg-gradient-to-br from-primary/5 to-transparent transition-all duration-300 overflow-hidden whitespace-nowrap
+            ${sidebarCollapsed ? 'lg:justify-center p-4' : 'p-4 gap-3'}`}
         >
           {/* Avatar always visible */}
           <div className="relative flex-shrink-0">
@@ -92,8 +114,8 @@ export default function Sidebar({
             <span className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 rounded-full border-2 border-white" />
           </div>
 
-          {/* Name + location — hidden when collapsed on desktop */}
-          <div className={`min-w-0 flex-1 transition-all duration-300 ${sidebarCollapsed ? 'lg:hidden' : ''}`}>
+          {/* Name + location — fades out when collapsed on desktop */}
+          <div className={`flex-1 transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:opacity-0 lg:w-0' : 'opacity-100 w-auto min-w-0'}`}>
             <h4 className="font-display font-bold text-on-surface text-sm leading-tight truncate">
               {profile.name || 'Ramesh Ji'}
             </h4>
@@ -120,7 +142,7 @@ export default function Sidebar({
         </div>
 
         {/* ── NAVIGATION ── */}
-        <nav className={`flex-1 ${sidebarCollapsed ? 'overflow-hidden' : 'overflow-y-auto'} py-3 space-y-0.5 no-scrollbar`}>
+        <nav ref={navRef} className="flex-1 overflow-y-auto py-3 space-y-0.5 no-scrollbar">
           {NAV_ITEMS.map(item => {
             const isActive = activeDashboardTab === item.id;
             return (
@@ -129,9 +151,9 @@ export default function Sidebar({
                 onClick={() => handleNavClick(item.id)}
                 title={sidebarCollapsed ? tr(item.label, language) : undefined}
                 className={`
-                  w-full flex items-center font-semibold text-sm transition-all duration-150
+                  w-full flex items-center font-semibold text-sm transition-all duration-300 whitespace-nowrap overflow-hidden
                   ${sidebarCollapsed
-                    ? 'lg:justify-center lg:px-2 lg:py-3 px-4 py-3 justify-start gap-3'
+                    ? 'lg:justify-center px-4 py-3 justify-start gap-3'
                     : 'px-4 py-3 gap-3'
                   }
                   ${isActive 
@@ -140,14 +162,14 @@ export default function Sidebar({
                   }
                 `}
               >
-                <span className={`material-symbols-outlined text-xl flex-shrink-0 ${isActive ? 'fill' : ''}`}>
+                <span className={`material-symbols-outlined text-xl flex-shrink-0 transition-all duration-300 ${isActive ? 'fill' : ''}`}>
                   {item.icon}
                 </span>
-                <span className={`flex-1 text-left truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:hidden' : ''}`}>
+                <span className={`flex-1 text-left truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:opacity-0 lg:w-0' : 'opacity-100 w-auto'}`}>
                   {tr(item.label, language)}
                 </span>
                 {item.badge && item.badge > 0 && (
-                  <span className={`bg-primary text-white font-bold text-xs px-1.5 py-0.5 rounded-full flex-shrink-0 ${sidebarCollapsed ? 'lg:hidden' : ''}`}>
+                  <span className={`bg-primary text-white font-bold text-xs px-1.5 py-0.5 rounded-full flex-shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'lg:opacity-0 lg:w-0 lg:px-0' : 'opacity-100'}`}>
                     {item.badge}
                   </span>
                 )}
@@ -161,7 +183,7 @@ export default function Sidebar({
         </nav>
 
         {/* ── FOOTER: JWT Inspector + Sign Out ── */}
-        <div className={`border-t border-surface-container-high bg-white transition-all duration-300 ${sidebarCollapsed ? 'lg:px-2 lg:py-3 p-3' : 'p-3'} space-y-1`}>
+        <div className={`border-t border-surface-container-high bg-white transition-all duration-300 p-3 space-y-1 overflow-hidden whitespace-nowrap`}>
           {/* JWT Inspector (only when token exists) */}
           {jwtToken && (
             <button
@@ -171,7 +193,7 @@ export default function Sidebar({
                 ${sidebarCollapsed ? 'lg:justify-center' : ''}`}
             >
               <Cpu className="w-4 h-4 flex-shrink-0" />
-              <span className={`truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:hidden' : ''}`}>
+              <span className={`truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:opacity-0 lg:w-0' : 'opacity-100 w-auto'}`}>
                 Inspect JWT
               </span>
             </button>
@@ -196,7 +218,7 @@ export default function Sidebar({
               ${sidebarCollapsed ? 'lg:justify-center' : ''}`}
           >
             <span className="material-symbols-outlined text-lg flex-shrink-0">logout</span>
-            <span className={`truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:hidden' : ''}`}>
+            <span className={`truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:opacity-0 lg:w-0' : 'opacity-100 w-auto'}`}>
               {tr("Sign Out / Reset", language)}
             </span>
           </button>

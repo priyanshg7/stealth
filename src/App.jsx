@@ -590,7 +590,11 @@ export default function App() {
   const [voiceReplies, setVoiceReplies] = useState([
     { sender: 'ai', text: 'Namaste! I am KisanMitra Voice Assistant. Ask me anything about your farm today.' }
   ]);
-  const [activeDashboardTab, setActiveDashboardTab] = useState('dashboard');
+  const [activeDashboardTab, setActiveDashboardTab] = useState(() => localStorage.getItem('km_active_tab') || 'dashboard');
+
+  useEffect(() => {
+    localStorage.setItem('km_active_tab', activeDashboardTab);
+  }, [activeDashboardTab]);
   const [soilCardReminderDismissed, setSoilCardReminderDismissed] = useState(false);
   const [onboardingCarouselIndex, setOnboardingCarouselIndex] = useState(0);
   const [showAnnualPlanWizard, setShowAnnualPlanWizard] = useState(false);
@@ -1656,7 +1660,7 @@ Instructions:
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-surface flex flex-col font-sans">
+    <div className={`h-screen bg-background text-on-surface flex flex-col font-sans ${view === 'DASHBOARD' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
       
       {/* TTS voice guide floating overlay */}
       {voiceGuide && (

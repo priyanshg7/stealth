@@ -15,6 +15,7 @@ import SeasonPlanner from './subviews/SeasonPlanner';
 import WeatherIntelligence from './subviews/WeatherIntelligence';
 import AnnualPlanner from './subviews/AnnualPlanner';
 import TodayTasks from './subviews/TodayTasks';
+import FarmJourney from './subviews/FarmJourney';
 
 
 export default function DashboardShell({
@@ -89,7 +90,7 @@ export default function DashboardShell({
   allSchemes
 }) {
   return (
-    <div className="flex-grow w-full flex bg-background text-on-surface relative overflow-hidden min-h-[calc(100vh-68px)] font-sans">
+    <div className="flex-grow w-full flex bg-background text-on-surface relative h-screen overflow-hidden font-sans">
       
       {/* Sidebar navigation drawer */}
       <Sidebar 
@@ -118,7 +119,7 @@ export default function DashboardShell({
       />
 
       {/* Main content body container */}
-      <div className={`flex-grow flex flex-col min-w-0 overflow-y-auto pb-16 relative transition-all duration-300`}>
+      <div className="flex-grow flex flex-col min-w-0 h-full overflow-y-auto relative transition-all duration-300">
         
         {/* Top command bar */}
         <Header 
@@ -292,21 +293,16 @@ export default function DashboardShell({
             />
           )}
 
-          {/* Simple Fallbacks for other tabs to keep navigation responsive */}
-          {['journey'].includes(activeDashboardTab) && (
-            <div className="bg-white border rounded-card p-6 shadow-sm text-center py-10 space-y-3">
-              <span className="material-symbols-outlined text-primary text-4xl font-bold">construction</span>
-              <h3 className="font-display font-extrabold text-lg text-on-surface">Module Subview Under Development</h3>
-              <p className="text-xs text-on-surface-variant max-w-sm mx-auto">
-                The {activeDashboardTab.replace('_', ' ')} layout is being actively structured by KisanMitra engineers. Direct alerts and command parameters remain available on the home Dashboard tab.
-              </p>
-              <button 
-                onClick={() => setActiveDashboardTab('dashboard')}
-                className="bg-primary hover:bg-secondary text-white font-bold px-4 py-2 rounded-xl text-xs"
-              >
-                Back to Dashboard
-              </button>
-            </div>
+          {activeDashboardTab === 'journey' && (
+            <FarmJourney
+              farms={farms}
+              selectedFarmIndex={selectedFarmIndex}
+              setSelectedFarmIndex={setSelectedFarmIndex}
+              getFarmDashboardData={getFarmDashboardData}
+              completedTasks={completedTasks}
+              weatherData={weatherData}
+              language={language}
+            />
           )}
 
         </main>

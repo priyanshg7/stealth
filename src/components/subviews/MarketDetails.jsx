@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MandiDiscovery from '../market/MandiDiscovery';
-import OverviewTab from '../market/tabs/OverviewTab';
+import MarketOverview from '../market/MarketOverview';
 import PriceTrendsTab from '../market/tabs/PriceTrendsTab';
 import LogisticsStorageTab from '../market/tabs/LogisticsStorageTab';
 import PriceAlertsTab from '../market/tabs/PriceAlertsTab';
@@ -38,6 +38,18 @@ export default function MarketDetails({
     loadInitialData();
   }, [cropName, farmState, farmDistrict]);
 
+  // Lock body scroll when drawer is open to make scrolling independent
+  useEffect(() => {
+    if (selectedMandi) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedMandi]);
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-on-surface-variant">
@@ -65,9 +77,10 @@ export default function MarketDetails({
   };
 
   return (
-    <div className="space-y-8 animate-fade-in-up pb-24 relative">
-      
-      {/* ── Header Title Block ── */}
+    <>
+      <div className="space-y-8 animate-fade-in-up pb-24 relative">
+        
+        {/* ── Header Title Block ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant/60 pb-4">
         <div>
           <h2 className="text-2xl font-display font-extrabold text-on-surface flex items-center gap-2">
@@ -84,46 +97,42 @@ export default function MarketDetails({
         </div>
       </div>
 
-      {/* ── Top Section: Selling Advisory & Price Trends Side-by-Side ── */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+      {/* ── Unified Scrolling Feed ── */}
+      <div className="max-w-5xl mx-auto space-y-8">
         
-        {/* Left Column: Selling Advisory (5 cols) */}
-        <div className="xl:col-span-5 space-y-6">
-          <OverviewTab 
-            mandi={defaultMandi} 
-            mandiData={mandiData} 
-            weatherData={weatherData} 
-          />
-        </div>
-
-        {/* Right Column: Price Trends Chart (7 cols) */}
-        <div className="xl:col-span-7">
-          <PriceTrendsTab 
-            mandi={defaultMandi} 
-            activeFarm={activeFarm}
-            liveMandiData={mandiData}
-          />
-        </div>
-
-      </div>
-
-      {/* ── Bottom Section: Mandi Options Explorer ── */}
-      <div className="border-t border-outline-variant/50 pt-8 space-y-6">
-        <div>
-          <h3 className="font-display font-extrabold text-xl text-on-surface">
-            Mandi Buyer Discovery (मंडी खरीदार खोजें)
-          </h3>
-          <p className="text-xs text-on-surface-variant font-semibold mt-1">
-            Compare estimated net realizations and logistics after transport deductions.
-          </p>
-        </div>
-
-        <MandiDiscovery 
-          farms={farms}
-          selectedFarmIndex={selectedFarmIndex}
-          mandiData={mandiData}
-          onSelectMandi={setSelectedMandi}
+        {/* 1. Market Overview (AI Recommendation, Summary, Transport) */}
+        <MarketOverview 
+          mandi={defaultMandi} 
+          mandiData={mandiData} 
+          weatherData={weatherData} 
         />
+
+        {/* 2. Price Trends & Analytics */}
+        <PriceTrendsTab 
+          mandi={defaultMandi} 
+          activeFarm={activeFarm}
+          liveMandiData={mandiData}
+        />
+
+        {/* 3. Mandi Options Explorer (Nearby Buyers) */}
+        <div id="mandi-discovery-section" className="border-t border-outline-variant/50 pt-8 space-y-6">
+          <div>
+            <h3 className="font-display font-extrabold text-xl text-on-surface">
+              Mandi Buyer Discovery (मंडी खरीदार खोजें)
+            </h3>
+            <p className="text-xs text-on-surface-variant font-semibold mt-1">
+              Compare estimated net realizations and logistics after transport deductions.
+            </p>
+          </div>
+
+          <MandiDiscovery 
+            farms={farms}
+            selectedFarmIndex={selectedFarmIndex}
+            mandiData={mandiData}
+            onSelectMandi={setSelectedMandi}
+          />
+        </div>
+      </div>
       </div>
 
       {/* ── Mandi Details Overlay Drawer ── */}
@@ -188,6 +197,6 @@ export default function MarketDetails({
         </div>
       )}
 
-    </div>
+    </>
   );
 }
