@@ -202,7 +202,7 @@ export default function MandiDiscovery({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* State */}
           <div>
-            <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">State (राज्य)</label>
+            <label className="text-[11px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">State (राज्य)</label>
             <select 
               value={farmState}
               onChange={(e) => {
@@ -218,7 +218,7 @@ export default function MandiDiscovery({
 
           {/* District */}
           <div>
-            <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">District (जिला)</label>
+            <label className="text-[11px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">District (जिला)</label>
             {districtsOptions.length > 0 ? (
               <select 
                 value={farmDistrict}
@@ -240,7 +240,7 @@ export default function MandiDiscovery({
 
           {/* Crop */}
           <div>
-            <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Crop (फसल)</label>
+            <label className="text-[11px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Crop (फसल)</label>
             <input 
               type="text" 
               value={crop}
@@ -273,7 +273,7 @@ export default function MandiDiscovery({
           {isAdvancedExpanded && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 animate-fade-in">
               <div>
-                <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Variety filter</label>
+                <label className="text-[11px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Variety filter</label>
                 <select 
                   value={variety}
                   onChange={(e) => setVariety(e.target.value)}
@@ -283,7 +283,7 @@ export default function MandiDiscovery({
                 </select>
               </div>
               <div>
-                <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Quantity (Qtl)</label>
+                <label className="text-[11px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Quantity (Qtl)</label>
                 <input 
                   type="number" 
                   value={quantity}
@@ -292,7 +292,7 @@ export default function MandiDiscovery({
                 />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Sort By</label>
+                <label className="text-[11px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Sort By</label>
                 <select 
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
@@ -304,7 +304,7 @@ export default function MandiDiscovery({
                 </select>
               </div>
               <div>
-                <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Transport Vehicle</label>
+                <label className="text-[11px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1 block">Transport Vehicle</label>
                 <select 
                   value={vehicleType}
                   onChange={(e) => setVehicleType(e.target.value)}
@@ -366,10 +366,10 @@ export default function MandiDiscovery({
                       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-4">
                         <div>
                           <div className="flex flex-wrap gap-2 mb-2">
-                            {isBestNet && <span className="bg-green-100 text-green-800 text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wide">Best Net Earnings</span>}
-                            {isNearest && <span className="bg-blue-100 text-blue-800 text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wide">Nearest</span>}
-                            {isHighestPrice && !isBestNet && <span className="bg-purple-100 text-purple-800 text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wide">Highest Price</span>}
-                            <span className="bg-surface-container-low border border-outline-variant flex items-center gap-1 text-on-surface-variant text-[9px] font-bold px-2 py-0.5 rounded">
+                            {isBestNet && <span className="bg-green-100 text-green-800 text-[10px] md:text-[11px] font-black px-2 py-0.5 rounded uppercase tracking-wide">Best Net Earnings</span>}
+                            {isNearest && <span className="bg-blue-100 text-blue-800 text-[10px] md:text-[11px] font-black px-2 py-0.5 rounded uppercase tracking-wide">Nearest</span>}
+                            {isHighestPrice && !isBestNet && <span className="bg-purple-100 text-purple-800 text-[10px] md:text-[11px] font-black px-2 py-0.5 rounded uppercase tracking-wide">Highest Price</span>}
+                            <span className="bg-surface-container-low border border-outline-variant flex items-center gap-1 text-on-surface-variant text-[10px] md:text-[11px] font-bold px-2 py-0.5 rounded">
                               <ShieldCheck size={10} className="text-green-600" /> AGMARKNET Verified
                             </span>
                           </div>
@@ -386,26 +386,26 @@ export default function MandiDiscovery({
                             <IndianRupee size={24} className="text-primary" />
                             {mandi.modalPrice}
                           </div>
-                          <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wide">Modal Price / Qtl</span>
+                          <span className="text-[11px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wide">Modal Price / Qtl</span>
                         </div>
                       </div>
 
                       {/* Middle Data Row */}
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5 border-y border-outline-variant/40 py-4">
                         <div>
-                          <div className="text-[10px] text-on-surface-variant uppercase font-bold mb-0.5">Variety</div>
+                          <div className="text-[11px] md:text-xs text-on-surface-variant uppercase font-bold mb-0.5">Variety</div>
                           <div className="text-sm font-extrabold text-on-surface">{mandi.variety || 'Other'}</div>
                         </div>
                         <div>
-                          <div className="text-[10px] text-on-surface-variant uppercase font-bold mb-0.5">Grade</div>
+                          <div className="text-[11px] md:text-xs text-on-surface-variant uppercase font-bold mb-0.5">Grade</div>
                           <div className="text-sm font-extrabold text-on-surface">{mandi.grade || 'FAQ'}</div>
                         </div>
                         <div>
-                          <div className="text-[10px] text-on-surface-variant uppercase font-bold mb-0.5">Min - Max Price</div>
+                          <div className="text-[11px] md:text-xs text-on-surface-variant uppercase font-bold mb-0.5">Min - Max Price</div>
                           <div className="text-sm font-extrabold text-on-surface">₹{mandi.minPrice} - ₹{mandi.maxPrice}</div>
                         </div>
                         <div>
-                          <div className="text-[10px] text-on-surface-variant uppercase font-bold mb-0.5 flex items-center gap-1"><Clock size={10}/> Last Updated</div>
+                          <div className="text-[11px] md:text-xs text-on-surface-variant uppercase font-bold mb-0.5 flex items-center gap-1"><Clock size={10}/> Last Updated</div>
                           <div className="text-sm font-extrabold text-on-surface">{mandi.arrivalDate || 'Today'}</div>
                         </div>
                       </div>
@@ -444,7 +444,7 @@ export default function MandiDiscovery({
                 
                 {/* Center Pin */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
-                  <div className="bg-primary text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg mb-1 whitespace-nowrap">{farmVillage}</div>
+                  <div className="bg-primary text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg mb-1 whitespace-nowrap">{farmVillage}</div>
                   <MapPin className="text-primary drop-shadow-md" size={32} fill="white" />
                 </div>
 
@@ -464,8 +464,8 @@ export default function MandiDiscovery({
                     >
                       <div className="bg-white border border-outline-variant shadow-lg rounded-xl p-2 mb-1 opacity-0 group-hover:opacity-100 transition-opacity absolute bottom-full left-1/2 -translate-x-1/2 whitespace-nowrap w-48 pointer-events-none">
                         <div className="font-bold text-xs">{m.market}</div>
-                        <div className="text-[10px] text-green-600 font-bold">Net: ₹{Math.max(0, Math.round(m.netExpected))}/Qtl</div>
-                        <div className="text-[9px] text-on-surface-variant">{m.distance} km • {m.travelTime}</div>
+                        <div className="text-xs text-green-600 font-bold">Net: ₹{Math.max(0, Math.round(m.netExpected))}/Qtl</div>
+                        <div className="text-[11px] text-on-surface-variant">{m.distance} km • {m.travelTime}</div>
                       </div>
                       <div className="relative flex items-center justify-center">
                         <div className="absolute w-8 h-8 bg-green-500/20 rounded-full animate-ping"></div>

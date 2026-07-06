@@ -19,7 +19,7 @@ export default function QuickActionFAB({
           <button
             key={i}
             onClick={act.action}
-            className="flex items-center gap-2 self-end bg-white hover:bg-surface-container border border-outline-variant/60 text-on-surface-variant py-2 px-3.5 rounded-xl text-xs font-bold shadow-md transition-all whitespace-nowrap"
+            className="flex items-center gap-2 self-end bg-white hover:bg-surface-container border border-outline-variant/60 text-on-surface-variant py-2 px-3.5 rounded-xl text-xs font-bold shadow-md transition-all whitespace-nowrap min-h-[48px]"
           >
             <span className="material-symbols-outlined text-sm font-bold text-primary">{act.icon}</span>
             <span>{act.label}</span>

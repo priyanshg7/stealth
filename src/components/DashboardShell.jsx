@@ -138,7 +138,7 @@ export default function DashboardShell({
         />
 
         {/* Dynamic content subviews routing based on active tab state */}
-        <main className="p-4 md:p-6 pb-32 max-w-7xl mx-auto w-full flex-grow space-y-6">
+        <main className="p-4 md:p-6 pb-48 md:pb-32 max-w-7xl mx-auto w-full flex-grow space-y-6">
           
           {activeDashboardTab === 'dashboard' && (
             (farms.length > 0) ? (

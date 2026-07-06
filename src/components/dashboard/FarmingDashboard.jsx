@@ -85,13 +85,13 @@ export default function FarmingDashboard({
 
         {/* Horizontal Farm Swapper */}
         <div className="space-y-2">
-          <span className="text-[11px] text-on-surface-variant font-bold uppercase tracking-wider block">My Farm Profiles</span>
-          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-1">
+          <span className="text-xs md:text-sm text-on-surface-variant font-bold uppercase tracking-wider block">My Farm Profiles</span>
+          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-2 -mx-4 px-4 md:mx-0 md:px-0">
             {farms.map((f, i) => (
               <button
                 key={i}
                 onClick={() => setSelectedFarmIndex(i)}
-                className={`p-4 rounded-card border transition-all text-left shrink-0 min-w-[200px] w-64 shadow-xs relative ${
+                className={`p-4 rounded-card border transition-all text-left shrink-0 w-11/12 max-w-[260px] md:min-w-[200px] md:w-64 shadow-xs relative min-h-[106px] ${
                   selectedFarmIndex === i
                     ? 'bg-white border-2 border-primary ring-2 ring-primary/10'
                     : 'bg-white border-outline-variant/60 hover:border-primary/45'
@@ -101,11 +101,11 @@ export default function FarmingDashboard({
                   <span className="font-extrabold text-sm text-on-surface flex items-center gap-1">
                     🚜 {f.name}
                   </span>
-                  <span className="text-[10px] bg-primary/10 text-primary font-black px-2 py-0.5 rounded-full">
+                  <span className="text-[11px] md:text-xs bg-primary/10 text-primary font-black px-2 py-0.5 rounded-full">
                     {f.area} {f.unit}
                   </span>
                 </div>
-                <div className="text-[11px] text-on-surface-variant/90 font-bold space-y-0.5">
+                <div className="text-xs text-on-surface-variant/90 font-bold space-y-1">
                   <div>Crop: <span className="text-primary">{f.crop?.name}</span></div>
                   <div>Stage: <span className="text-on-surface">{f.crop?.stage || 'Sowing'}</span></div>
                   <div className="flex justify-between items-center mt-2 border-t pt-1.5 border-outline-variant/30">
@@ -117,7 +117,7 @@ export default function FarmingDashboard({
             ))}
             <button
               onClick={startNewFarmRegistration}
-              className="p-4 rounded-card border-2 border-dashed border-primary/50 text-primary bg-primary/5 hover:bg-primary/10 flex flex-col justify-center items-center text-center shrink-0 min-w-[180px] h-[106px] transition-colors"
+              className="p-4 rounded-card border-2 border-dashed border-primary/50 text-primary bg-primary/5 hover:bg-primary/10 flex flex-col justify-center items-center text-center shrink-0 w-11/12 max-w-[200px] md:min-w-[180px] h-[106px] transition-colors"
             >
               <PlusCircle className="w-6 h-6 mb-1" />
               <span className="text-xs font-bold">{t("Add New Farm", language)}</span>
@@ -145,12 +145,12 @@ export default function FarmingDashboard({
             {/* Annual Plan Card */}
             <div className="bg-white p-5 rounded-2xl border border-outline-variant hover:border-primary/50 transition-all shadow-xs space-y-3 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] text-primary font-black uppercase tracking-wider">Recommended workflow</span>
+                <span className="text-[11px] md:text-xs text-primary font-black uppercase tracking-wider">Recommended workflow</span>
                 <h3 className="font-extrabold text-base text-on-surface mt-1">Create Annual Farm Plan</h3>
                 <p className="text-xs text-on-surface-variant font-medium mt-1">
                   Plan your entire year across Kharif, Rabi, and Zaid seasons. Auto-calculates optimal crop rotations to replenish soil nutrients.
                 </p>
-                <div className="flex gap-2 items-center text-[10px] text-on-surface-variant font-bold mt-3">
+                <div className="flex gap-2 items-center text-[11px] md:text-xs text-on-surface-variant font-bold mt-3">
                   <span className="bg-surface-container-high px-2 py-0.5 rounded">Takes 3-5 min</span>
                   <span className="text-green-700">✓ Full rotation benefits</span>
                 </div>
@@ -166,12 +166,12 @@ export default function FarmingDashboard({
             {/* Seasonal Plan Card */}
             <div className="bg-white p-5 rounded-2xl border border-outline-variant hover:border-primary/50 transition-all shadow-xs space-y-3 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] text-on-surface-variant font-black uppercase tracking-wider">Single crop cycle</span>
+                <span className="text-[11px] md:text-xs text-on-surface-variant font-black uppercase tracking-wider">Single crop cycle</span>
                 <h3 className="font-extrabold text-base text-on-surface mt-1">Create Seasonal Plan</h3>
                 <p className="text-xs text-on-surface-variant font-medium mt-1">
                   Quickly set up a schedule for a single season. Generates localized irrigation alerts, weather advisory, and weekly diagnostics.
                 </p>
-                <div className="flex gap-2 items-center text-[10px] text-on-surface-variant font-bold mt-3">
+                <div className="flex gap-2 items-center text-[11px] md:text-xs text-on-surface-variant font-bold mt-3">
                   <span className="bg-surface-container-high px-2 py-0.5 rounded">Takes 2 min</span>
                   <span className="text-primary">✓ Quick setup</span>
                 </div>
@@ -277,7 +277,7 @@ export default function FarmingDashboard({
               if (list.length === 0) return null;
               return (
                 <div className="space-y-2">
-                  <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${colorClass} w-fit block`}>
+                  <span className={`text-[11px] md:text-xs font-black uppercase tracking-wider px-2 py-0.5 rounded ${colorClass} w-fit block`}>
                     {label} Priority Tasks
                   </span>
                   <div className="space-y-2.5">
@@ -365,7 +365,7 @@ export default function FarmingDashboard({
                 </span>
               </div>
               <div className="min-w-0">
-                <span className="text-[10px] text-on-surface-variant font-bold uppercase block">{activeFarm?.crop?.stage} Stage</span>
+                <span className="text-[11px] md:text-xs text-on-surface-variant font-bold uppercase block">{activeFarm?.crop?.stage} Stage</span>
                 <h4 className="font-extrabold text-base text-on-surface truncate">{activeFarm?.crop?.name?.toUpperCase()} ({activeFarm?.crop?.variety})</h4>
                 <span className="text-xs text-primary font-bold block mt-0.5">{dashboardData.growthProgress}% Growth Progress</span>
               </div>
@@ -450,19 +450,19 @@ export default function FarmingDashboard({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <span className="text-[10px] text-on-surface-variant uppercase font-black tracking-wider">Best Nearby Mandi</span>
+              <span className="text-[11px] md:text-xs text-on-surface-variant uppercase font-black tracking-wider">Best Nearby Mandi</span>
               <span className="font-bold text-sm block">{dashboardData.market?.recommendedMandi || 'Nashik APMC'}</span>
               <span className="text-xs font-semibold text-primary">{dashboardData.market?.adjustedEarnings || '₹2,250 / Qtl'}</span>
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] text-on-surface-variant uppercase font-black tracking-wider">Minimum Support Price (MSP)</span>
+              <span className="text-[11px] md:text-xs text-on-surface-variant uppercase font-black tracking-wider">Minimum Support Price (MSP)</span>
               <span className="font-bold text-sm block">MSP Target: ₹2,425</span>
               <span className="text-xs font-semibold text-green-700 font-extrabold flex items-center gap-0.5">
                 ★ Mandi price is {dashboardData.market?.recommendation === 'Hold' ? 'above' : 'near'} MSP
               </span>
             </div>
             <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex flex-col justify-between items-start">
-              <span className="text-[10px] text-primary uppercase font-black tracking-wider">Recommendation</span>
+              <span className="text-[11px] md:text-xs text-primary uppercase font-black tracking-wider">Recommendation</span>
               <span className="text-xs font-black text-on-surface-variant mt-1">
                 Recommendation: <strong className="text-primary">{dashboardData.market?.recommendation === 'Hold' ? 'Monitor / Hold Prices' : 'Good Day to Sell'}</strong>
               </span>
@@ -496,7 +496,7 @@ export default function FarmingDashboard({
                   <span className="text-xs font-extrabold text-on-surface block">
                     {weatherData.forecast?.[0]?.rainProbability > 50 ? '🌦️ Expected Rain soon' : '☀️ Sunny & Warm'}
                   </span>
-                  <span className="text-[10px] text-on-surface-variant font-semibold">
+                  <span className="text-[11px] md:text-xs text-on-surface-variant font-semibold">
                     Humidity: {weatherData.current?.humidityMorning}% | Wind: {weatherData.current?.windSpeed} km/h
                   </span>
                 </div>
@@ -578,7 +578,7 @@ export default function FarmingDashboard({
               <div>
                 <h4 className="font-bold text-xs text-on-surface">{scheme.name}</h4>
                 <p className="text-[10px] text-primary font-black mt-1">{scheme.benefits}</p>
-                <span className="text-[9px] text-amber-800 font-extrabold block mt-0.5">⚠️ {scheme.deadline}</span>
+                <span className="text-[10px] text-amber-800 font-extrabold block mt-0.5">⚠️ {scheme.deadline}</span>
               </div>
               <button 
                 onClick={() => setSelectedScheme(scheme)}
@@ -637,7 +637,7 @@ export default function FarmingDashboard({
               className="p-3.5 rounded-2xl border border-outline-variant/60 bg-white hover:border-primary/50 flex flex-col justify-center items-center text-center gap-2 transition-all shadow-xs hover:shadow-sm group min-h-[96px]"
             >
               <span className="material-symbols-outlined text-primary text-2xl group-hover:scale-110 transition-transform">{act.icon}</span>
-              <span className="text-[11px] font-black text-on-surface-variant leading-none">{t(act.label, language)}</span>
+              <span className="text-xs font-black text-on-surface-variant leading-none">{t(act.label, language)}</span>
             </button>
           ))}
         </div>
@@ -646,7 +646,7 @@ export default function FarmingDashboard({
       {/* Reschedule Task Modal Dialog */}
       {activeDialogTask && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm border border-outline-variant shadow-2xl overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto border border-outline-variant shadow-2xl flex flex-col p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-sm font-bold text-primary flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-primary text-lg">calendar_today</span>
@@ -686,7 +686,7 @@ export default function FarmingDashboard({
       {/* Mandi Analysis Modal */}
       {selectedMandiDetails && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md border border-outline-variant shadow-2xl overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-outline-variant shadow-2xl flex flex-col p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-sm font-bold text-primary flex items-center gap-1">
                 <span className="material-symbols-outlined text-primary text-lg">trending_up</span> Mandi Price Trends Analysis
@@ -729,7 +729,7 @@ export default function FarmingDashboard({
       {/* Government Scheme Modal */}
       {selectedScheme && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm border border-outline-variant shadow-2xl overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto border border-outline-variant shadow-2xl flex flex-col p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-sm font-bold text-primary">{selectedScheme.name}</h3>
               <button onClick={() => setSelectedScheme(null)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1">
@@ -770,7 +770,7 @@ export default function FarmingDashboard({
       {/* Community Post Modal */}
       {selectedCommunityPost && (
         <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md border border-outline-variant shadow-2xl overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-outline-variant shadow-2xl flex flex-col p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <div>
                 <span className="text-xs text-primary font-bold">{selectedCommunityPost.author} ({selectedCommunityPost.location})</span>

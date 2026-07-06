@@ -94,7 +94,7 @@ export default function Sidebar({
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:static lg:translate-x-0 flex-shrink-0 h-screen
           ${sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'}
-          w-72
+          w-[85vw] max-w-[320px] lg:w-72
         `}
       >
         {/* ── HEADER: Logo / Profile ── */}
@@ -151,7 +151,7 @@ export default function Sidebar({
                 onClick={() => handleNavClick(item.id)}
                 title={sidebarCollapsed ? tr(item.label, language) : undefined}
                 className={`
-                  w-full flex items-center font-semibold text-[15px] transition-all duration-300 whitespace-nowrap overflow-hidden
+                  w-full flex items-center font-semibold text-[15px] transition-all duration-300 whitespace-nowrap overflow-hidden min-h-[48px]
                   ${sidebarCollapsed
                     ? 'lg:justify-center px-4 py-3.5 justify-start gap-4'
                     : 'px-4 py-3.5 gap-4'
@@ -189,7 +189,7 @@ export default function Sidebar({
             <button
               onClick={() => setShowJwtInspector && setShowJwtInspector(true)}
               title={sidebarCollapsed ? 'Inspect JWT' : undefined}
-              className={`w-full flex items-center gap-3 p-2.5 rounded-xl font-semibold text-xs text-[#006e2d] bg-[#f0fdf4] hover:bg-[#dcfce7] border border-[#bbf7d0] transition-colors
+              className={`w-full flex items-center gap-3 p-2.5 rounded-xl font-semibold text-xs text-[#006e2d] bg-[#f0fdf4] hover:bg-[#dcfce7] border border-[#bbf7d0] transition-colors min-h-[48px]
                 ${sidebarCollapsed ? 'lg:justify-center' : ''}`}
             >
               <Cpu className="w-4 h-4 flex-shrink-0" />
@@ -214,7 +214,7 @@ export default function Sidebar({
               localStorage.removeItem('km_season_confirmed');
             }}
             title={sidebarCollapsed ? 'Sign Out' : undefined}
-            className={`w-full flex items-center gap-3 p-2.5 rounded-xl font-bold text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors
+            className={`w-full flex items-center gap-3 p-2.5 rounded-xl font-bold text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors min-h-[48px]
               ${sidebarCollapsed ? 'lg:justify-center' : ''}`}
           >
             <span className="material-symbols-outlined text-lg flex-shrink-0">logout</span>
