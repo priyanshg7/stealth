@@ -17,7 +17,7 @@ import WeatherIntelligence from './subviews/WeatherIntelligence';
 import AnnualPlanner from './subviews/AnnualPlanner';
 import TodayTasks from './subviews/TodayTasks';
 import FarmJourney from './subviews/FarmJourney';
-
+import RescheduleTaskModal from './subviews/RescheduleTaskModal';
 
 export default function DashboardShell({
   weatherData,
@@ -86,6 +86,10 @@ export default function DashboardShell({
   voiceGuide,
   setVoiceGuide,
   translating,
+  showRescheduleModal,
+  setShowRescheduleModal,
+  rescheduledTasks,
+  setRescheduledTasks,
   isListening,
   startSpeechRecognition,
   allSchemes
@@ -154,6 +158,7 @@ export default function DashboardShell({
                 setCompletedTasks={setCompletedTasks}
                 activeDialogTask={activeDialogTask}
                 setActiveDialogTask={setActiveDialogTask}
+                setShowRescheduleModal={setShowRescheduleModal}
                 selectedRescheduleDate={selectedRescheduleDate}
                 setSelectedRescheduleDate={setSelectedRescheduleDate}
                 selectedScheme={selectedScheme}
@@ -289,12 +294,12 @@ export default function DashboardShell({
 
           {activeDashboardTab === 'tasks' && (
             <TodayTasks
-              farms={farms}
-              selectedFarmIndex={selectedFarmIndex}
-              getFarmDashboardData={getFarmDashboardData}
+              dashboardData={getFarmDashboardData(farms[selectedFarmIndex])}
               completedTasks={completedTasks}
               setCompletedTasks={setCompletedTasks}
-              weatherData={weatherData}
+              activeDialogTask={activeDialogTask}
+              setActiveDialogTask={setActiveDialogTask}
+              setShowRescheduleModal={setShowRescheduleModal}
               language={language}
             />
           )}
@@ -309,10 +314,28 @@ export default function DashboardShell({
               weatherData={weatherData}
               language={language}
             />
-          )}
+            )}
           </ErrorBoundary>
         </main>
       </div>
+
+      {showRescheduleModal && activeDialogTask && (
+        <RescheduleTaskModal
+          task={activeDialogTask}
+          onClose={() => {
+            setShowRescheduleModal(false);
+            setActiveDialogTask(null);
+          }}
+          onSave={(taskId, newDate, newTime) => {
+            setRescheduledTasks({
+              ...rescheduledTasks,
+              [taskId]: { date: newDate, time: newTime }
+            });
+            setShowRescheduleModal(false);
+            setActiveDialogTask(null);
+          }}
+        />
+      )}
 
       {/* Floating Voice Assistant drawer */}
       <VoiceAssistant 

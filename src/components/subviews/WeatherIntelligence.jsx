@@ -61,7 +61,7 @@ export default function WeatherIntelligence({
       {/* 1. Header with sync status & farm meta */}
       <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-primary font-bold uppercase tracking-wider bg-primary/10 px-2.5 py-0.5 rounded-full">
               🏛️ Official IMD API Integration
             </span>
@@ -77,14 +77,14 @@ export default function WeatherIntelligence({
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="text-right">
+        <div className="flex items-center justify-between md:justify-end w-full md:w-auto gap-3 shrink-0 mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-0 border-outline-variant/30">
+          <div className="text-left md:text-right">
             <span className="text-[10px] text-on-surface-variant font-bold block">Last Synchronized:</span>
             <span className="text-xs font-black text-on-surface">{syncTimestamp}</span>
           </div>
           <button 
             onClick={fetchWeather}
-            className="p-2.5 bg-surface-container hover:bg-surface-container-high rounded-full border border-outline-variant transition-all"
+            className="p-2.5 bg-surface-container hover:bg-surface-container-high rounded-full border border-outline-variant transition-all shrink-0"
             title="Refresh Forecast"
           >
             <RefreshCw className="w-4 h-4 text-on-surface-variant" />

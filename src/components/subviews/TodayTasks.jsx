@@ -4,22 +4,39 @@ import { t } from '../../utils/translations';
 import { getTaskWeatherCheck } from '../../utils/weatherService';
 
 export default function TodayTasks({
-  farms = [],
-  selectedFarmIndex = 0,
-  getFarmDashboardData,
+  dashboardData,
   completedTasks,
   setCompletedTasks,
+  activeDialogTask,
+  setActiveDialogTask,
+  setShowRescheduleModal,
   weatherData,
   language
 }) {
-  const activeFarm = farms[selectedFarmIndex];
-  const dashboardData = activeFarm ? getFarmDashboardData(activeFarm) : null;
   const rawTasks = dashboardData?.tasks || [];
   
   const [personalTasks, setPersonalTasks] = useState([]);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskDate, setNewTaskDate] = useState(new Date().toISOString().split('T')[0]);
+  const [newTaskTime, setNewTaskTime] = useState('Anytime');
+  const [newTaskPriority, setNewTaskPriority] = useState('Medium');
+  const [newTaskCategory, setNewTaskCategory] = useState('PERSONAL');
   const [emailReminder, setEmailReminder] = useState(false);
+
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+
+  const handlePrevDay = () => {
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() - 1);
+    setSelectedDate(d.toISOString().split('T')[0]);
+  };
+
+  const handleNextDay = () => {
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() + 1);
+    setSelectedDate(d.toISOString().split('T')[0]);
+  };
 
   // Dynamically adjust tasks based on weather forecast
   const generatedTasks = rawTasks.map(task => {
@@ -36,7 +53,8 @@ export default function TodayTasks({
     return task;
   });
 
-  const tasks = [...generatedTasks, ...personalTasks];
+  const allTasks = [...generatedTasks, ...personalTasks];
+  const tasks = allTasks.filter(t => (t.date || new Date().toISOString().split('T')[0]) === selectedDate);
 
   const handleToggleTask = (taskId) => {
     if (completedTasks.includes(taskId)) {
@@ -49,13 +67,13 @@ export default function TodayTasks({
   const handleAddPersonalTask = (e) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
-
     const newTask = {
       id: `personal_task_${Date.now()}`,
       title: newTaskTitle,
-      category: 'PERSONAL',
-      priority: 'Medium',
-      time: 'Anytime',
+      category: newTaskCategory,
+      priority: newTaskPriority,
+      time: newTaskTime,
+      date: newTaskDate,
       duration: 'Flexible',
       why: 'User-added custom task',
       benefit: 'Personal productivity',
@@ -65,6 +83,10 @@ export default function TodayTasks({
 
     setPersonalTasks([...personalTasks, newTask]);
     setNewTaskTitle('');
+    setNewTaskDate(new Date().toISOString().split('T')[0]);
+    setNewTaskTime('Anytime');
+    setNewTaskPriority('Medium');
+    setNewTaskCategory('PERSONAL');
     setEmailReminder(false);
     setShowAddTaskModal(false);
   };
@@ -79,11 +101,13 @@ export default function TodayTasks({
             📋 Automated Daily Work Plan
           </span>
           <h2 className="font-display font-extrabold text-xl text-on-surface mt-1.5 flex items-center gap-2">
-            <CheckSquare className="w-5 h-5 text-primary" /> Today's Work Tasks
+            <CheckSquare className="w-5 h-5 text-primary" /> Work Tasks
           </h2>
-          <p className="text-xs text-on-surface-variant font-medium mt-0.5">
-            AI-generated tasks adjusted dynamically based on active crop stage, soil metrics, and IMD weather forecasts.
-          </p>
+          <div className="flex items-center gap-3 mt-2">
+            <button onClick={handlePrevDay} className="p-1 hover:bg-surface-container rounded-full text-on-surface-variant font-bold text-xs border border-outline-variant/50 px-2 flex items-center gap-1">← Prev</button>
+            <span className="text-xs font-bold text-primary">{selectedDate === new Date().toISOString().split('T')[0] ? "Today" : selectedDate}</span>
+            <button onClick={handleNextDay} className="p-1 hover:bg-surface-container rounded-full text-on-surface-variant font-bold text-xs border border-outline-variant/50 px-2 flex items-center gap-1">Next →</button>
+          </div>
         </div>
         <button 
           onClick={() => setShowAddTaskModal(true)}
@@ -118,6 +142,34 @@ export default function TodayTasks({
                   onChange={(e) => setNewTaskTitle(e.target.value)}
                   className="w-full bg-surface-container-lowest border border-outline-variant/60 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/50"
                 />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Date</label>
+                  <input type="date" required value={newTaskDate} onChange={(e) => setNewTaskDate(e.target.value)} className="w-full bg-surface-container-lowest border border-outline-variant/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Time</label>
+                  <select value={newTaskTime} onChange={(e) => setNewTaskTime(e.target.value)} className="w-full bg-surface-container-lowest border border-outline-variant/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <option value="Anytime">Anytime</option>
+                    <option value="08:00 AM">08:00 AM</option>
+                    <option value="12:00 PM">12:00 PM</option>
+                    <option value="04:00 PM">04:00 PM</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Priority</label>
+                  <select value={newTaskPriority} onChange={(e) => setNewTaskPriority(e.target.value)} className="w-full bg-surface-container-lowest border border-outline-variant/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Tag/Category</label>
+                  <input type="text" placeholder="E.g., Personal" value={newTaskCategory} onChange={(e) => setNewTaskCategory(e.target.value)} className="w-full bg-surface-container-lowest border border-outline-variant/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                </div>
               </div>
 
               <div className="flex items-center justify-between bg-blue-50/50 p-4 rounded-xl border border-blue-100">
@@ -224,7 +276,7 @@ export default function TodayTasks({
                         <div className="flex flex-wrap gap-2 items-center mt-1.5 text-[9px] font-bold uppercase tracking-wider text-on-surface-variant">
                           <span className={`px-2 py-0.5 rounded-md ${task.isPersonal ? 'bg-blue-100 text-blue-800' : 'bg-surface-container text-on-surface'}`}>{task.category}</span>
                           {!task.isPersonal && <span className={`px-2 py-0.5 rounded-md ${isHigh ? 'bg-red-50 text-red-700' : 'bg-slate-100'}`}>{task.priority} Priority</span>}
-                          <span className="flex items-center gap-1"><Clock className="w-2.5 h-2.5" /> {task.time} ({task.duration})</span>
+                          {task.time && <span className="flex items-center gap-1"><Clock className="w-2.5 h-2.5" /> {task.time} ({task.duration})</span>}
                           {task.isPersonal && task.emailReminder && (
                             <span className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md"><Bell className="w-2.5 h-2.5" /> Reminder Set</span>
                           )}
@@ -255,6 +307,20 @@ export default function TodayTasks({
                       </div>
                     )}
                   </div>
+
+                  {!isCompleted && (
+                    <div className="shrink-0">
+                      <button
+                        onClick={() => {
+                          setActiveDialogTask(task);
+                          setShowRescheduleModal(true);
+                        }}
+                        className="border border-outline-variant/60 hover:bg-surface-container text-on-surface-variant font-bold px-3 py-1.5 rounded-xl text-xs"
+                      >
+                        Reschedule
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}

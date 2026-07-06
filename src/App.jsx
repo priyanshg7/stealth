@@ -612,6 +612,10 @@ export default function App() {
     const saved = localStorage.getItem('km_completed_tasks');
     return saved ? JSON.parse(saved) : [];
   });
+  const [rescheduledTasks, setRescheduledTasks] = useState(() => {
+    const saved = localStorage.getItem('km_rescheduled_tasks');
+    return saved ? JSON.parse(saved) : {};
+  });
   const [voiceAssistantOpen, setVoiceAssistantOpen] = useState(false);
   const [voiceReplies, setVoiceReplies] = useState([
     { sender: 'ai', text: 'Namaste! I am KisanMitra Voice Assistant. Ask me anything about your farm today.' }
@@ -631,6 +635,7 @@ export default function App() {
   const [selectedMandiDetails, setSelectedMandiDetails] = useState(null);
   const [selectedCommunityPost, setSelectedCommunityPost] = useState(null);
   const [showAllTasksModal, setShowAllTasksModal] = useState(false);
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
 
@@ -640,6 +645,7 @@ export default function App() {
   useEffect(() => { localStorage.setItem('km_farms', JSON.stringify(farms)); }, [farms]);
   useEffect(() => { localStorage.setItem('km_selected_farm_index', selectedFarmIndex); }, [selectedFarmIndex]);
   useEffect(() => { localStorage.setItem('km_completed_tasks', JSON.stringify(completedTasks)); }, [completedTasks]);
+  useEffect(() => { localStorage.setItem('km_rescheduled_tasks', JSON.stringify(rescheduledTasks)); }, [rescheduledTasks]);
   useEffect(() => { localStorage.setItem('km_soil_card_uploaded', soilHealthCardUploaded); }, [soilHealthCardUploaded]);
   useEffect(() => { localStorage.setItem('km_soil_card_reminder_dismissed', soilCardReminderDismissed); }, [soilCardReminderDismissed]);
 
@@ -1380,6 +1386,19 @@ export default function App() {
         action: `Open the Government Schemes tab to verify eligibility and apply.`,
         benefit: topSch.benefits,
         actionText: 'View Scheme Details'
+      });
+    }
+
+    // Merge rescheduled tasks and remove default times
+    if (data.tasks) {
+      data.tasks = data.tasks.map(t => {
+        const override = rescheduledTasks[t.id];
+        if (override) {
+          return { ...t, date: override.date, time: override.time };
+        }
+        // Remove hardcoded time from auto-generated tasks
+        const { time, ...rest } = t;
+        return { ...rest, date: new Date().toISOString().split('T')[0] }; // Default to today
       });
     }
 
@@ -3842,6 +3861,12 @@ Instructions:
               setSelectedCommunityPost={setSelectedCommunityPost}
               showAllTasksModal={showAllTasksModal}
               setShowAllTasksModal={setShowAllTasksModal}
+              activeDialogTask={activeDialogTask}
+              setActiveDialogTask={setActiveDialogTask}
+              showRescheduleModal={showRescheduleModal}
+              setShowRescheduleModal={setShowRescheduleModal}
+              rescheduledTasks={rescheduledTasks}
+              setRescheduledTasks={setRescheduledTasks}
               startNewFarmRegistration={startNewFarmRegistration}
               setView={setView}
               setFarms={setFarms}

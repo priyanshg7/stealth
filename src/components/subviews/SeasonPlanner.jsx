@@ -1260,7 +1260,7 @@ export default function SeasonPlanner({
                 <div 
                   key={v.id}
                   onClick={() => handleSelectVariety(v)}
-                  className={`cursor-pointer rounded-card border p-6 flex flex-col justify-between h-[490px] bg-white transition-all relative ${
+                  className={`cursor-pointer rounded-card border p-6 flex flex-col justify-between h-auto min-h-[450px] bg-white transition-all relative ${
                     isBestFit 
                       ? 'border-2 border-[#0c8a47] ring-1 ring-[#0c8a47]/20 shadow-md translate-y-[-2px]' 
                       : 'border-outline-variant/60 hover:border-[#0c8a47]/40 hover:shadow-md'

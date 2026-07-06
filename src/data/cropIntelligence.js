@@ -226,6 +226,31 @@ export const DISEASE_DATABASE = {
   maize: [
     { name: 'Fall Armyworm', humidityThreshold: 70, tempRange: [20, 35], riskFactor: 'warm_humid', severity: 'Severe', treatment: 'Emamectin Benzoate 5% SG', organicTreatment: 'Bt spray + Trichogramma release' },
     { name: 'Turcicum Leaf Blight', humidityThreshold: 85, tempRange: [18, 27], riskFactor: 'humidity', severity: 'Medium', treatment: 'Mancozeb 75% WP @ 2.5g/L', organicTreatment: 'Trichoderma harzianum seed treatment' }
+  ],
+  bajra: [
+    { name: 'Downy Mildew (Green Ear)', humidityThreshold: 85, tempRange: [20, 30], riskFactor: 'humidity', severity: 'Severe', treatment: 'Metalaxyl 35% WS seed treatment @ 6g/kg', organicTreatment: 'Seed treatment with Trichoderma viride @ 4g/kg' },
+    { name: 'Ergot (Sugary Disease)', humidityThreshold: 80, tempRange: [20, 30], riskFactor: 'rain_at_flowering', severity: 'High', treatment: 'Mancozeb 75% WP @ 2.5g/L spray at flowering', organicTreatment: 'Remove infected ear heads; apply neem oil spray' },
+    { name: 'Stem Borer', humidityThreshold: 70, tempRange: [25, 35], riskFactor: 'warm_humid', severity: 'Medium', treatment: 'Carbofuran 3G @ 8kg/acre in leaf whorls', organicTreatment: 'Trichogramma chilonis release @ 50,000/acre' }
+  ],
+  mustard: [
+    { name: 'White Rust (Albugo)', humidityThreshold: 80, tempRange: [10, 20], riskFactor: 'humidity', severity: 'High', treatment: 'Metalaxyl + Mancozeb (Ridomil MZ) @ 2.5g/L', organicTreatment: 'Neem oil 2% spray + crop rotation' },
+    { name: 'Alternaria Blight', humidityThreshold: 75, tempRange: [15, 25], riskFactor: 'humidity', severity: 'High', treatment: 'Mancozeb 75% WP @ 2.5g/L at 45 & 60 DAS', organicTreatment: 'Trichoderma viride seed treatment + neem oil spray' },
+    { name: 'Mustard Aphid', humidityThreshold: 65, tempRange: [10, 20], riskFactor: 'cool_dry', severity: 'Severe', treatment: 'Imidacloprid 17.8% SL @ 0.3ml/L', organicTreatment: 'Neem seed kernel extract 5% spray; release ladybird beetles' }
+  ],
+  gram: [
+    { name: 'Wilt (Fusarium)', humidityThreshold: 70, tempRange: [20, 30], riskFactor: 'soil_moisture', severity: 'Severe', treatment: 'Carbendazim 50% WP seed treatment @ 2g/kg', organicTreatment: 'Trichoderma viride seed treatment @ 4g/kg + deep summer ploughing' },
+    { name: 'Ascochyta Blight', humidityThreshold: 85, tempRange: [15, 25], riskFactor: 'humidity', severity: 'High', treatment: 'Mancozeb 75% WP @ 2.5g/L', organicTreatment: 'Neem oil spray + resistant varieties' },
+    { name: 'Pod Borer (Helicoverpa)', humidityThreshold: 65, tempRange: [20, 35], riskFactor: 'warm_humid', severity: 'Severe', treatment: 'Emamectin Benzoate 5% SG @ 0.4g/L', organicTreatment: 'NPV (Helicoverpa) spray + Trichogramma release + bird perches' }
+  ],
+  cotton: [
+    { name: 'Pink Bollworm', humidityThreshold: 70, tempRange: [25, 35], riskFactor: 'warm_humid', severity: 'Severe', treatment: 'Profenophos 50% EC @ 2ml/L', organicTreatment: 'Pheromone traps + Trichogramma release + timely picking' },
+    { name: 'Whitefly', humidityThreshold: 75, tempRange: [25, 38], riskFactor: 'warm_humid', severity: 'High', treatment: 'Diafenthiuron 50% WP @ 1g/L', organicTreatment: 'Neem oil 2% spray + yellow sticky traps' },
+    { name: 'Bacterial Blight', humidityThreshold: 85, tempRange: [25, 35], riskFactor: 'rain', severity: 'High', treatment: 'Copper Oxychloride 50% WP @ 3g/L', organicTreatment: 'Seed treatment with Pseudomonas fluorescens + Bordeaux mixture spray' }
+  ],
+  soybean: [
+    { name: 'Yellow Mosaic Virus (YMV)', humidityThreshold: 75, tempRange: [25, 35], riskFactor: 'warm_humid', severity: 'Severe', treatment: 'Thiamethoxam 25% WG @ 0.2g/L (whitefly vector control)', organicTreatment: 'Neem oil spray to control whitefly vector + resistant varieties' },
+    { name: 'Rust (Phakopsora)', humidityThreshold: 80, tempRange: [20, 28], riskFactor: 'humidity', severity: 'High', treatment: 'Hexaconazole 5% EC @ 2ml/L', organicTreatment: 'Trichoderma viride seed treatment + neem-based fungicide spray' },
+    { name: 'Stem Fly', humidityThreshold: 70, tempRange: [25, 35], riskFactor: 'warm_humid', severity: 'Medium', treatment: 'Thiamethoxam 30% FS seed treatment', organicTreatment: 'Intercropping with maize; neem seed kernel extract spray' }
   ]
 };
 

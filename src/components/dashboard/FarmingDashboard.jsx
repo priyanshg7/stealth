@@ -17,6 +17,7 @@ export default function FarmingDashboard({
   setCompletedTasks,
   activeDialogTask,
   setActiveDialogTask,
+  setShowRescheduleModal,
   selectedRescheduleDate,
   setSelectedRescheduleDate,
   selectedScheme,
@@ -310,7 +311,7 @@ export default function FarmingDashboard({
                           <button
                             onClick={() => {
                               setActiveDialogTask(task);
-                              setSelectedRescheduleDate('');
+                              setShowRescheduleModal(true);
                             }}
                             className="flex-grow md:flex-grow-0 border border-outline-variant/60 hover:bg-surface-container text-on-surface-variant font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
                           >

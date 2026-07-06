@@ -113,7 +113,15 @@ export function generateAnnualStrategy(selectedCrops, farm, mode = 'conventional
     // Crop Sowing details based on season
     const isKharif = season === 'Kharif';
     const isRabi = season === 'Rabi';
-    const cropId = crop.id.toLowerCase();
+    // Resolve the base crop type for disease/cost lookups.
+    // Priority: cropName > id-based extraction > season-based fallback
+    const KNOWN_CROPS = ['wheat', 'rice', 'maize', 'bajra', 'mustard', 'gram', 'cotton', 'soybean'];
+    let cropId = (crop.cropName || '').toLowerCase();
+    if (!KNOWN_CROPS.includes(cropId)) {
+      // Try parsing from the id (e.g. "pref-rice" -> "rice", "pb1121" -> check if any known crop is a substring)
+      const rawId = (crop.id || '').replace('pref-', '').replace('gemini-', '').toLowerCase();
+      cropId = KNOWN_CROPS.find(k => rawId.includes(k)) || rawId || cropId;
+    }
     const varietyName = crop.name || 'Karan Vandana';
     const duration = crop.maturityDays || 120;
     
@@ -268,7 +276,7 @@ export function generateAnnualStrategy(selectedCrops, farm, mode = 'conventional
       overview: {
         title: `${crop.cropName || crop.name} Sowing Strategy`,
         objective: `Achieve high grain weight and quality through timely sowing and nutrient management.`,
-        timelineText: isKharif ? 'June - October' : 'November - March',
+        timelineText: isKharif ? 'June - October' : (isRabi ? 'November - March' : 'April - May'),
         profitability: `Estimated Net profit: ₹${estProfit.toLocaleString('en-IN')}`,
         suitability: `Perfect fit for ${district}'s historical temperature range.`,
         warnings: isKharif ? 'Monitor monsoonal breaks to coordinate irrigation.' : 'Protect from late heat stress during grain filling.'

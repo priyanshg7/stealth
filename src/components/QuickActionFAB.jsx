@@ -7,7 +7,7 @@ export default function QuickActionFAB({
   return (
     <div className="fixed bottom-6 right-4 z-40 group font-sans hidden lg:block">
       {/* Expandable options menu */}
-      <div className="flex flex-col gap-2.5 mb-3.5 scale-0 group-hover:scale-100 origin-bottom transition-all duration-200 pointer-events-none group-hover:pointer-events-auto">
+      <div className="absolute bottom-[110%] right-0 flex flex-col gap-2.5 scale-0 group-hover:scale-100 origin-bottom transition-all duration-200 pointer-events-none group-hover:pointer-events-auto mb-2">
         {[
           { label: 'Scan Crop', icon: 'photo_camera', action: () => setActiveDashboardTab('diagnosis') },
           { label: 'Speak to AI', icon: 'mic', action: () => setVoiceAssistantOpen(true) },

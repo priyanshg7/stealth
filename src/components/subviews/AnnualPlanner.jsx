@@ -1019,74 +1019,78 @@ export default function AnnualPlanner({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-              {seasonRecs.map((crop, idx) => (
+              {seasonRecs.map((crop, idx) => {
+                const estimatedProfitValue = Math.round((crop.livePrice || crop.msp) * crop.yieldPotential * (parseFloat(setupForm.area) || 1) * 0.65); // 65% margin estimate
+                return (
                 <div 
                   key={crop.id}
-                  className={`bg-white border-2 rounded-3xl p-6 flex flex-col justify-between cursor-pointer transition-all duration-300 group ${
+                  className={`bg-white border p-6 flex flex-col justify-between cursor-pointer transition-all duration-300 h-auto min-h-[450px] rounded-[24px] group relative ${
                     idx === 0 
-                      ? 'border-primary shadow-[0_8px_24px_rgba(33,197,93,0.15)] hover:shadow-[0_12px_32px_rgba(33,197,93,0.25)]' 
-                      : 'border-outline-variant/60 shadow-sm hover:border-primary/50 hover:shadow-md'
+                      ? 'border-2 border-[#0c8a47] ring-1 ring-[#0c8a47]/20 shadow-md translate-y-[-2px]' 
+                      : 'border-outline-variant/60 shadow-sm hover:border-[#0c8a47]/40 hover:shadow-md'
                   }`}
                   onClick={() => handleSelectCrop(crop)}
                 >
-                  <div className="space-y-5">
+                  <div className="space-y-4">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-display font-black text-xl text-on-surface">{crop.name}</h4>
+                        <h4 className="font-display font-extrabold text-xl text-on-surface">{crop.name}</h4>
                         <span className="text-xs text-on-surface-variant font-bold block mt-0.5">{crop.institution}</span>
                       </div>
                       {idx === 0 && (
-                        <div className="flex items-center gap-1 bg-primary text-white text-[10px] font-black px-3 py-1 rounded-full shadow-sm uppercase tracking-wider animate-pulse-slow">
+                        <div className="flex items-center gap-1 bg-[#0c8a47] text-white text-[10px] font-black px-3 py-1 rounded-full shadow-sm uppercase tracking-wider animate-pulse-slow shrink-0">
                           <Sparkles className="w-3 h-3" /> Best Match
                         </div>
                       )}
                     </div>
 
-                    <div className="space-y-4">
-                      {/* Yield Bar */}
-                      <div>
-                        <div className="flex justify-between text-xs font-bold mb-1">
-                          <span className="text-on-surface-variant flex items-center gap-1"><TrendingUp className="w-3.5 h-3.5" /> Est. Yield</span>
-                          <span className="text-on-surface">{crop.yieldPotential} Qtl</span>
-                        </div>
-                        <div className="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
-                          <div className="bg-primary h-full rounded-full" style={{ width: `${Math.min(parseInt(crop.yieldPotential) * 2, 100)}%` }} />
-                        </div>
+                    {/* Estimated Net Profit Row */}
+                    <div className="space-y-1 bg-surface-container-low/40 p-3 rounded-xl border border-outline-variant/30">
+                      <span className="text-[10px] text-on-surface-variant font-bold flex items-center gap-1.5">
+                        <TrendingUp className="w-4 h-4 text-on-surface-variant" /> Estimated Net Profit
+                      </span>
+                      <div className="flex items-baseline gap-1.5 flex-wrap">
+                        <span className="text-2xl font-black text-[#0c8a47]">₹{estimatedProfitValue.toLocaleString()}</span>
+                        <span className="text-[11px] text-on-surface-variant font-bold">for {setupForm.area || 1} {setupForm.unit || 'Acre'}</span>
                       </div>
+                    </div>
 
-                      {/* Profit Bar */}
-                      <div>
-                        <div className="flex justify-between text-xs font-bold mb-1">
-                          <span className="text-on-surface-variant flex items-center gap-1"><DollarSign className="w-3.5 h-3.5" /> Live Market Rate</span>
-                          <span className="text-green-700">₹{crop.livePrice || crop.msp}/Qtl</span>
-                        </div>
-                        <div className="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
-                          <div className="bg-green-500 h-full rounded-full" style={{ width: '85%' }} />
-                        </div>
-                      </div>
+                    {/* Key Technical Details Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 text-[10px] border-y border-outline-variant/40 py-3 font-bold text-on-surface-variant">
+                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Est. Yield</span> <span className="text-on-surface font-extrabold">{crop.yieldPotential} Qtl</span></div>
+                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Duration</span> <span className="text-on-surface font-extrabold">{crop.maturityDays} days</span></div>
+                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Water Req.</span> <span className="text-on-surface font-extrabold">{crop.waterRequirement} mm</span></div>
+                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Disease Resist.</span> <span className="text-on-surface font-extrabold block truncate">{crop.diseaseResistance >= 4 ? 'High' : 'Moderate'}</span></div>
+                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Irrigation</span> <span className="text-on-surface font-extrabold">{crop.irrigationCount} cycles</span></div>
+                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Soil Type</span> <span className="text-on-surface font-extrabold block truncate" title={crop.suitableSoils?.join(', ')}>{crop.suitableSoils?.join(', ')}</span></div>
+                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Sells Price</span> <span className="text-[#0c8a47] font-black">₹{crop.livePrice || crop.msp}/Qtl</span></div>
+                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Market Demand</span> <span className="text-on-surface font-extrabold">{crop.exportDemand || 'Medium'}</span></div>
+                    </div>
 
-                      {/* Water Bar */}
-                      <div>
-                        <div className="flex justify-between text-xs font-bold mb-1">
-                          <span className="text-on-surface-variant flex items-center gap-1"><Droplet className="w-3.5 h-3.5" /> Water Need</span>
-                          <span className="text-blue-700">{crop.waterRequirement} mm</span>
-                        </div>
-                        <div className="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
-                          <div className="bg-blue-500 h-full rounded-full" style={{ width: `${Math.min(parseInt(crop.waterRequirement) / 10, 100)}%` }} />
-                        </div>
-                      </div>
+                    {/* Dynamic Agronomist "Why this?" text */}
+                    <div className="text-[11px] leading-relaxed text-on-surface-variant h-[90px] overflow-y-auto pr-1">
+                      <strong className="text-on-surface text-xs font-bold block mb-1">Why this?</strong>
+                      <ul className="list-disc pl-4 space-y-1.5 text-on-surface-variant font-medium">
+                        {crop.keyTraits?.map((trait, tIdx) => <li key={tIdx}>{trait}</li>)}
+                        <li>{crop.premiumGrade ? 'Premium grade commands higher market value.' : 'Standard mandi staple.'}</li>
+                        {crop.waterRequirement <= 500 && <li>Water efficient crop suitable for limited irrigation.</li>}
+                      </ul>
                     </div>
                   </div>
 
-                  <button className={`w-full mt-6 font-bold text-sm py-3 rounded-xl transition-all ${
-                    idx === 0 
-                      ? 'bg-primary text-white hover:bg-primary-dark shadow-md' 
-                      : 'bg-surface-container text-on-surface group-hover:bg-primary group-hover:text-white'
-                  }`}>
-                    Select {crop.name}
-                  </button>
+                  <div className="pt-4">
+                    <button className={`w-full font-black text-xs py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 ${
+                      idx === 0 
+                        ? 'bg-[#0c8a47] text-white hover:bg-[#096a36] shadow-md' 
+                        : 'bg-surface-container text-on-surface hover:bg-[#0c8a47] hover:text-white'
+                    }`}>
+                      <Check className={`w-4 h-4 ${idx === 0 ? 'text-white' : 'opacity-70 group-hover:text-white group-hover:opacity-100'}`} />
+                      Select {crop.name}
+                    </button>
+                  </div>
                 </div>
-              ))}
+                );
+              })}
 
               {/* Fallow land rest option */}
               <div 
@@ -1118,7 +1122,6 @@ export default function AnnualPlanner({
       {/* ── 3. STRATEGY WORKSPACE ────────────────────────────────────────── */}
       {step === 'strategy' && strategyData && (
         <div className="space-y-6">
-          
           {/* Header Controls */}
           <div className="bg-white border border-outline-variant/60 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -1142,386 +1145,255 @@ export default function AnnualPlanner({
             </div>
           </div>
 
-          {/* Connected Horizontal Timeline */}
-          <div className="bg-white border border-outline-variant/60 rounded-3xl p-8 shadow-sm">
-            <h3 className="font-display font-black text-base text-on-surface mb-6 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-primary" />
-              Your Crop Rotation Journey
+          {/* Continuous Vertical "Final Year-Long Plan" */}
+          <div className="bg-white border border-outline-variant/60 rounded-3xl p-6 md:p-8 shadow-sm">
+            <h3 className="font-display font-black text-2xl text-on-surface mb-8 border-b pb-4">
+              Final Year-Long Plan
             </h3>
             
-            <div className="flex flex-col md:flex-row items-stretch gap-4 relative">
-              {/* Connecting line for desktop */}
-              <div className="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-surface-container -translate-y-1/2 z-0 rounded-full" />
-              
-              {strategyData.timeline.map((item, idx) => {
-                const isActive = activeSeasonTab === item.season;
+            <div className="space-y-16">
+              {['Kharif', 'Rabi', 'Zaid'].map((season) => {
+                const details = strategyData.details[season];
+                const timelineInfo = strategyData.timeline.find(t => t.season === season);
+                
+                if (!details || !timelineInfo) return null;
+                
                 return (
-                  <div 
-                    key={idx}
-                    onClick={() => setActiveSeasonTab(item.season)}
-                    className={`flex-1 relative z-10 p-5 rounded-2xl cursor-pointer transition-all duration-300 border-2 ${
-                      isActive 
-                        ? 'border-primary bg-primary/5 shadow-md scale-[1.02]' 
-                        : 'border-surface-container bg-white hover:border-primary/40 hover:bg-surface-container-lowest'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] ${
-                        isActive ? 'bg-primary text-white shadow-sm' : 'bg-surface-container-high text-on-surface'
-                      }`}>
-                        {idx + 1}
-                      </div>
-                      <span className={`text-[11px] font-black uppercase tracking-wider ${isActive ? 'text-primary' : 'text-on-surface-variant'}`}>
-                        {item.season}
-                      </span>
-                    </div>
-                    
-                    <strong className="text-on-surface text-lg block font-black font-display leading-tight">{item.cropName}</strong>
-                    <span className="text-xs text-on-surface-variant font-bold block mt-1">
-                      {item.variety !== 'N/A' ? `${item.variety} • ${item.duration}` : 'Soil rest & recovery'}
-                    </span>
-                    
-                    {/* Badges */}
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {wizardPreferences[item.season]?.crop ? (
-                        <span className="text-[10px] bg-blue-100 text-blue-800 font-extrabold py-1 px-2 rounded border border-blue-200 flex items-center gap-1">
-                          <Check className="w-3 h-3" /> Farmer Selected
-                        </span>
-                      ) : item.cropName !== 'Fallow' ? (
-                        <span className="text-[10px] bg-primary/10 text-primary font-extrabold py-1 px-2 rounded border border-primary/20 flex items-center gap-1">
-                          <Sparkles className="w-3 h-3" /> AI Recommended
-                        </span>
-                      ) : null}
+                  <div key={season} className="relative">
+                    {/* Season Header */}
+                    <div className="mb-6">
+                      <h4 className="font-display font-black text-2xl text-[#0c8a47]">
+                        {season} Season: {timelineInfo.cropName} {timelineInfo.variety !== 'N/A' ? `(${timelineInfo.variety})` : ''}
+                      </h4>
+                      <p className="text-sm text-on-surface-variant font-bold mt-1">
+                        {details.overview.timelineText} • {details.overview.objective}
+                      </p>
                     </div>
 
-                    {/* Mismatch Warning */}
-                    {wizardPreferences[item.season]?.crop && item.waterRequirement && item.waterRequirement > 700 && setupForm.irrigationSource.toLowerCase() === 'rainfed' && (
-                      <div className="mt-3 text-[10px] bg-orange-50 text-orange-800 border border-orange-200 rounded p-2">
-                        <div className="font-bold flex items-center gap-1 mb-1">
-                          <ShieldAlert className="w-3 h-3" /> Condition Mismatch
+                    <div className="space-y-10">
+                      {/* Monthly Activity Calendar Table */}
+                      <div>
+                        <h5 className="font-display font-black text-lg text-on-surface mb-3 flex items-center gap-2">
+                          <Calendar className="w-5 h-5 text-on-surface-variant" />
+                          Monthly Activity Calendar
+                        </h5>
+                        <div className="overflow-x-auto rounded-xl border border-outline-variant/40">
+                          <table className="w-full text-left border-collapse">
+                            <thead>
+                              <tr className="bg-surface-container-lowest border-b border-outline-variant/40">
+                                <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant w-32">Month</th>
+                                <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant">Key Activities</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-outline-variant/20">
+                              {details.calendar.map((act, idx) => (
+                                <tr key={idx} className="hover:bg-surface-container-lowest/50 transition-colors">
+                                  <td className="p-4 text-sm font-bold text-on-surface">{act.month}</td>
+                                  <td className="p-4 text-sm font-medium text-on-surface-variant">
+                                    <span className="text-primary font-bold">{act.activity}:</span> {act.outcome}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
-                        Requires high water. Rainfed may be risky.
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setWizardPreferences(prev => ({...prev, [item.season]: {crop: '', variety: ''}}));
-                            setStep('setup');
-                          }}
-                          className="text-orange-900 underline font-bold mt-1 block hover:text-orange-700"
-                        >
-                          Use AI Recommendation Instead
-                        </button>
                       </div>
-                    )}
+
+                      {/* Fertilizer & Nutrient Schedule */}
+                      <div>
+                        <h5 className="font-display font-black text-lg text-on-surface mb-3 flex items-center gap-2">
+                          <Layers className="w-5 h-5 text-on-surface-variant" />
+                          Fertilizer & Nutrient Schedule
+                        </h5>
+                        
+                        {/* Inorganic/Organic Toggle */}
+                        <div className="flex bg-surface-container-lowest p-1 rounded-xl border border-outline-variant/40 mb-4 w-fit">
+                          <button 
+                            onClick={() => setNutrientMode('conventional')}
+                            className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${
+                              nutrientMode === 'conventional' ? 'bg-white text-primary shadow-sm border border-outline-variant/20' : 'text-on-surface-variant hover:text-on-surface'
+                            }`}
+                          >
+                            Inorganic Plan
+                          </button>
+                          <button 
+                            onClick={() => setNutrientMode('organic')}
+                            className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${
+                              nutrientMode === 'organic' ? 'bg-primary text-white shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+                            }`}
+                          >
+                            Organic Plan
+                          </button>
+                        </div>
+
+                        {details.nutrients.items.length > 0 ? (
+                          <div className="overflow-x-auto rounded-xl border border-outline-variant/40">
+                            <table className="w-full text-left border-collapse">
+                              <thead>
+                                <tr className="bg-surface-container-lowest border-b border-outline-variant/40">
+                                  <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant w-48">Stage</th>
+                                  <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant w-48">Fertilizer</th>
+                                  <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant w-32">Quantity</th>
+                                  <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant">Method</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-outline-variant/20">
+                                {details.nutrients.items.map((item, idx) => (
+                                  <tr key={idx} className="hover:bg-surface-container-lowest/50 transition-colors">
+                                    <td className="p-4 text-sm font-bold text-[#b54a4a]">{item.stage}</td>
+                                    <td className="p-4 text-sm font-bold text-on-surface">{item.name}</td>
+                                    <td className="p-4 text-sm font-bold text-on-surface">{item.qty} {item.unit}</td>
+                                    <td className="p-4 text-sm font-medium text-on-surface-variant">{item.method}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <div className="p-6 bg-surface-container-lowest rounded-xl border border-outline-variant/40 text-center">
+                            <p className="text-sm font-bold text-on-surface-variant">{details.nutrients.summary}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Pest & Disease Prevention */}
+                      {timelineInfo.cropName !== 'Fallow Land' && (
+                        <div>
+                          <h5 className="font-display font-black text-lg text-on-surface mb-3 flex items-center gap-2">
+                            <AlertTriangle className="w-5 h-5 text-on-surface-variant" />
+                            Pest & Disease Prevention
+                          </h5>
+                          
+                          {details.pests && details.pests.length > 0 ? (
+                            <div className="overflow-x-auto rounded-xl border border-outline-variant/40">
+                              <table className="w-full text-left border-collapse">
+                                <thead>
+                                  <tr className="bg-surface-container-lowest border-b border-outline-variant/40">
+                                    <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant w-40">Threat</th>
+                                    <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant w-48">Symptoms</th>
+                                    <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant">Organic Prevention</th>
+                                    <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant">Chemical Control</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-outline-variant/20">
+                                  {details.pests.map((pest, idx) => (
+                                    <tr key={idx} className="hover:bg-surface-container-lowest/50 transition-colors">
+                                      <td className="p-4">
+                                        <strong className="text-sm font-bold text-red-700 block">{pest.name}</strong>
+                                        <span className="text-[10px] uppercase font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded mt-1 inline-block">{pest.probability} Risk</span>
+                                      </td>
+                                      <td className="p-4 text-xs font-medium text-on-surface-variant">{pest.symptoms}</td>
+                                      <td className="p-4 text-xs font-medium text-green-700 bg-green-50/30">{pest.organic || pest.prevention}</td>
+                                      <td className="p-4 text-xs font-medium text-on-surface-variant">{pest.chemical}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          ) : (
+                            <div className="p-6 bg-surface-container-lowest rounded-xl border border-outline-variant/40 flex items-start gap-3">
+                              <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                              <p className="text-sm font-medium text-on-surface-variant">
+                                No critical seasonal pests flagged for this specific crop variety in your region. However, maintain general vigilance. Implement standard crop rotation and clean cultivation practices to prevent soil-borne diseases. Use neem-oil sprays preventatively if unusual weather patterns emerge.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Water Management */}
+                      {details.water && details.water.items && details.water.items.length > 0 && (
+                        <div>
+                          <h5 className="font-display font-black text-lg text-on-surface mb-3 flex items-center gap-2">
+                            <Droplet className="w-5 h-5 text-blue-500" />
+                            Water Management
+                          </h5>
+                          <div className="overflow-x-auto rounded-xl border border-outline-variant/40">
+                            <table className="w-full text-left border-collapse">
+                              <thead>
+                                <tr className="bg-blue-50/50 border-b border-outline-variant/40">
+                                  <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant w-48">Irrigation Event</th>
+                                  <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant">Growth Stage</th>
+                                  <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant w-36">Volume (L/acre)</th>
+                                  <th className="p-4 text-xs font-black uppercase tracking-wider text-on-surface-variant w-32">Pump Duration</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-outline-variant/20">
+                                {details.water.items.map((item, idx) => (
+                                  <tr key={idx} className="hover:bg-blue-50/30 transition-colors">
+                                    <td className="p-4 text-sm font-bold text-blue-700">{item.event}</td>
+                                    <td className="p-4 text-xs font-medium text-on-surface-variant">{item.stage}</td>
+                                    <td className="p-4 text-sm font-bold text-on-surface">{item.waterLiters?.toLocaleString('en-IN')}</td>
+                                    <td className="p-4 text-sm font-bold text-on-surface">{item.durationHours} hrs</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                          <div className="mt-3 p-3 bg-amber-50/50 border border-amber-100 rounded-xl text-xs flex gap-2 items-start text-amber-900">
+                            <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                            <span className="font-medium">{details.water.items[0]?.savingAdvisory || details.water.warnings}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Government Schemes & Subsidies */}
+                      {details.schemes && details.schemes.length > 0 && (
+                        <div>
+                          <h5 className="font-display font-black text-lg text-on-surface mb-3 flex items-center gap-2">
+                            <Shield className="w-5 h-5 text-on-surface-variant" />
+                            Government Schemes & Subsidies
+                          </h5>
+                          <div className="grid gap-3">
+                            {details.schemes.map((scheme, idx) => (
+                              <div key={idx} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/40 hover:border-primary/30 transition-all group">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <ShieldCheck className="w-4 h-4 text-green-600 shrink-0" />
+                                    <strong className="text-sm font-black text-on-surface">{scheme.name}</strong>
+                                  </div>
+                                  <p className="text-xs text-on-surface-variant font-medium ml-6">{scheme.benefits}</p>
+                                </div>
+                                <a 
+                                  href={scheme.link}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white font-bold text-xs px-4 py-2 rounded-lg shrink-0 transition-colors flex items-center gap-1 w-full sm:w-auto justify-center"
+                                >
+                                  Apply <ChevronRight className="w-3.5 h-3.5" />
+                                </a>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                    </div>
                   </div>
                 );
               })}
             </div>
-          </div>
 
-          {/* Workspace Content split */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            
-            {/* Modern Sidebar */}
-            <div className="lg:col-span-1 bg-white border border-outline-variant/60 rounded-3xl p-4 shadow-sm h-fit">
-              <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest block px-4 mb-3 mt-2">
-                {activeSeasonTab} Plan
-              </span>
-              <nav className="space-y-1.5">
-                {[
-                  { id: 'overview', label: 'Season Overview', icon: Info },
-                  { id: 'calendar', label: 'Monthly Calendar', icon: Calendar },
-                  { id: 'nutrients', label: 'Smart Nutrient Plan', icon: Layers },
-                  { id: 'water', label: 'Water Strategy', icon: Droplet },
-                  { id: 'pests', label: 'Pest Prevention', icon: AlertTriangle },
-                  { id: 'schemes', label: 'Govt. Subsidies', icon: Shield },
-                ].map(tab => {
-                  const IconComp = tab.icon;
-                  const isActive = activeStrategyWorkspace === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveStrategyWorkspace(tab.id)}
-                      className={`w-full text-left px-4 py-3.5 rounded-2xl font-bold text-sm flex items-center gap-3 transition-all relative overflow-hidden ${
-                        isActive
-                          ? 'bg-primary/10 text-primary'
-                          : 'bg-transparent text-on-surface-variant hover:bg-surface-container-low'
-                      }`}
-                    >
-                      {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" />}
-                      <IconComp className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-on-surface-variant/70'}`} />
-                      <span>{tab.label}</span>
-                    </button>
-                  );
-                })}
-              </nav>
-            </div>
-
-            {/* Workspace detail area */}
-            <div className="lg:col-span-3 bg-white border border-outline-variant/60 rounded-3xl p-8 shadow-sm min-h-[500px]">
-              
-              {/* ── Tab: Overview ── */}
-              {activeStrategyWorkspace === 'overview' && (
-                <div className="space-y-6 animate-fade-in">
-                  <div className="flex items-center gap-3 border-b border-surface-container pb-4">
-                    <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
-                      <Info className="w-6 h-6" />
-                    </div>
-                    <h4 className="font-display font-black text-xl text-on-surface">
-                      {strategyData.details[activeSeasonTab].overview.title}
-                    </h4>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-5 border border-outline-variant/50 rounded-2xl bg-surface-container-lowest">
-                      <span className="text-xs text-on-surface-variant font-bold uppercase tracking-wider block mb-1">Primary Objective</span>
-                      <strong className="text-sm text-on-surface">{strategyData.details[activeSeasonTab].overview.objective}</strong>
-                    </div>
-                    <div className="p-5 border border-outline-variant/50 rounded-2xl bg-surface-container-lowest">
-                      <span className="text-xs text-on-surface-variant font-bold uppercase tracking-wider block mb-1">Expected Timeline</span>
-                      <strong className="text-sm text-on-surface">{strategyData.details[activeSeasonTab].overview.timelineText}</strong>
-                    </div>
-                    <div className="p-5 border border-outline-variant/50 rounded-2xl bg-surface-container-lowest sm:col-span-2">
-                      <span className="text-xs text-on-surface-variant font-bold uppercase tracking-wider block mb-1 flex items-center gap-1">
-                        <TrendingUp className="w-3.5 h-3.5" /> Financial Outlook
-                      </span>
-                      <strong className="text-base text-green-700 block mt-1">{strategyData.details[activeSeasonTab].overview.profitability}</strong>
-                    </div>
-                  </div>
-                    
-                  <div className="p-5 bg-amber-50/80 border-l-4 border-amber-500 rounded-r-2xl text-amber-900 mt-2">
-                    <h5 className="font-bold text-sm flex items-center gap-2 mb-1">
-                      <AlertTriangle className="w-4 h-4 text-amber-600" /> Key Considerations
-                    </h5>
-                    <p className="text-sm font-medium leading-relaxed opacity-90">
-                      {strategyData.details[activeSeasonTab].overview.warnings}
-                    </p>
-                  </div>
+            {/* Financial Summary */}
+            <div className="mt-12 pt-8 border-t-2 border-outline-variant/40">
+              <h4 className="font-display font-black text-xl text-on-surface mb-4 flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-green-600" />
+                Annual Financial Summary
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
+                  <span className="text-xs font-black uppercase tracking-wider text-green-600 block mb-1">Total Revenue</span>
+                  <strong className="text-2xl font-black text-green-800">₹{strategyData.financialSummary.totalRevenue.toLocaleString('en-IN')}</strong>
                 </div>
-              )}
-
-              {/* ── Tab: Calendar ── */}
-              {activeStrategyWorkspace === 'calendar' && (
-                <div className="space-y-6 animate-fade-in">
-                  <div className="flex items-center gap-3 border-b border-surface-container pb-4">
-                    <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
-                      <Calendar className="w-6 h-6" />
-                    </div>
-                    <h4 className="font-display font-black text-xl text-on-surface">
-                      Monthly Action Plan
-                    </h4>
-                  </div>
-                  
-                  <div className="relative pl-6 space-y-8 before:absolute before:inset-0 before:ml-8 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-surface-container-high before:to-transparent pt-4 pb-4">
-                    {strategyData.details[activeSeasonTab].calendar.map((act, idx) => (
-                      <div key={idx} className="relative flex items-start justify-between md:justify-normal md:odd:flex-row-reverse group">
-                        {/* Timeline Node */}
-                        <div className="absolute left-0 md:left-1/2 flex items-center justify-center w-6 h-6 rounded-full bg-white border-4 border-primary -translate-x-1/2 shadow-sm group-hover:scale-125 transition-transform" />
-                        
-                        {/* Content Card */}
-                        <div className="ml-8 md:ml-0 md:w-[calc(50%-2rem)] md:odd:pr-8 md:even:pl-8">
-                          <div className="p-5 bg-white border-2 border-outline-variant/40 rounded-2xl shadow-sm hover:border-primary/30 hover:shadow-md transition-all">
-                            <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-primary/10 px-2.5 py-1 rounded-md inline-block mb-3">
-                              {act.month}
-                            </span>
-                            <h5 className="font-black text-base text-on-surface mb-2">{act.activity}</h5>
-                            <div className="space-y-1.5 text-xs text-on-surface-variant font-medium mb-3">
-                              <p className="flex justify-between"><span>Timing:</span> <strong className="text-on-surface">{act.date}</strong></p>
-                              <p className="flex justify-between"><span>Duration:</span> <strong className="text-on-surface">{act.duration}</strong></p>
-                              <p className="flex justify-between"><span>Est. Cost:</span> <strong className="text-on-surface">₹{act.cost.toLocaleString('en-IN')}</strong></p>
-                            </div>
-                            <div className="bg-surface-container-lowest p-3 rounded-xl border border-surface-container">
-                              <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Expected Outcome</span>
-                              <p className="text-xs text-on-surface font-semibold">{act.outcome}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                <div className="bg-red-50 border border-red-200 rounded-xl p-5 text-center">
+                  <span className="text-xs font-black uppercase tracking-wider text-red-600 block mb-1">Total Cost</span>
+                  <strong className="text-2xl font-black text-red-800">₹{strategyData.financialSummary.totalCost.toLocaleString('en-IN')}</strong>
                 </div>
-              )}
-
-              {/* ── Tab: Nutrients ── */}
-              {activeStrategyWorkspace === 'nutrients' && (
-                <div className="space-y-6 animate-fade-in">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-container pb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
-                        <Layers className="w-6 h-6" />
-                      </div>
-                      <h4 className="font-display font-black text-xl text-on-surface">
-                        Nutrient Planner
-                      </h4>
-                    </div>
-                    <div className="bg-surface-container-lowest p-1 rounded-xl border flex">
-                      <button 
-                        onClick={() => setNutrientMode('conventional')}
-                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-                          nutrientMode === 'conventional' ? 'bg-white text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
-                        }`}
-                      >
-                        Inorganic
-                      </button>
-                      <button 
-                        onClick={() => setNutrientMode('organic')}
-                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-                          nutrientMode === 'organic' ? 'bg-primary text-white shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
-                        }`}
-                      >
-                        Organic
-                      </button>
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-on-surface-variant font-medium leading-relaxed bg-surface-container-lowest p-4 rounded-2xl border">
-                    <Info className="w-4 h-4 inline-block mr-2 text-primary -mt-0.5" />
-                    {strategyData.details[activeSeasonTab].nutrients.summary}
-                  </p>
-
-                  <div className="grid gap-4">
-                    {strategyData.details[activeSeasonTab].nutrients.items.map((item, idx) => (
-                      <div key={idx} className="p-5 border-2 border-outline-variant/40 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-primary/30 transition-all bg-white shadow-sm">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[10px] font-black text-white bg-primary px-2.5 py-0.5 rounded-md uppercase tracking-wider">
-                              {item.stage}
-                            </span>
-                          </div>
-                          <strong className="text-on-surface text-lg block font-black mt-2">{item.name}</strong>
-                          <p className="text-xs text-on-surface-variant font-medium mt-1">
-                            Recommended Brands: <span className="font-bold">{item.brands}</span>
-                          </p>
-                        </div>
-                        <div className="sm:text-right bg-surface-container-lowest p-3 rounded-xl border border-surface-container w-full sm:w-auto">
-                          <strong className="text-primary block text-2xl font-black">{item.qty} <span className="text-sm">{item.unit}</span></strong>
-                          <span className="text-xs text-on-surface-variant font-bold block mt-1">Est. Cost: ₹{item.cost}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                <div className="bg-primary/5 border border-primary/30 rounded-xl p-5 text-center">
+                  <span className="text-xs font-black uppercase tracking-wider text-primary block mb-1">Estimated Net Profit</span>
+                  <strong className="text-2xl font-black text-primary">₹{strategyData.financialSummary.netProfit.toLocaleString('en-IN')}</strong>
                 </div>
-              )}
-
-              {/* ── Tab: Water ── */}
-              {activeStrategyWorkspace === 'water' && (
-                <div className="space-y-6 animate-fade-in">
-                  <div className="flex items-center gap-3 border-b border-surface-container pb-4">
-                    <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600">
-                      <Droplet className="w-6 h-6" />
-                    </div>
-                    <h4 className="font-display font-black text-xl text-on-surface">
-                      Water Management
-                    </h4>
-                  </div>
-                  
-                  <div className="grid gap-5">
-                    {strategyData.details[activeSeasonTab].water.items.map((item, idx) => (
-                      <div key={idx} className="p-5 border-2 border-outline-variant/40 rounded-2xl bg-white shadow-sm hover:border-blue-300 transition-all">
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                          <div>
-                            <strong className="text-on-surface text-lg font-black">{item.event}</strong>
-                            <div className="text-xs text-on-surface-variant font-bold mt-1">{item.stage}</div>
-                          </div>
-                          <div className="text-right flex-shrink-0">
-                            <div className="text-sm font-black text-blue-700">{item.durationHours} hrs pumping</div>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-xs font-bold">
-                            <span className="text-on-surface-variant">Volume required</span>
-                            <span className="text-blue-800">{item.waterLiters} L/acre</span>
-                          </div>
-                          <div className="w-full bg-blue-50 h-2 rounded-full overflow-hidden">
-                            <div className="bg-blue-500 h-full rounded-full" style={{ width: '60%' }} />
-                          </div>
-                        </div>
-
-                        <div className="mt-4 p-3 bg-amber-50/50 border border-amber-100 rounded-xl text-xs flex gap-2 items-start text-amber-900">
-                          <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
-                          <span className="font-medium">{item.savingAdvisory}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ── Tab: Pests ── */}
-              {activeStrategyWorkspace === 'pests' && (
-                <div className="space-y-6 animate-fade-in">
-                  <div className="flex items-center gap-3 border-b border-surface-container pb-4">
-                    <div className="bg-red-50 p-2.5 rounded-xl text-red-600">
-                      <AlertTriangle className="w-6 h-6" />
-                    </div>
-                    <h4 className="font-display font-black text-xl text-on-surface">
-                      Pest & Disease Prevention
-                    </h4>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    {strategyData.details[activeSeasonTab].pests.map((pest, idx) => (
-                      <div key={idx} className="p-5 border-2 border-outline-variant/40 rounded-2xl bg-white shadow-sm hover:border-red-200 transition-all">
-                        <div className="flex justify-between items-start mb-4">
-                          <strong className="text-on-surface text-lg font-black leading-tight pr-2">{pest.name}</strong>
-                          <span className="text-[10px] font-black uppercase tracking-wider text-red-700 bg-red-100 px-2.5 py-1 rounded-md shrink-0">
-                            {pest.probability} Risk
-                          </span>
-                        </div>
-                        
-                        <div className="space-y-3">
-                          <div className="bg-green-50/50 border border-green-100 p-3 rounded-xl">
-                            <span className="text-[10px] font-bold text-green-800 uppercase block mb-1">Organic Prevention</span>
-                            <p className="text-xs text-on-surface font-medium">{pest.organic}</p>
-                          </div>
-                          <div className="bg-surface-container-lowest border p-3 rounded-xl">
-                            <span className="text-[10px] font-bold text-on-surface-variant uppercase block mb-1">Chemical Control</span>
-                            <p className="text-xs text-on-surface font-medium">{pest.chemical}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ── Tab: Schemes ── */}
-              {activeStrategyWorkspace === 'schemes' && (
-                <div className="space-y-6 animate-fade-in">
-                  <div className="flex items-center gap-3 border-b border-surface-container pb-4">
-                    <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
-                      <Shield className="w-6 h-6" />
-                    </div>
-                    <h4 className="font-display font-black text-xl text-on-surface">
-                      Govt. Schemes & Subsidies
-                    </h4>
-                  </div>
-                  
-                  <div className="grid gap-4">
-                    {strategyData.details[activeSeasonTab].schemes.map((scheme, idx) => (
-                      <div key={idx} className="p-5 border-2 border-outline-variant/40 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-primary/30 transition-all bg-white shadow-sm group">
-                        <div className="space-y-2 flex-1">
-                          <div className="flex items-center gap-2">
-                            <ShieldCheck className="w-4 h-4 text-green-600" />
-                            <strong className="text-on-surface text-base font-black">{scheme.name}</strong>
-                          </div>
-                          <p className="text-sm text-on-surface-variant font-medium leading-relaxed">{scheme.benefits}</p>
-                        </div>
-                        <a 
-                          href={scheme.link}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white font-bold text-sm px-5 py-2.5 rounded-xl shrink-0 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center"
-                        >
-                          Apply Now <ChevronRight className="w-4 h-4" />
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
+              </div>
             </div>
           </div>
         </div>
