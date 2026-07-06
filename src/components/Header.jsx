@@ -2,6 +2,7 @@ import { t } from '../utils/translations';
 import React from 'react';
 
 export default function Header({
+  activeDashboardTab,
   profile,
   language,
   setLanguage,
@@ -20,14 +21,24 @@ export default function Header({
       
       {/* Left Side: Sidebar Toggle + Dynamic Greeting */}
       <div className="flex items-center gap-3">
-        {/* Mobile hamburger — opens mobile drawer */}
-        <button 
-          onClick={() => setSidebarOpen(true)}
-          className="p-3 rounded-xl border border-outline-variant hover:bg-surface-container lg:hidden text-on-surface-variant flex items-center justify-center min-h-[48px] min-w-[48px]"
-          title="Open navigation"
-        >
-          <span className="material-symbols-outlined text-xl">menu</span>
-        </button>
+        {/* Mobile hamburger or back button */}
+        {activeDashboardTab !== 'dashboard' ? (
+          <button 
+            onClick={() => setActiveDashboardTab('dashboard')}
+            className="p-3 rounded-xl border border-outline-variant hover:bg-surface-container lg:hidden text-on-surface-variant flex items-center justify-center min-h-[48px] min-w-[48px]"
+            title="Go Back"
+          >
+            <span className="material-symbols-outlined text-xl">arrow_back</span>
+          </button>
+        ) : (
+          <button 
+            onClick={() => setSidebarOpen(true)}
+            className="p-3 rounded-xl border border-outline-variant hover:bg-surface-container lg:hidden text-on-surface-variant flex items-center justify-center min-h-[48px] min-w-[48px]"
+            title="Open navigation"
+          >
+            <span className="material-symbols-outlined text-xl">menu</span>
+          </button>
+        )}
 
         {/* Desktop collapse/expand toggle */}
         <button
@@ -40,22 +51,22 @@ export default function Header({
           </span>
         </button>
         
-        <div>
-          <h2 className="font-display font-bold text-base md:text-lg text-on-surface flex items-center gap-1.5">
-            <span>
+        <div className="flex-1 min-w-0">
+          <h2 className="font-display font-bold text-sm md:text-lg text-on-surface flex items-center gap-1 md:gap-1.5 truncate">
+            <span className="truncate">
               {(() => {
                 const hr = new Date().getHours();
                 if (hr < 12) return t('Good Morning', language);
                 if (hr < 17) return t('Good Afternoon', language);
                 return t('Good Evening', language);
               })()}
+              <span className="text-primary font-extrabold ml-1">
+                {profile.name ? `${profile.name.split(' ')[0]} Ji` : 'Ramesh Ji'}
+              </span>
             </span>
-            <span className="text-primary font-extrabold">
-              {profile.name ? `${profile.name.split(' ')[0]} Ji` : 'Ramesh Ji'}
-            </span>
-            <span>🌾</span>
+            <span className="hidden sm:inline">🌾</span>
           </h2>
-          <p className="text-xs text-on-surface-variant font-medium hidden sm:block">
+          <p className="text-xs text-on-surface-variant font-medium hidden sm:block truncate">
             {new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>

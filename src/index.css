@@ -3,9 +3,11 @@
 @tailwind utilities;
 
 @layer base {
-  html {
+  html, body, #root {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    max-width: 100vw;
   }
   body {
     @apply bg-background text-on-surface font-sans antialiased text-[15px] md:text-base leading-relaxed;

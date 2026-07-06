@@ -119,10 +119,11 @@ export default function DashboardShell({
       />
 
       {/* Main content body container */}
-      <div className="flex-grow flex flex-col min-w-0 h-full overflow-y-auto relative transition-all duration-300">
+      <div className="flex-grow flex flex-col min-w-0 h-full overflow-y-auto overflow-x-hidden relative transition-all duration-300">
         
         {/* Top command bar */}
         <Header 
+          activeDashboardTab={activeDashboardTab}
           profile={profile}
           language={language}
           setLanguage={setLanguage}
@@ -322,14 +323,7 @@ export default function DashboardShell({
         startSpeechRecognition={startSpeechRecognition}
       />
 
-      {/* Floating Voice Assistant MIC button overlay for mobile devices */}
-      <button
-        onClick={() => setVoiceAssistantOpen(true)}
-        className="fixed bottom-6 left-4 z-40 bg-primary hover:bg-secondary text-white h-14 w-14 rounded-full flex items-center justify-center shadow-2xl animate-pulse-ring border-2 border-white lg:hidden"
-        title="Voice Assistant"
-      >
-        <span className="material-symbols-outlined text-2xl font-bold">mic</span>
-      </button>
+
 
       {/* Floating Quick Action menu FAB */}
       <QuickActionFAB 

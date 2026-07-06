@@ -544,7 +544,7 @@ const evaluateScheme = (scheme, profile, farm) => {
 };
 
 export default function App() {
-  const [view, setView] = useState('WELCOME');
+  const [view, setView] = useState(() => localStorage.getItem('km_jwt') ? 'DASHBOARD' : 'WELCOME');
   const [language, setLanguage] = useState('en');
   const [voiceGuide, setVoiceGuide] = useState(false);
   const [playingAudio, setPlayingAudio] = useState(null);
