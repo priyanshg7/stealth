@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { generateRecommendations } from '../../utils/aiRecommendationEngine';
 import { calculateNutrientPlan, parseSoilData } from '../../data/soilNutrientEngine';
+import { generateCropSchedule } from '../../utils/farmScheduleEngine';
 
 const CROP_VARIETIES = {
   wheat: [
@@ -589,64 +590,44 @@ export default function SeasonPlanner({
     const cropKey = formFields.cropName.toLowerCase();
     const varietyName = selectedVariety?.name || 'Karan Vandana';
     
-    // Create live tasks list for dashboard
-    const generatedTasks = [
-      {
-        id: `t-${cropKey}-1`,
-        title: 'Primary Land Ploughing & Manure Incorporation',
-        category: 'Land Prep',
-        priority: 'High',
-        time: '07:00 AM',
-        duration: '3 hours',
-        why: `Prepare the land for ${varietyName}. Proper tilling improves soil aeration and embeds organic manure.`,
-        benefit: 'Improves root development and soil drainage efficiency by 25%.',
-        resources: 'Tractor with MB Plough, 3 Trolleys of Compost Manure',
-        status: 'pending'
-      },
-      {
-        id: `t-${cropKey}-2`,
-        title: 'Seed Fungicide Treatment (Biological/Chemical)',
-        category: 'Sowing Prep',
-        priority: 'High',
-        time: '09:30 AM',
-        duration: '1 hour',
-        why: `Pre-treating ${varietyName} seeds prevents seed-borne fungal infections common in the planting month.`,
-        benefit: 'Increases germination rate by 15% and saves early crop loss.',
-        resources: 'Seeds, Trichoderma Viride (10g/kg seed), Mixing tub, gloves',
-        status: 'pending'
-      },
-      {
-        id: `t-${cropKey}-3`,
-        title: 'Initial Irrigation Check & Gate Setup',
-        category: 'Irrigation',
-        priority: 'High',
-        time: '11:00 AM',
-        duration: '2 hours',
-        why: `Prepare the field water paths. Pre-sowing watering ensures correct soil moisture index.`,
-        benefit: 'Ensures uniform seed placement and early seedling sprout.',
-        resources: 'Borewell pump active, spade, secondary valves check',
-        status: 'pending'
-      },
-      {
-        id: `t-${cropKey}-4`,
-        title: 'Apply Basal Fertilizer Dose',
-        category: 'Nutrients',
-        priority: 'Medium',
-        time: '03:30 PM',
-        duration: '1.5 hours',
-        why: 'Basal application provides core Phosphate (DAP) and Potash (MOP) required for root setup.',
-        benefit: 'Stimulates root expansion and early tillering.',
-        resources: fertilizerMode === 'conventional' ? 'DAP and MOP mix' : 'Vermicompost and Neem Cake',
-        status: 'pending'
-      }
-    ];
+    // Map plantingMonth selection to a valid date
+    const currentYear = new Date().getFullYear();
+    const monthMap = {
+      january: '01', february: '02', march: '03', april: '04', may: '05', june: '06',
+      july: '07', august: '08', september: '09', october: '10', november: '11', december: '12',
+      jan: '01', feb: '02', mar: '03', apr: '04', jun: '06', jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12'
+    };
+    const mKey = (formFields.plantingMonth || 'July').toLowerCase().trim();
+    const mCode = monthMap[mKey] || '07';
+    const calculatedSowingDate = `${currentYear}-${mCode}-05`;
+    
+    const durationDays = selectedVariety ? parseInt(selectedVariety.duration) : 120;
+    
+    const addDaysLocal = (dateStr, days) => {
+      const date = new Date(dateStr);
+      date.setDate(date.getDate() + days);
+      return date.toISOString().split('T')[0];
+    };
+    const calculatedHarvestDate = addDaysLocal(calculatedSowingDate, durationDays);
+
+    // Create live tasks list using the farmScheduleEngine
+    const generatedTasks = generateCropSchedule({
+      cropName: formFields.cropName,
+      varietyName: varietyName,
+      sowingDate: calculatedSowingDate,
+      area: formFields.area,
+      irrigationMethods: formFields.irrigation,
+      farmingMethod: formFields.farmingMethod,
+      durationDays: durationDays,
+      existingTasks: []
+    });
 
     const confirmedPlan = {
       cropName: formFields.cropName.charAt(0).toUpperCase() + formFields.cropName.slice(1),
       cropIcon: formFields.cropName.toLowerCase() === 'wheat' ? '🌾' : (formFields.cropName.toLowerCase() === 'rice' ? '🌱' : '🌽'),
       healthScore: 92,
-      growthProgress: 5,
-      harvestDays: selectedVariety ? parseInt(selectedVariety.duration) : 120,
+      growthProgress: 0,
+      harvestDays: durationDays,
       expectedYield: `${costs.expectedYield} Quintals/Acre`,
       estimatedProfit: simData.profit,
       weatherStatus: 'Optimized',
@@ -706,12 +687,28 @@ export default function SeasonPlanner({
     const sName = locParts[2]?.trim() || 'Rajasthan';
 
     if (updatedFarms[selectedFarmIndex]) {
+      const oldCrop = updatedFarms[selectedFarmIndex].crop;
+      if (oldCrop && oldCrop.name) {
+        if (!updatedFarms[selectedFarmIndex].cropHistory) {
+          updatedFarms[selectedFarmIndex].cropHistory = [];
+        }
+        const isDuplicate = updatedFarms[selectedFarmIndex].cropHistory.some(
+          h => h.name === oldCrop.name && h.sowingDate === oldCrop.sowingDate
+        );
+        if (!isDuplicate) {
+          updatedFarms[selectedFarmIndex].cropHistory.push({
+            ...oldCrop,
+            archivedAt: new Date().toISOString()
+          });
+        }
+      }
+
       updatedFarms[selectedFarmIndex].crop = {
         name: formFields.cropName.charAt(0).toUpperCase() + formFields.cropName.slice(1),
         variety: varietyName,
         stage: 'Sowing / Preparation',
-        sowingDate: '2026-07-05',
-        harvestDate: '2026-11-10',
+        sowingDate: calculatedSowingDate,
+        harvestDate: calculatedHarvestDate,
         previousCrop: formFields.lastCrop,
         farmingType: formFields.farmingMethod,
         confirmedPlan: confirmedPlan
@@ -747,12 +744,13 @@ export default function SeasonPlanner({
         plots: 1,
         area: formFields.area,
         unit: formFields.unit,
+        cropHistory: [],
         crop: {
           name: formFields.cropName.charAt(0).toUpperCase() + formFields.cropName.slice(1),
           variety: varietyName,
           stage: 'Sowing / Preparation',
-          sowingDate: '2026-07-05',
-          harvestDate: '2026-11-10',
+          sowingDate: calculatedSowingDate,
+          harvestDate: calculatedHarvestDate,
           previousCrop: formFields.lastCrop,
           farmingType: formFields.farmingMethod,
           confirmedPlan: confirmedPlan

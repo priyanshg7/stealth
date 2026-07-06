@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import DashboardShell from './components/DashboardShell';
 import { fetchWeatherIntelligence } from './utils/weatherService';
+import { getCropStageByDas, generateCropSchedule } from './utils/farmScheduleEngine';
 
 // Firebase SDK Imports & Configuration
 import { initializeApp } from 'firebase/app';
@@ -622,6 +623,29 @@ export default function App() {
   ]);
   const [activeDashboardTab, setActiveDashboardTab] = useState(() => localStorage.getItem('km_active_tab') || 'dashboard');
 
+  const customSetCompletedTasks = (value) => {
+    setCompletedTasks((prev) => {
+      const next = typeof value === 'function' ? value(prev) : value;
+      // Sync tasks status and completedAt inside the active farm
+      setFarms((prevFarms) => {
+        const updated = [...prevFarms];
+        const activeFarm = updated[selectedFarmIndex];
+        if (activeFarm && activeFarm.crop?.confirmedPlan?.tasks) {
+          activeFarm.crop.confirmedPlan.tasks = activeFarm.crop.confirmedPlan.tasks.map((t) => {
+            const isCompleted = next.includes(t.id);
+            return {
+              ...t,
+              status: isCompleted ? 'completed' : 'pending',
+              completedAt: isCompleted ? (t.completedAt || new Date().toISOString()) : null
+            };
+          });
+        }
+        return updated;
+      });
+      return next;
+    });
+  };
+
   useEffect(() => {
     localStorage.setItem('km_active_tab', activeDashboardTab);
   }, [activeDashboardTab]);
@@ -968,7 +992,38 @@ export default function App() {
   const getFarmDashboardData = (farm) => {
     if (!farm) return null;
     if (farm.crop?.confirmedPlan) {
-      return farm.crop.confirmedPlan;
+      const plan = farm.crop.confirmedPlan;
+      const sowingDateStr = farm.crop.sowingDate || '2026-07-05';
+      const sowingDate = new Date(sowingDateStr);
+      const today = new Date();
+      const ageDays = Math.max(0, Math.floor((today - sowingDate) / (1000 * 60 * 60 * 24)));
+      const duration = plan.harvestDays || 120;
+      const remainingDays = Math.max(0, duration - ageDays);
+      const tasks = plan.tasks || [];
+      const totalTasks = tasks.length;
+      const completedTasksCount = tasks.filter(t => t.status === 'completed').length;
+      const growthProgress = totalTasks > 0 ? Math.round((completedTasksCount / totalTasks) * 100) : plan.growthProgress || 0;
+      
+      const stageName = getCropStageByDas(ageDays, duration);
+      let timelineStageIndex = 1;
+      if (stageName === 'Preparation') timelineStageIndex = 1;
+      else if (stageName === 'Sowing & Germination') timelineStageIndex = 2;
+      else if (stageName === 'Seedling Stage') timelineStageIndex = 3;
+      else if (stageName === 'Active Vegetative') timelineStageIndex = 4;
+      else if (stageName === 'Flowering Stage') timelineStageIndex = 5;
+      else if (stageName === 'Grain Filling / Maturity') timelineStageIndex = 6;
+      else if (stageName === 'Harvesting') timelineStageIndex = 7;
+      else if (stageName === 'Post-Harvest & Storage') timelineStageIndex = 8;
+
+      return {
+        ...plan,
+        ageDays,
+        remainingDays,
+        growthProgress,
+        timelineStageIndex,
+        stageName,
+        tasks
+      };
     }
     const cropId = farm.crop?.name || 'wheat';
     const cropDetails = CROPS.find(c => c.id === cropId) || { name: 'Wheat', icon: '🌾' };
@@ -3833,7 +3888,7 @@ Instructions:
               setShowJwtInspector={setShowJwtInspector}
               handleSignOut={handleSignOut}
               completedTasks={completedTasks}
-              setCompletedTasks={setCompletedTasks}
+              setCompletedTasks={customSetCompletedTasks}
               voiceAssistantOpen={voiceAssistantOpen}
               setVoiceAssistantOpen={setVoiceAssistantOpen}
               voiceReplies={voiceReplies}

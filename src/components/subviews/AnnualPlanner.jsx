@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { t } from '../../utils/translations';
 import { generateRecommendations, getGeminiVarieties } from '../../utils/aiRecommendationEngine';
+import { generateCropSchedule } from '../../utils/farmScheduleEngine';
 import { getSoilHealthSummary } from '../../data/soilNutrientEngine';
 import { generateAnnualStrategy } from '../../utils/annualPlannerEngine';
 
@@ -278,33 +279,69 @@ export default function AnnualPlanner({
   const handleSaveAnnualPlan = () => {
     if (!activeFarm || !strategyData) return;
 
-    // Create live tasks list for dashboard
+    const currentYear = new Date().getFullYear();
+    const seasonSowingDates = {
+      Kharif: `${currentYear}-06-15`,
+      Rabi: `${currentYear}-11-05`,
+      Zaid: `${currentYear}-04-05`
+    };
+
+    // Generate tasks list using the farmScheduleEngine for each season
     const generatedTasks = [];
-    Object.entries(strategyData.details).forEach(([season, details]) => {
-      details.calendar.forEach((act, idx) => {
-        generatedTasks.push({
-          id: `task-annual-${season}-${idx}`,
-          title: `${act.activity} (${season} Crop)`,
-          category: act.activity.includes('Fertilizer') || act.activity.includes('dressing') ? 'Fertilizer' : (act.activity.includes('Harvest') ? 'Harvesting' : 'Land Prep'),
-          priority: idx === 0 || act.activity.includes('Harvest') ? 'High' : 'Medium',
-          time: '07:30 AM',
-          duration: act.duration,
-          why: act.outcome,
-          resources: act.resources,
-          benefit: act.outcome,
-          status: 'pending'
+    Object.entries(wizardCrops).forEach(([season, crop]) => {
+      if (crop && crop.id !== 'fallow') {
+        const sowingDate = seasonSowingDates[season];
+        const duration = crop.maturityDays || 120;
+        const cropTasks = generateCropSchedule({
+          cropName: crop.cropName || crop.name,
+          varietyName: crop.name,
+          sowingDate: sowingDate,
+          area: setupForm.area,
+          irrigationMethods: [setupForm.irrigationSource.toLowerCase()],
+          farmingMethod: setupForm.farmingMethod,
+          durationDays: duration,
+          existingTasks: []
         });
-      });
+
+        const seasonTasks = cropTasks.map(t => ({
+          ...t,
+          id: `${t.id}-${season}`,
+          title: `${t.title} (${season})`,
+          season: season
+        }));
+
+        generatedTasks.push(...seasonTasks);
+      }
     });
+
+    // Determine current active crop based on season of the year
+    const todayMonth = new Date().getMonth();
+    let activeSeason = 'Kharif';
+    if (todayMonth >= 10 || todayMonth <= 2) {
+      activeSeason = 'Rabi';
+    } else if (todayMonth >= 3 && todayMonth <= 4) {
+      activeSeason = 'Zaid';
+    }
+
+    const activeCropInfo = wizardCrops[activeSeason] || wizardCrops.Kharif || wizardCrops.Rabi || wizardCrops.Zaid;
+    const activeCropName = activeCropInfo?.cropName || activeCropInfo?.name || 'Wheat';
+    const activeSowingDate = seasonSowingDates[activeSeason] || `${currentYear}-06-15`;
+
+    const addDaysLocal = (dateStr, days) => {
+      const date = new Date(dateStr);
+      date.setDate(date.getDate() + days);
+      return date.toISOString().split('T')[0];
+    };
+    const activeHarvestDate = addDaysLocal(activeSowingDate, activeCropInfo?.maturityDays || 120);
 
     // Populate active farm crop confirmedPlan
     const updatedConfirmedPlan = {
-      cropName: strategyData.timeline[0]?.cropName || 'Wheat',
-      cropIcon: strategyData.timeline[0]?.cropName?.toLowerCase() === 'rice' ? '🌱' : '🌾',
+      cropName: activeCropName,
+      cropIcon: activeCropName.toLowerCase() === 'rice' ? '🌱' : (activeCropName.toLowerCase() === 'wheat' ? '🌾' : '🌽'),
       healthScore: 90,
       growthProgress: 0,
-      harvestDays: 120,
-      expectedYield: strategyData.timeline[0]?.estimatedYield || '24 Qtl',
+      harvestDays: activeCropInfo?.maturityDays || 120,
+      expectedYield: `${activeCropInfo?.yieldPotential || 22} Quintals/Acre`,
       estimatedProfit: strategyData.financialSummary.netProfit,
       weatherStatus: 'Optimized',
       diseaseRisk: 'Low',
@@ -336,10 +373,38 @@ export default function AnnualPlanner({
 
     const updatedFarms = [...farms];
     if (updatedFarms[selectedFarmIndex]) {
+      // Archive old crop if present
+      const oldCrop = updatedFarms[selectedFarmIndex].crop;
+      if (oldCrop && oldCrop.name) {
+        if (!updatedFarms[selectedFarmIndex].cropHistory) {
+          updatedFarms[selectedFarmIndex].cropHistory = [];
+        }
+        const isDuplicate = updatedFarms[selectedFarmIndex].cropHistory.some(
+          h => h.name === oldCrop.name && h.sowingDate === oldCrop.sowingDate
+        );
+        if (!isDuplicate) {
+          updatedFarms[selectedFarmIndex].cropHistory.push({
+            ...oldCrop,
+            archivedAt: new Date().toISOString()
+          });
+        }
+      }
+
       updatedFarms[selectedFarmIndex].crop = {
-        ...updatedFarms[selectedFarmIndex].crop,
+        name: activeCropName,
+        variety: activeCropInfo?.name || 'Karan Vandana',
+        stage: 'Sowing / Preparation',
+        sowingDate: activeSowingDate,
+        harvestDate: activeHarvestDate,
+        previousCrop: setupForm.farmingMethod,
+        farmingType: setupForm.farmingMethod,
         confirmedPlan: updatedConfirmedPlan
       };
+      updatedFarms[selectedFarmIndex].area = setupForm.area;
+      updatedFarms[selectedFarmIndex].unit = setupForm.unit;
+      updatedFarms[selectedFarmIndex].district = setupForm.district;
+      updatedFarms[selectedFarmIndex].state = setupForm.state;
+
       setFarms(updatedFarms);
     }
 

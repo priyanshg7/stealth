@@ -246,7 +246,12 @@ export default function FarmingDashboard({
 
         <div className="space-y-4">
           {(() => {
-            const tasks = dashboardData?.tasks || [];
+            const todayStr = new Date().toISOString().split('T')[0];
+            const tasks = (dashboardData?.tasks || []).filter(t => {
+              const isToday = t.date === todayStr;
+              const isOverdue = t.date < todayStr && t.status !== 'completed';
+              return isToday || isOverdue;
+            });
             const pending = tasks.filter(task => !completedTasks.includes(task.id));
 
             if (pending.length === 0) {
@@ -819,12 +824,37 @@ export default function FarmingDashboard({
               </button>
             </div>
             <div className="py-4 space-y-3 text-xs leading-relaxed max-h-96 overflow-y-auto pr-1">
-              {[
-                { day: 'Tomorrow', title: 'Check drip line clogging', category: 'Irrigation', duration: '1 hour' },
-                { day: 'Day after', title: 'Prepare compost mixture dressing', category: 'Nutrition', duration: '2 hours' },
-                { day: 'July 1st', title: 'Pesticide weed spray', category: 'Protection', duration: '2.5 hours' },
-                { day: 'July 3rd', title: 'Secondary tillering measurement check', category: 'Agronomy', duration: '1 hour' }
-              ].map((item, idx) => (
+              {(() => {
+                const today = new Date();
+                const sevenDaysLater = new Date();
+                sevenDaysLater.setDate(today.getDate() + 7);
+                const todayStr = today.toISOString().split('T')[0];
+                const sevenDaysLaterStr = sevenDaysLater.toISOString().split('T')[0];
+
+                const upcomingTasks = (dashboardData?.tasks || [])
+                  .filter(t => t.date > todayStr && t.date <= sevenDaysLaterStr && t.status !== 'completed')
+                  .map(t => {
+                    const taskDate = new Date(t.date);
+                    const diffTime = taskDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    let dayLabel = t.date;
+                    if (diffDays === 1) dayLabel = 'Tomorrow';
+                    else if (diffDays === 2) dayLabel = 'Day after';
+                    return {
+                      day: dayLabel,
+                      title: t.title,
+                      category: t.category,
+                      duration: t.duration || 'Flexible'
+                    };
+                  });
+
+                if (upcomingTasks.length === 0) {
+                  return [
+                    { day: 'Rest Period', title: 'No scheduled operations in the next 7 days', category: 'Rest', duration: 'N/A' }
+                  ];
+                }
+                return upcomingTasks;
+              })().map((item, idx) => (
                 <div key={idx} className="p-3 rounded-xl border border-outline-variant bg-surface-container-low/40 flex justify-between items-center gap-3">
                   <div>
                     <span className="text-[10px] text-primary font-bold bg-primary/10 rounded px-1.5 py-0.5 uppercase">{item.day}</span>

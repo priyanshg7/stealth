@@ -301,6 +301,10 @@ export default function DashboardShell({
               setActiveDialogTask={setActiveDialogTask}
               setShowRescheduleModal={setShowRescheduleModal}
               language={language}
+              farms={farms}
+              selectedFarmIndex={selectedFarmIndex}
+              setFarms={setFarms}
+              weatherData={weatherData}
             />
           )}
 

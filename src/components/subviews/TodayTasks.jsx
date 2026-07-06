@@ -11,7 +11,10 @@ export default function TodayTasks({
   setActiveDialogTask,
   setShowRescheduleModal,
   weatherData,
-  language
+  language,
+  farms,
+  selectedFarmIndex,
+  setFarms
 }) {
   const rawTasks = dashboardData?.tasks || [];
   
@@ -25,6 +28,7 @@ export default function TodayTasks({
   const [emailReminder, setEmailReminder] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [filterType, setFilterType] = useState('today'); // 'today' | 'upcoming' | 'previous'
 
   const handlePrevDay = () => {
     const d = new Date(selectedDate);
@@ -54,7 +58,20 @@ export default function TodayTasks({
   });
 
   const allTasks = [...generatedTasks, ...personalTasks];
-  const tasks = allTasks.filter(t => (t.date || new Date().toISOString().split('T')[0]) === selectedDate);
+  
+  // Filter tasks based on selected tab/type
+  let tasks = [];
+  if (filterType === 'today') {
+    tasks = allTasks.filter(t => {
+      const isScheduledToday = t.date === selectedDate;
+      const isOverdue = t.date < selectedDate && t.status !== 'completed';
+      return isScheduledToday || isOverdue;
+    });
+  } else if (filterType === 'upcoming') {
+    tasks = allTasks.filter(t => t.date > selectedDate);
+  } else if (filterType === 'previous') {
+    tasks = allTasks.filter(t => t.date < selectedDate || t.status === 'completed');
+  }
 
   const handleToggleTask = (taskId) => {
     if (completedTasks.includes(taskId)) {
@@ -78,10 +95,22 @@ export default function TodayTasks({
       why: 'User-added custom task',
       benefit: 'Personal productivity',
       isPersonal: true,
-      emailReminder: emailReminder
+      emailReminder: emailReminder,
+      status: 'pending'
     };
 
-    setPersonalTasks([...personalTasks, newTask]);
+    if (farms && setFarms && farms[selectedFarmIndex]?.crop?.confirmedPlan) {
+      const updatedFarms = [...farms];
+      const activeFarm = updatedFarms[selectedFarmIndex];
+      activeFarm.crop.confirmedPlan.tasks = [
+        ...(activeFarm.crop.confirmedPlan.tasks || []),
+        newTask
+      ];
+      setFarms(updatedFarms);
+    } else {
+      setPersonalTasks([...personalTasks, newTask]);
+    }
+
     setNewTaskTitle('');
     setNewTaskDate(new Date().toISOString().split('T')[0]);
     setNewTaskTime('Anytime');
@@ -114,6 +143,34 @@ export default function TodayTasks({
           className="shrink-0 bg-primary hover:bg-secondary text-white font-bold py-2.5 px-4 rounded-xl flex items-center gap-2 shadow-sm transition-colors text-sm"
         >
           <Plus className="w-4 h-4" /> Add Personal Task
+        </button>
+      </div>
+
+      {/* Task Filters */}
+      <div className="flex bg-white border border-outline-variant/60 rounded-xl p-1 shadow-2xs">
+        <button
+          onClick={() => setFilterType('today')}
+          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+            filterType === 'today' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant hover:text-on-surface'
+          }`}
+        >
+          Today's Work & Overdue
+        </button>
+        <button
+          onClick={() => setFilterType('upcoming')}
+          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+            filterType === 'upcoming' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant hover:text-on-surface'
+          }`}
+        >
+          Upcoming Work
+        </button>
+        <button
+          onClick={() => setFilterType('previous')}
+          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+            filterType === 'previous' ? 'bg-primary text-white shadow-xs' : 'text-on-surface-variant hover:text-on-surface'
+          }`}
+        >
+          Previous & Completed
         </button>
       </div>
 
@@ -237,8 +294,16 @@ export default function TodayTasks({
         {tasks.length === 0 ? (
           <div className="bg-white border border-outline-variant/60 rounded-card p-8 text-center space-y-2">
             <CheckCircle2 className="w-12 h-12 text-primary mx-auto" />
-            <h4 className="font-bold text-on-surface text-sm">All Tasks Cleared!</h4>
-            <p className="text-xs text-on-surface-variant max-w-xs mx-auto">No pending tasks for today. Check back tomorrow morning for your next AI-generated planner.</p>
+            <h4 className="font-bold text-on-surface text-sm">
+              {filterType === 'today' ? 'All Tasks Cleared!' : filterType === 'upcoming' ? 'No Upcoming Work' : 'No Previous Records'}
+            </h4>
+            <p className="text-xs text-on-surface-variant max-w-xs mx-auto">
+              {filterType === 'today' 
+                ? 'No pending tasks scheduled for this day or overdue. Check upcoming work or enjoy your rest!' 
+                : filterType === 'upcoming' 
+                  ? 'No future crop lifecycle events scheduled yet. Generate a new plan to add activities.' 
+                  : 'No completed or historical activities exist on this farm yet.'}
+            </p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -280,6 +345,13 @@ export default function TodayTasks({
                           {task.isPersonal && task.emailReminder && (
                             <span className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md"><Bell className="w-2.5 h-2.5" /> Reminder Set</span>
                           )}
+                          {isCompleted ? (
+                            <span className="text-green-700 font-bold bg-green-50 px-2 py-0.5 rounded-md">✓ Completed</span>
+                          ) : task.date && task.date < new Date().toISOString().split('T')[0] ? (
+                            <span className="text-red-700 font-bold bg-red-50 px-2 py-0.5 rounded-md animate-pulse">⚠️ Overdue ({task.date})</span>
+                          ) : task.date ? (
+                            <span className="text-primary font-bold bg-primary/5 px-2 py-0.5 rounded-md">Scheduled: {task.date}</span>
+                          ) : null}
                         </div>
                       </div>
                       

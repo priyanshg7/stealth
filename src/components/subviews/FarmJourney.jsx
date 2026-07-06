@@ -48,25 +48,80 @@ export default function FarmJourney({
   const activeFarm = farms[selectedFarmIndex];
   const dashboardData = activeFarm ? getFarmDashboardData(activeFarm) : null;
   const rawTasks = dashboardData?.tasks || [];
+  const cropHistory = activeFarm?.cropHistory || [];
   
   // State for historical view
-  const [activeSeason, setActiveSeason] = useState('current'); // 'current' or 'season_2025_kharif'
+  const [activeSeason, setActiveSeason] = useState('current');
 
   const currentCropData = {
     cropName: dashboardData?.cropName || activeFarm?.crop?.name || 'Wheat',
     variety: activeFarm?.crop?.variety || 'Karan Vandana',
-    sowingDate: activeFarm?.crop?.sowingDate || '2026-06-01',
-    harvestDate: activeFarm?.crop?.harvestDate || '2026-10-15',
+    sowingDate: activeFarm?.crop?.sowingDate || '2026-07-05',
+    harvestDate: activeFarm?.crop?.harvestDate || '2026-11-05',
     currentStage: dashboardData?.timelineStageIndex || 3,
-    ageDays: 35, // Mocked for calculation based on sowing date
-    remainingDays: dashboardData?.harvestDays || 85,
-    completionPercentage: dashboardData?.growthProgress || 35,
+    ageDays: dashboardData?.ageDays || 0,
+    remainingDays: dashboardData?.remainingDays || 120,
+    completionPercentage: dashboardData?.growthProgress || 0,
     expectedYield: dashboardData?.expectedYield || '24 Quintals/Acre'
   };
 
   const isHistorical = activeSeason !== 'current';
-  const displayData = isHistorical ? MOCK_PREVIOUS_CROP : currentCropData;
-  const displayTasks = isHistorical ? MOCK_PREVIOUS_CROP.tasks : rawTasks;
+  
+  let displayData = currentCropData;
+  let displayTasks = rawTasks;
+
+  if (activeSeason === 'season_2025_kharif') {
+    displayData = MOCK_PREVIOUS_CROP;
+    displayTasks = MOCK_PREVIOUS_CROP.tasks;
+  } else if (activeSeason.startsWith('history-')) {
+    const histIdx = parseInt(activeSeason.replace('history-', ''), 10);
+    const histCrop = cropHistory[histIdx];
+    if (histCrop) {
+      const histTasks = histCrop.confirmedPlan?.tasks || [];
+      const completedCount = histTasks.filter(t => t.status === 'completed').length;
+      const totalCount = histTasks.length;
+      const completionScore = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 100;
+      
+      displayData = {
+        cropName: histCrop.name,
+        variety: histCrop.variety,
+        sowingDate: histCrop.sowingDate,
+        harvestDate: histCrop.harvestDate,
+        remainingDays: 0,
+        totalDays: histCrop.confirmedPlan?.harvestDays || 120,
+        completionScore: completionScore,
+        expectedYield: histCrop.confirmedPlan?.expectedYield || '24 Quintals/Acre'
+      };
+      displayTasks = histTasks;
+    }
+  }
+
+  const currentMilestones = [
+    { 
+      title: 'Sowing Completed', 
+      date: currentCropData.sowingDate, 
+      icon: 'Sprout', 
+      done: displayTasks.some(t => t.category === 'Sowing' && t.status === 'completed')
+    },
+    { 
+      title: 'First Irrigation', 
+      date: displayTasks.find(t => t.category === 'Irrigation')?.date || 'Upcoming', 
+      icon: 'Droplets', 
+      done: displayTasks.some(t => t.category === 'Irrigation' && t.status === 'completed')
+    },
+    { 
+      title: 'Flowering Stage', 
+      date: displayTasks.find(t => t.title.toLowerCase().includes('flowering'))?.date || 'Upcoming', 
+      icon: 'Sun', 
+      done: displayTasks.some(t => t.title.toLowerCase().includes('flowering') && t.status === 'completed')
+    },
+    { 
+      title: 'Harvest Ready', 
+      date: currentCropData.harvestDate, 
+      icon: 'CheckCircle2', 
+      done: displayTasks.some(t => t.category === 'Harvesting' && t.status === 'completed')
+    }
+  ];
 
   return (
     <div className="space-y-6 animate-fade-in font-sans pb-10">
@@ -90,6 +145,11 @@ export default function FarmJourney({
                 className="bg-black/20 border border-white/30 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-sm"
               >
                 <option value="current" className="text-black">Current Season ({currentCropData.cropName})</option>
+                {cropHistory.map((hist, idx) => (
+                  <option key={idx} value={`history-${idx}`} className="text-black">
+                    {hist.name} ({hist.variety}) - {hist.sowingDate}
+                  </option>
+                ))}
                 <option value="season_2025_kharif" className="text-black">Kharif 2025 ({MOCK_PREVIOUS_CROP.cropName})</option>
               </select>
             </div>
@@ -154,7 +214,7 @@ export default function FarmJourney({
                    <p className="text-xs text-on-surface-variant mb-3">Soil testing, land preparation, and seed selection.</p>
                    
                    <div className="space-y-2">
-                     {displayTasks.filter(t => ['Planning', 'Preparation', 'Soil'].includes(t.stage) || ['Planning', 'Land Preparation'].includes(t.category)).map(task => {
+                     {displayTasks.filter(t => ['Planning', 'Preparation', 'Soil'].includes(t.stage) || ['Planning', 'Land Preparation', 'Land Prep', 'Sowing Prep'].includes(t.category)).map(task => {
                        const isDone = task.status === 'completed' || completedTasks.includes(task.id);
                        return (
                          <div key={task.id} className={`flex items-start gap-3 p-3 rounded-xl border ${isDone ? 'bg-emerald-50/50 border-emerald-100' : 'bg-surface-container-lowest border-outline-variant/40'}`}>
@@ -191,7 +251,7 @@ export default function FarmJourney({
                    )}
 
                    <div className="space-y-2">
-                     {displayTasks.filter(t => ['Sowing', 'Seed Treatment', 'Transplanting'].includes(t.stage) || t.category === 'Sowing').map(task => {
+                     {displayTasks.filter(t => ['Sowing', 'Seed Treatment', 'Transplanting'].includes(t.stage) || ['Sowing', 'Sowing Prep'].includes(t.category)).map(task => {
                        const isDone = task.status === 'completed' || completedTasks.includes(task.id);
                        return (
                          <div key={task.id} className={`flex items-start gap-3 p-3 rounded-xl border ${isDone ? 'bg-emerald-50/50 border-emerald-100' : 'bg-surface-container-lowest border-outline-variant/40'}`}>
@@ -217,7 +277,7 @@ export default function FarmJourney({
                    <p className="text-xs text-on-surface-variant mb-3">Irrigation, fertilization, and weed management.</p>
                    
                    <div className="space-y-2">
-                     {displayTasks.filter(t => ['Vegetative Growth', 'Fertilization', 'Irrigation', 'Weed Management'].includes(t.stage) || ['Fertilization', 'Irrigation'].includes(t.category)).map(task => {
+                     {displayTasks.filter(t => ['Vegetative Growth', 'Fertilization', 'Irrigation', 'Weed Management'].includes(t.stage) || ['Fertilization', 'Irrigation', 'Weed Control'].includes(t.category)).map(task => {
                        const isDone = task.status === 'completed' || completedTasks.includes(task.id);
                        return (
                          <div key={task.id} className={`flex items-start gap-3 p-3 rounded-xl border ${isDone ? 'bg-emerald-50/50 border-emerald-100' : 'bg-surface-container-lowest border-outline-variant/40'}`}>
@@ -254,7 +314,7 @@ export default function FarmJourney({
                    )}
 
                    <div className="space-y-2">
-                     {displayTasks.filter(t => ['Flowering', 'Pest Management', 'Disease Management'].includes(t.stage) || t.category === 'Crop Protection').map(task => {
+                     {displayTasks.filter(t => ['Flowering', 'Pest Management', 'Disease Management', 'Disease Control'].includes(t.stage) || ['Crop Protection', 'Pest Management', 'Disease Control', 'Disease Control'].includes(t.category)).map(task => {
                        const isDone = task.status === 'completed' || completedTasks.includes(task.id);
                        return (
                          <div key={task.id} className={`flex items-start gap-3 p-3 rounded-xl border ${isDone ? 'bg-emerald-50/50 border-emerald-100' : 'bg-surface-container-lowest border-outline-variant/40'}`}>
@@ -280,7 +340,7 @@ export default function FarmJourney({
                    <p className="text-xs text-on-surface-variant mb-3">Harvesting, storage, and market intelligence.</p>
                    
                    <div className="space-y-2">
-                     {displayTasks.filter(t => ['Harvest', 'Selling'].includes(t.stage) || t.category === 'Harvest').map(task => {
+                     {displayTasks.filter(t => ['Harvest', 'Selling'].includes(t.stage) || ['Harvest', 'Harvesting', 'Post-Harvest', 'Marketing'].includes(t.category)).map(task => {
                        const isDone = task.status === 'completed' || completedTasks.includes(task.id);
                        return (
                          <div key={task.id} className={`flex items-start gap-3 p-3 rounded-xl border ${isDone ? 'bg-emerald-50/50 border-emerald-100' : 'bg-surface-container-lowest border-outline-variant/40'}`}>
@@ -415,13 +475,8 @@ export default function FarmJourney({
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-card shadow-sm border border-amber-100 p-6">
             <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-amber-900"><AlertCircle className="w-5 h-5"/> Key Milestones</h3>
             <div className="grid grid-cols-2 gap-3">
-              {(isHistorical ? MOCK_PREVIOUS_CROP.milestones : [
-                { title: 'Sowing Completed', date: currentCropData.sowingDate, icon: 'Sprout', done: true },
-                { title: 'First Irrigation', date: 'Upcoming', icon: 'Droplets', done: false },
-                { title: 'Flowering Stage', date: 'Expected: Sep 10', icon: 'Sun', done: false },
-                { title: 'Harvest Ready', date: `Expected: ${currentCropData.harvestDate}`, icon: 'CheckCircle2', done: false }
-              ]).map((m, i) => (
-                <div key={i} className={`p-3 rounded-xl border ${m.done || isHistorical ? 'bg-white border-amber-200' : 'bg-white/50 border-outline-variant/40 opacity-70'}`}>
+              {(activeSeason === 'season_2025_kharif' ? MOCK_PREVIOUS_CROP.milestones : currentMilestones).map((m, i) => (
+                <div key={i} className={`p-3 rounded-xl border ${m.done || activeSeason === 'season_2025_kharif' ? 'bg-white border-amber-200' : 'bg-white/50 border-outline-variant/40 opacity-70'}`}>
                   <div className={`p-1.5 w-fit rounded-lg mb-2 ${m.done || isHistorical ? 'bg-amber-100 text-amber-600' : 'bg-surface-container text-on-surface-variant'}`}>
                     <Activity className="w-4 h-4" />
                   </div>
@@ -457,53 +512,48 @@ export default function FarmJourney({
           <div className="bg-white rounded-card shadow-sm border border-outline-variant/60 p-6">
             <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-primary"/> Journey Analytics</h3>
             
-            {isHistorical ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/40 text-center">
-                    <div className="text-2xl font-black text-on-surface">{MOCK_PREVIOUS_CROP.analytics.totalTasks}</div>
-                    <div className="text-[10px] font-bold text-on-surface-variant uppercase mt-1">Total Activities</div>
+            {(() => {
+              const totalTasksNum = displayTasks.length;
+              const completedTasksNum = displayTasks.filter(t => t.status === 'completed' || (activeSeason === 'current' && completedTasks.includes(t.id))).length;
+              const irrigationsCount = displayTasks.filter(t => t.category === 'Irrigation').length;
+              const diseasesCount = displayTasks.filter(t => t.category === 'Disease Control' || t.category === 'Pest Management' || t.category === 'Disease Diagnosis').length;
+              const finalYield = displayData.expectedYield || '24 Quintals/Acre';
+              const finalProfit = displayData.estimatedProfit ? `₹${displayData.estimatedProfit.toLocaleString('en-IN')}` : (displayData.profit || '₹85,000');
+
+              return (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/40 text-center">
+                      <div className="text-2xl font-black text-on-surface">{totalTasksNum}</div>
+                      <div className="text-[10px] font-bold text-on-surface-variant uppercase mt-1">Total Activities</div>
+                    </div>
+                    <div className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/40 text-center">
+                      <div className="text-2xl font-black text-emerald-600">{completedTasksNum}</div>
+                      <div className="text-[10px] font-bold text-on-surface-variant uppercase mt-1">Completed</div>
+                    </div>
+                    <div className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/40 text-center">
+                      <div className="text-2xl font-black text-blue-600">{irrigationsCount}</div>
+                      <div className="text-[10px] font-bold text-on-surface-variant uppercase mt-1">Irrigations</div>
+                    </div>
+                    <div className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/40 text-center">
+                      <div className="text-2xl font-black text-red-600">{diseasesCount}</div>
+                      <div className="text-[10px] font-bold text-on-surface-variant uppercase mt-1">Inspections</div>
+                    </div>
                   </div>
-                  <div className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/40 text-center">
-                    <div className="text-2xl font-black text-emerald-600">{MOCK_PREVIOUS_CROP.analytics.completedOnTime}</div>
-                    <div className="text-[10px] font-bold text-on-surface-variant uppercase mt-1">On-Time</div>
-                  </div>
-                  <div className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/40 text-center">
-                    <div className="text-2xl font-black text-blue-600">{MOCK_PREVIOUS_CROP.analytics.irrigations}</div>
-                    <div className="text-[10px] font-bold text-on-surface-variant uppercase mt-1">Irrigations</div>
-                  </div>
-                  <div className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/40 text-center">
-                    <div className="text-2xl font-black text-red-600">{MOCK_PREVIOUS_CROP.analytics.diseases}</div>
-                    <div className="text-[10px] font-bold text-on-surface-variant uppercase mt-1">Disease Alerts</div>
+                  
+                  <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100 flex items-center justify-between">
+                    <div>
+                      <div className="text-[10px] font-bold uppercase text-emerald-800">Final/Expected Yield</div>
+                      <div className="text-sm font-black text-emerald-900">{finalYield}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] font-bold uppercase text-emerald-800">Est. Profit</div>
+                      <div className="text-sm font-black text-emerald-900">{finalProfit}</div>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100 flex items-center justify-between">
-                  <div>
-                    <div className="text-[10px] font-bold uppercase text-emerald-800">Final Yield</div>
-                    <div className="text-sm font-black text-emerald-900">{MOCK_PREVIOUS_CROP.yield}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-[10px] font-bold uppercase text-emerald-800">Est. Profit</div>
-                    <div className="text-sm font-black text-emerald-900">{MOCK_PREVIOUS_CROP.profit}</div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40">
-                  <span className="text-xs font-bold text-on-surface-variant">Activities Completed</span>
-                  <span className="text-sm font-black text-on-surface">
-                    {displayTasks.filter(t => t.status === 'completed' || completedTasks.includes(t.id)).length} / {displayTasks.length}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40">
-                  <span className="text-xs font-bold text-on-surface-variant">On-Time Rate</span>
-                  <span className="text-sm font-black text-emerald-600">100%</span>
-                </div>
-                <p className="text-[10px] text-center text-on-surface-variant font-medium">Analytics will build automatically as you log progress.</p>
-              </div>
-            )}
+              );
+            })()}
           </div>
 
           {/* Season Comparison (Only if historical is selected) */}
