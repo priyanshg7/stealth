@@ -3,6 +3,7 @@ import {
   MapPin, Search, Navigation, Filter, Map, Clock, 
   IndianRupee, ArrowRight, Activity, ShieldCheck, CheckCircle2, AlertTriangle, Truck, Compass, Loader2, Info, RefreshCw
 } from 'lucide-react';
+import { fetchMandiPrices } from '../../utils/mandiService';
 
 const ALL_STATES = [
   'Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 
@@ -60,7 +61,6 @@ export default function MandiDiscovery({
     setIsSearching(true);
     setLastSearchScope(scope);
     try {
-      const { fetchMandiPrices } = await import('../../utils/mandiService');
       // Fetch prices for the entire state because API district data is often sparse.
       // We always pass empty string for district to get maximum results, then sort locally by distance.
       const data = await fetchMandiPrices(crop, farmState, '');
