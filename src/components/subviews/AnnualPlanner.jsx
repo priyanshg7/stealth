@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Sparkles, Calendar, Droplet, ArrowRight, ShieldCheck, AlertTriangle, 
   Layers, DollarSign, RefreshCw, FileText, CheckCircle2, ChevronRight, 
   Info, Users, Shield, BookOpen, AlertCircle, TrendingUp, TrendingDown,
   ArrowLeft, Download, Share2, ClipboardList, CheckSquare, Settings, Wrench,
-  MapPin, Leaf, Activity, ChevronDown, Check, CloudRain, Sun, Sprout, ShieldAlert
+  MapPin, Leaf, Activity, ChevronDown, Check, CloudRain, Sun, Sprout, ShieldAlert,
+  Loader2
 } from 'lucide-react';
 import { t } from '../../utils/translations';
-import { generateRecommendations, getGeminiVarieties } from '../../utils/aiRecommendationEngine';
+import { generateRecommendations, getGeminiVarieties, getGeminiVarietiesForCrop } from '../../utils/aiRecommendationEngine';
 import { generateCropSchedule } from '../../utils/farmScheduleEngine';
 import { getSoilHealthSummary } from '../../data/soilNutrientEngine';
 import { generateAnnualStrategy } from '../../utils/annualPlannerEngine';
@@ -97,10 +98,13 @@ export default function AnnualPlanner({
   const [wizardSeasonIndex, setWizardSeasonIndex] = useState(0); // 0 (Kharif), 1 (Rabi), 2 (Zaid)
   const [wizardCrops, setWizardCrops] = useState({ Kharif: null, Rabi: null, Zaid: null });
   const [seasonRecs, setSeasonRecs] = useState([]);
+  const [loadingRecs, setLoadingRecs] = useState(false);
 
   // Generate crop recommendations for the current wizard season step
-  useEffect(() => {
+  const loadRecommendations = useCallback(async () => {
     if (step !== 'wizard') return;
+    setLoadingRecs(true);
+    setSeasonRecs([]); // Clear previous recommendations to show loader
 
     const currentSeason = SEASONS[wizardSeasonIndex];
     // Formulate a temporary farm object based on form parameters
@@ -122,12 +126,10 @@ export default function AnnualPlanner({
       seasonalCrops = ['bajra', 'maize']; // Short/catch crops for Zaid
     }
 
-    const loadRecommendations = async () => {
-      setLoadingRecs(true);
-      
-      const manualCrop = wizardPreferences[currentSeason]?.crop;
-      const manualVariety = wizardPreferences[currentSeason]?.variety;
-      
+    const manualCrop = wizardPreferences[currentSeason]?.crop;
+    const manualVariety = wizardPreferences[currentSeason]?.variety;
+
+    try {
       if (manualCrop && manualCrop !== 'Other') {
         // User specified a crop (e.g. Bajra), we need to fetch varieties for it
         console.log(`[AnnualPlanner] Querying Gemini for specific crop: ${manualCrop} varieties...`);
@@ -180,6 +182,7 @@ export default function AnnualPlanner({
              };
            });
            setSeasonRecs(mappedGemini);
+           setLoadingRecs(false);
            return;
         }
         
@@ -229,11 +232,11 @@ export default function AnnualPlanner({
              }
            }
            setSeasonRecs(finalRecommendations);
+           setLoadingRecs(false);
            return;
         } else {
            // Failsafe for crops not in database
            console.warn(`[AnnualPlanner] Crop ${manualCrop} not found in local database.`);
-           const areaVal = parseFloat(setupForm.area) || 5.0;
            const genericRec = {
              id: 'generic-' + Date.now(),
              name: manualVariety || `Standard ${manualCrop} Variety`,
@@ -256,6 +259,7 @@ export default function AnnualPlanner({
              seedRate: 40
            };
            setSeasonRecs([genericRec]);
+           setLoadingRecs(false);
            return;
         }
       }
@@ -309,6 +313,7 @@ export default function AnnualPlanner({
           };
         });
         setSeasonRecs(mappedGemini);
+        setLoadingRecs(false);
         return;
       }
 
@@ -329,10 +334,17 @@ export default function AnnualPlanner({
         .sort((a, b) => b.suitabilityScore - a.suitabilityScore)
         .slice(0, 3);
       setSeasonRecs(filteredRecs);
-    };
+      setLoadingRecs(false);
+    } catch (e) {
+      console.error("[AnnualPlanner] loadRecommendations error:", e);
+      setSeasonRecs([]); // Indicates error
+      setLoadingRecs(false);
+    }
+  }, [step, wizardSeasonIndex, setupForm, weatherData, profile, wizardPreferences]);
 
+  useEffect(() => {
     loadRecommendations();
-  }, [step, wizardSeasonIndex, setupForm, weatherData, profile]);
+  }, [loadRecommendations]);
 
   // ── Strategy & Detail Panel State ──────────────────────────────────
   const [strategyData, setStrategyData] = useState(null);
@@ -406,7 +418,7 @@ export default function AnnualPlanner({
 
     // Find next empty season
     let nextIndex = wizardSeasonIndex + 1;
-    while (nextIndex < 3 && wizardPreferences[SEASONS[nextIndex]]?.crop) {
+    while (nextIndex < 3 && wizardPreferences[SEASONS[nextIndex]]?.crop && wizardPreferences[SEASONS[nextIndex]]?.variety) {
       nextIndex++;
     }
 
@@ -1403,103 +1415,131 @@ export default function AnnualPlanner({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-              {seasonRecs.map((crop, idx) => {
-                const estimatedProfitValue = Math.round((crop.livePrice || crop.msp) * crop.yieldPotential * (parseFloat(setupForm.area) || 1) * 0.65); // 65% margin estimate
-                return (
-                <div 
-                  key={crop.id}
-                  className={`bg-white border p-6 flex flex-col justify-between cursor-pointer transition-all duration-300 h-auto min-h-[450px] rounded-[24px] group relative ${
-                    idx === 0 
-                      ? 'border-2 border-[#0c8a47] ring-1 ring-[#0c8a47]/20 shadow-md translate-y-[-2px]' 
-                      : 'border-outline-variant/60 shadow-sm hover:border-[#0c8a47]/40 hover:shadow-md'
-                  }`}
-                  onClick={() => handleSelectCrop(crop)}
+            {loadingRecs ? (
+              <div className="flex flex-col items-center justify-center py-20 space-y-4 animate-fade-in">
+                <Loader2 className="w-12 h-12 text-[#0c8a47] animate-spin" />
+                <p className="text-lg font-bold text-on-surface">
+                  Generating AI variety recommendations for <span className="text-[#0c8a47]">{SEASONS[wizardSeasonIndex]}</span>...
+                </p>
+                <p className="text-xs text-on-surface-variant max-w-sm text-center font-medium">
+                  Analyzing soil parameters ({setupForm.soilType}), irrigation ({setupForm.irrigationSource}), and matching with local weather patterns.
+                </p>
+              </div>
+            ) : seasonRecs.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 space-y-4">
+                <AlertCircle className="w-12 h-12 text-red-500" />
+                <p className="text-lg font-bold text-on-surface">
+                  Failed to generate recommendations for {SEASONS[wizardSeasonIndex]}
+                </p>
+                <p className="text-sm text-on-surface-variant max-w-md text-center font-medium">
+                  We encountered an issue matching the crop variety database. Please check your network connection and retry.
+                </p>
+                <button 
+                  onClick={loadRecommendations}
+                  className="mt-2 px-6 py-2.5 rounded-xl bg-[#0c8a47] text-white font-bold text-sm flex items-center gap-2 hover:bg-[#096a36] shadow-sm transition-all"
                 >
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-display font-extrabold text-xl text-on-surface">{crop.name}</h4>
-                        <span className="text-xs text-on-surface-variant font-bold block mt-0.5">{crop.institution}</span>
-                      </div>
-                      {idx === 0 && (
-                        <div className="flex items-center gap-1 bg-[#0c8a47] text-white text-[10px] font-black px-3 py-1 rounded-full shadow-sm uppercase tracking-wider animate-pulse-slow shrink-0">
-                          <Sparkles className="w-3 h-3" /> Best Match
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Estimated Net Profit Row */}
-                    <div className="space-y-1 bg-surface-container-low/40 p-3 rounded-xl border border-outline-variant/30">
-                      <span className="text-[10px] text-on-surface-variant font-bold flex items-center gap-1.5">
-                        <TrendingUp className="w-4 h-4 text-on-surface-variant" /> Estimated Net Profit
-                      </span>
-                      <div className="flex items-baseline gap-1.5 flex-wrap">
-                        <span className="text-2xl font-black text-[#0c8a47]">₹{estimatedProfitValue.toLocaleString()}</span>
-                        <span className="text-[11px] text-on-surface-variant font-bold">for {setupForm.area || 1} {setupForm.unit || 'Acre'}</span>
-                      </div>
-                    </div>
-
-                    {/* Key Technical Details Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 text-[10px] border-y border-outline-variant/40 py-3 font-bold text-on-surface-variant">
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Est. Yield</span> <span className="text-on-surface font-extrabold">{crop.yieldPotential} Qtl</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Duration</span> <span className="text-on-surface font-extrabold">{crop.maturityDays} days</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Water Req.</span> <span className="text-on-surface font-extrabold">{crop.waterRequirement} mm</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Disease Resist.</span> <span className="text-on-surface font-extrabold block truncate">{crop.diseaseResistance >= 4 ? 'High' : 'Moderate'}</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Irrigation</span> <span className="text-on-surface font-extrabold">{crop.irrigationCount} cycles</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Soil Type</span> <span className="text-on-surface font-extrabold block truncate" title={crop.suitableSoils?.join(', ')}>{crop.suitableSoils?.join(', ')}</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Sells Price</span> <span className="text-[#0c8a47] font-black">₹{crop.livePrice || crop.msp}/Qtl</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Market Demand</span> <span className="text-on-surface font-extrabold">{crop.exportDemand || 'Medium'}</span></div>
-                    </div>
-
-                    {/* Dynamic Agronomist "Why this?" text */}
-                    <div className="text-[11px] leading-relaxed text-on-surface-variant h-[90px] overflow-y-auto pr-1">
-                      <strong className="text-on-surface text-xs font-bold block mb-1">Why this?</strong>
-                      <ul className="list-disc pl-4 space-y-1.5 text-on-surface-variant font-medium">
-                        {crop.keyTraits?.map((trait, tIdx) => <li key={tIdx}>{trait}</li>)}
-                        <li>{crop.premiumGrade ? 'Premium grade commands higher market value.' : 'Standard mandi staple.'}</li>
-                        {crop.waterRequirement <= 500 && <li>Water efficient crop suitable for limited irrigation.</li>}
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="pt-4">
-                    <button className={`w-full font-black text-xs py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 ${
-                      idx === 0 
-                        ? 'bg-[#0c8a47] text-white hover:bg-[#096a36] shadow-md' 
-                        : 'bg-surface-container text-on-surface hover:bg-[#0c8a47] hover:text-white'
-                    }`}>
-                      <Check className={`w-4 h-4 ${idx === 0 ? 'text-white' : 'opacity-70 group-hover:text-white group-hover:opacity-100'}`} />
-                      Select {crop.name}
-                    </button>
-                  </div>
-                </div>
-                );
-              })}
-
-              {/* Fallow land rest option */}
-              <div 
-                className="bg-[#faf7f2] border-2 border-[#e6dcc3] rounded-3xl p-6 flex flex-col justify-between cursor-pointer transition-all duration-300 hover:border-amber-500/50 hover:shadow-md group"
-                onClick={() => handleSelectCrop({ id: 'fallow', name: 'Leave Fallow', cropName: 'Fallow Recovery' })}
-              >
-                <div className="space-y-4">
-                  <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-700 mb-2">
-                    <Leaf className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="font-display font-black text-xl text-amber-900">Leave Land Fallow</h4>
-                    <span className="text-xs text-amber-800 font-bold block mt-0.5">Soil Recovery Season</span>
-                  </div>
-                  <p className="text-sm font-medium leading-relaxed text-amber-900/80 mt-2">
-                    Advised for organic matter recovery. Sowing a cover crop during this time can increase succeeding yield by up to 15%.
-                  </p>
-                </div>
-
-                <button className="w-full mt-6 font-bold text-sm py-3 rounded-xl bg-amber-200/50 text-amber-900 group-hover:bg-amber-500 group-hover:text-white transition-all">
-                  Rest Soil This Season
+                  <RefreshCw className="w-4 h-4" /> Retry AI Analysis
                 </button>
               </div>
-            </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+                {seasonRecs.map((crop, idx) => {
+                  const estimatedProfitValue = Math.round((crop.livePrice || crop.msp) * crop.yieldPotential * (parseFloat(setupForm.area) || 1) * 0.65); // 65% margin estimate
+                  return (
+                  <div 
+                    key={crop.id}
+                    className={`bg-white border p-6 flex flex-col justify-between cursor-pointer transition-all duration-300 h-auto min-h-[450px] rounded-[24px] group relative ${
+                      idx === 0 
+                        ? 'border-2 border-[#0c8a47] ring-1 ring-[#0c8a47]/20 shadow-md translate-y-[-2px]' 
+                        : 'border-outline-variant/60 shadow-sm hover:border-[#0c8a47]/40 hover:shadow-md'
+                    }`}
+                    onClick={() => handleSelectCrop(crop)}
+                  >
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-display font-extrabold text-xl text-on-surface">{crop.name}</h4>
+                          <span className="text-xs text-on-surface-variant font-bold block mt-0.5">{crop.institution}</span>
+                        </div>
+                        {idx === 0 && (
+                          <div className="flex items-center gap-1 bg-[#0c8a47] text-white text-[10px] font-black px-3 py-1 rounded-full shadow-sm uppercase tracking-wider animate-pulse-slow shrink-0">
+                            <Sparkles className="w-3 h-3" /> Best Match
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Estimated Net Profit Row */}
+                      <div className="space-y-1 bg-surface-container-low/40 p-3 rounded-xl border border-outline-variant/30">
+                        <span className="text-[10px] text-on-surface-variant font-bold flex items-center gap-1.5">
+                          <TrendingUp className="w-4 h-4 text-on-surface-variant" /> Estimated Net Profit
+                        </span>
+                        <div className="flex items-baseline gap-1.5 flex-wrap">
+                          <span className="text-2xl font-black text-[#0c8a47]">₹{estimatedProfitValue.toLocaleString()}</span>
+                          <span className="text-[11px] text-on-surface-variant font-bold">for {setupForm.area || 1} {setupForm.unit || 'Acre'}</span>
+                        </div>
+                      </div>
+
+                      {/* Key Technical Details Grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 text-[10px] border-y border-outline-variant/40 py-3 font-bold text-on-surface-variant">
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Est. Yield</span> <span className="text-on-surface font-extrabold">{crop.yieldPotential} Qtl</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Duration</span> <span className="text-on-surface font-extrabold">{crop.maturityDays} days</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Water Req.</span> <span className="text-on-surface font-extrabold">{crop.waterRequirement} mm</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Disease Resist.</span> <span className="text-on-surface font-extrabold block truncate">{crop.diseaseResistance >= 4 ? 'High' : 'Moderate'}</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Irrigation</span> <span className="text-on-surface font-extrabold">{crop.irrigationCount} cycles</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Soil Type</span> <span className="text-on-surface font-extrabold block truncate" title={crop.suitableSoils?.join(', ')}>{crop.suitableSoils?.join(', ')}</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Sells Price</span> <span className="text-[#0c8a47] font-black">₹{crop.livePrice || crop.msp}/Qtl</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block tracking-wider">Market Demand</span> <span className="text-on-surface font-extrabold">{crop.exportDemand || 'Medium'}</span></div>
+                      </div>
+
+                      {/* Dynamic Agronomist "Why this?" text */}
+                      <div className="text-[11px] leading-relaxed text-on-surface-variant h-[90px] overflow-y-auto pr-1">
+                        <strong className="text-on-surface text-xs font-bold block mb-1">Why this?</strong>
+                        <ul className="list-disc pl-4 space-y-1.5 text-on-surface-variant font-medium">
+                          {crop.keyTraits?.map((trait, tIdx) => <li key={tIdx}>{trait}</li>)}
+                          <li>{crop.premiumGrade ? 'Premium grade commands higher market value.' : 'Standard mandi staple.'}</li>
+                          {crop.waterRequirement <= 500 && <li>Water efficient crop suitable for limited irrigation.</li>}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="pt-4">
+                      <button className={`w-full font-black text-xs py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 ${
+                        idx === 0 
+                          ? 'bg-[#0c8a47] text-white hover:bg-[#096a36] shadow-md' 
+                          : 'bg-surface-container text-on-surface hover:bg-[#0c8a47] hover:text-white'
+                      }`}>
+                        <Check className={`w-4 h-4 ${idx === 0 ? 'text-white' : 'opacity-70 group-hover:text-white group-hover:opacity-100'}`} />
+                        Select {crop.name}
+                      </button>
+                    </div>
+                  </div>
+                  );
+                })}
+
+                {/* Fallow land rest option */}
+                <div 
+                  className="bg-[#faf7f2] border-2 border-[#e6dcc3] rounded-3xl p-6 flex flex-col justify-between cursor-pointer transition-all duration-300 hover:border-amber-500/50 hover:shadow-md group"
+                  onClick={() => handleSelectCrop({ id: 'fallow', name: 'Leave Fallow', cropName: 'Fallow Recovery' })}
+                >
+                  <div className="space-y-4">
+                    <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-700 mb-2">
+                      <Leaf className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-display font-black text-xl text-amber-900">Leave Land Fallow</h4>
+                      <span className="text-xs text-amber-800 font-bold block mt-0.5">Soil Recovery Season</span>
+                    </div>
+                    <p className="text-sm font-medium leading-relaxed text-amber-900/80 mt-2">
+                      Advised for organic matter recovery. Sowing a cover crop during this time can increase succeeding yield by up to 15%.
+                    </p>
+                  </div>
+
+                  <button className="w-full mt-6 font-bold text-sm py-3 rounded-xl bg-amber-200/50 text-amber-900 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                    Rest Soil This Season
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
