@@ -293,31 +293,61 @@ export default function SeasonPlanner({
         };
       });
     } else {
-      // Fallback if AI fails
-      console.warn("Falling back to generic recommendations.");
-      const genericRec = {
-        id: 'generic-' + Date.now(),
-        name: formFields.preferredVariety || 'Standard Regional Variety',
-        description: 'Standard regional choice matching typical local weather patterns and soil specifications.',
-        profitPerAcre: 40000,
-        whyThisTemplate: 'This variety is a standard recommendation given local configurations.',
-        sowingMonth: 'November',
-        duration: '120 days',
-        water: '400 mm',
-        diseaseResistance: 'Medium',
-        marketDemand: 'Standard',
-        maturity: 'Medium',
-        suitableSoil: activeFarm.soil.type,
-        price: '₹2,100/Qtl',
-        yield: '20 Qtl/Acre',
-        badges: ['Best Fit'],
-        yieldPotential: 20,
-        livePrice: 2100,
-        seedRate: 40
-      };
-      finalRecommendations = [genericRec];
+      // Fallback to local ICAR database
+      console.log(`[SeasonPlanner] Gemini API quota limit/error. Using local ICAR recommendations database for ${crop}.`);
+      const rankedRaw = generateRecommendations(crop, activeFarm, profile, weatherData, null);
+      
+      if (rankedRaw && rankedRaw.length > 0) {
+        finalRecommendations = mapRecommendationsToUi(rankedRaw, areaVal);
+        
+        // If farmer selected a specific variety, ensure it's at the top
+        if (formFields.preferredVariety) {
+          const prefLower = formFields.preferredVariety.toLowerCase();
+          const matchedIdx = finalRecommendations.findIndex(v => v.name.toLowerCase().includes(prefLower));
+          if (matchedIdx > 0) {
+            const matched = finalRecommendations.splice(matchedIdx, 1)[0];
+            finalRecommendations.unshift(matched);
+          } else if (matchedIdx === -1) {
+            // Variety not in database, we should still evaluate it using a mock entry based on top recommendation
+            const mockEntry = {
+               ...finalRecommendations[0],
+               id: 'custom-' + Date.now(),
+               name: formFields.preferredVariety,
+               description: `Custom farmer-selected variety. Evaluated based on baseline parameters for ${crop}.`,
+               badges: ['Farmer Selected']
+            };
+            finalRecommendations.unshift(mockEntry);
+          }
+        }
+      } else {
+         // Failsafe for crops not in database
+         console.warn(`[SeasonPlanner] Crop ${crop} not found in local database.`);
+         const genericRec = {
+           id: 'generic-' + Date.now(),
+           name: formFields.preferredVariety || `Standard ${formFields.cropName} Variety`,
+           description: `Standard regional choice for ${formFields.cropName} matching typical local weather patterns.`,
+           profitPerAcre: 40000,
+           whyThisTemplate: `This variety is a standard recommendation for ${formFields.cropName} given local configurations.`,
+           sowingMonth: 'November',
+           duration: '120 days',
+           water: '400 mm',
+           diseaseResistance: 'Medium',
+           marketDemand: 'Standard',
+           maturity: 'Medium',
+           suitableSoil: activeFarm.soil.type,
+           price: '₹2,100/Qtl',
+           yield: '20 Qtl/Acre',
+           badges: ['Best Fit'],
+           yieldPotential: 20,
+           livePrice: 2100,
+           seedRate: 40
+         };
+         finalRecommendations = [genericRec];
+      }
     }
     
+    // Ensure we slice to top 3
+    finalRecommendations = finalRecommendations.slice(0, 3);
     setRecommendations(finalRecommendations);
     const selected = finalRecommendations[0];
     setSelectedVariety(selected);

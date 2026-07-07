@@ -123,8 +123,145 @@ export default function AnnualPlanner({
     }
 
     const loadRecommendations = async () => {
-      // 1. Try Gemini API first
-      console.log(`[AnnualPlanner] Querying Gemini for ${currentSeason} varieties...`);
+      setLoadingRecs(true);
+      
+      const manualCrop = wizardPreferences[currentSeason]?.crop;
+      const manualVariety = wizardPreferences[currentSeason]?.variety;
+      
+      if (manualCrop && manualCrop !== 'Other') {
+        // User specified a crop (e.g. Bajra), we need to fetch varieties for it
+        console.log(`[AnnualPlanner] Querying Gemini for specific crop: ${manualCrop} varieties...`);
+        let aiRecommendations = await getGeminiVarietiesForCrop(
+          manualCrop.toLowerCase(),
+          setupForm.state,
+          setupForm.district,
+          setupForm.soilType,
+          setupForm.irrigationSource,
+          null,
+          manualVariety
+        );
+        
+        if (aiRecommendations && Array.isArray(aiRecommendations) && aiRecommendations.length > 0) {
+           const mappedGemini = aiRecommendations.map((v, idx) => {
+             const mspVal = parseFloat(v.price?.replace(/[^0-9]/g, '')) || 2200;
+             const yieldVal = parseFloat(v.yield) || 20;
+             const areaVal = parseFloat(setupForm.area) || 5.0;
+             const projectedRevenue = Math.round(yieldVal * areaVal * mspVal);
+             const estimatedCost = Math.round(areaVal * 12000);
+             const projectedProfit = projectedRevenue - estimatedCost;
+             
+             return {
+                id: `gemini-${v.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+                name: v.name,
+                description: v.description,
+                institution: 'Gemini AI Recommendation',
+                maturityDays: parseInt(v.duration) || 120,
+                yieldPotential: yieldVal,
+                seedRate: 40,
+                spacingCm: '20×5',
+                waterRequirement: parseInt(v.water) || 350,
+                irrigationCount: 4,
+                diseaseResistance: 4,
+                pestResistance: 3,
+                droughtTolerance: 3,
+                floodTolerance: 2,
+                heatTolerance: 4,
+                suitableSoils: [setupForm.soilType],
+                suitableStates: [setupForm.state],
+                cropRotationBonus: {},
+                nutrientRequirement: { N: 120, P: 60, K: 40 },
+                organicAlternatives: { FYM: 10000 },
+                msp: mspVal,
+                livePrice: mspVal,
+                projectedProfit,
+                badges: Array.isArray(v.badges) ? v.badges : ['Gemini AI Recommended'],
+                cropName: manualCrop,
+                suitabilityScore: 90 - idx * 5
+             };
+           });
+           setSeasonRecs(mappedGemini);
+           return;
+        }
+        
+        // Fallback to local
+        console.log(`[AnnualPlanner] Gemini failed for ${manualCrop}. Using local database.`);
+        const rankedRaw = generateRecommendations(manualCrop, tempFarm, profile, weatherData, null);
+        if (rankedRaw && rankedRaw.length > 0) {
+           const areaVal = parseFloat(setupForm.area) || 5.0;
+           const finalRecommendations = rankedRaw.map((v, idx) => {
+             const livePrice = v.livePrice || v.msp || 2275;
+             const profitPerAcre = Math.round(v.projectedProfit / areaVal) || 45000;
+             const badges = [];
+             if (idx === 0) badges.push('Best Fit');
+             if (v.waterRequirement < 400) badges.push('Water Efficient');
+             if (badges.length === 0) badges.push('Recommended');
+             
+             return {
+               ...v,
+               badges,
+               cropName: manualCrop,
+               yield: `${v.yieldPotential || 24} Qtl/Acre`,
+               duration: `${v.maturityDays || 120} days`,
+               water: `${v.waterRequirement || 350} mm`,
+               diseaseResistance: v.diseaseResistance >= 4 ? 'High' : (v.diseaseResistance >= 3 ? 'Medium' : 'Low'),
+               maturity: `${v.maturityDays || 120} days`,
+               suitableSoil: (v.suitableSoils || []).join(', ') || 'Clay Loam',
+               price: `₹${livePrice}/Qtl`,
+               marketDemand: v.exportDemand || 'High',
+               profitPerAcre
+             };
+           }).slice(0, 3);
+           
+           if (manualVariety) {
+             const prefLower = manualVariety.toLowerCase();
+             const matchedIdx = finalRecommendations.findIndex(v => v.name.toLowerCase().includes(prefLower));
+             if (matchedIdx > 0) {
+               const matched = finalRecommendations.splice(matchedIdx, 1)[0];
+               finalRecommendations.unshift(matched);
+             } else if (matchedIdx === -1) {
+               finalRecommendations.unshift({
+                 ...finalRecommendations[0],
+                 id: 'custom-' + Date.now(),
+                 name: manualVariety,
+                 description: `Custom farmer-selected variety. Evaluated based on baseline parameters for ${manualCrop}.`,
+                 badges: ['Farmer Selected']
+               });
+             }
+           }
+           setSeasonRecs(finalRecommendations);
+           return;
+        } else {
+           // Failsafe for crops not in database
+           console.warn(`[AnnualPlanner] Crop ${manualCrop} not found in local database.`);
+           const areaVal = parseFloat(setupForm.area) || 5.0;
+           const genericRec = {
+             id: 'generic-' + Date.now(),
+             name: manualVariety || `Standard ${manualCrop} Variety`,
+             description: `Standard regional choice for ${manualCrop} matching typical local weather patterns.`,
+             profitPerAcre: 40000,
+             cropName: manualCrop,
+             whyThisTemplate: `This variety is a standard recommendation for ${manualCrop} given local configurations.`,
+             sowingMonth: currentSeason === 'Kharif' ? 'June' : (currentSeason === 'Rabi' ? 'November' : 'March'),
+             duration: '120 days',
+             water: '400 mm',
+             diseaseResistance: 'Medium',
+             marketDemand: 'Standard',
+             maturity: 'Medium',
+             suitableSoil: setupForm.soilType,
+             price: '₹2,100/Qtl',
+             yield: '20 Qtl/Acre',
+             badges: ['Best Fit'],
+             yieldPotential: 20,
+             livePrice: 2100,
+             seedRate: 40
+           };
+           setSeasonRecs([genericRec]);
+           return;
+        }
+      }
+
+      // Existing generic season logic
+      console.log(`[AnnualPlanner] Querying Gemini for best generic ${currentSeason} varieties...`);
       const geminiResult = await getGeminiVarieties(
         currentSeason,
         setupForm.state,
@@ -175,7 +312,7 @@ export default function AnnualPlanner({
         return;
       }
 
-      // 2. Fall back to local ICAR database
+      // Fall back to local ICAR database for generic seasonal crops
       console.log(`[AnnualPlanner] Gemini API quota limit/error. Using local ICAR recommendations database.`);
       const allVarieties = [];
       seasonalCrops.forEach(cId => {
@@ -220,10 +357,11 @@ export default function AnnualPlanner({
 
     SEASONS.forEach((season, index) => {
       const pref = wizardPreferences[season];
-      if (pref && pref.crop) {
+      // Only skip the season if BOTH crop AND variety are explicitly selected by farmer.
+      if (pref && pref.crop && pref.variety) {
         initialWizardCrops[season] = {
           id: `pref-${pref.crop.toLowerCase()}`,
-          name: pref.variety || pref.crop,
+          name: pref.variety,
           description: `Farmer preferred selection for ${season}.`,
           cropName: pref.crop,
           isFarmerSelected: true,
@@ -241,7 +379,7 @@ export default function AnnualPlanner({
 
     setWizardCrops(initialWizardCrops);
 
-    // If all seasons are selected, jump straight to strategy
+    // If all seasons are selected (including variety), jump straight to strategy
     if (firstEmptySeasonIndex === -1) {
       const targetFarm = farms[selectedFarmId] || {
         name: 'Manual Strategy Farm',
