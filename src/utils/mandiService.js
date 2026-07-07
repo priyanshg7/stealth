@@ -20,10 +20,28 @@ const COMMODITY_MAP = {
   bajra: 'Bajra(Pearl Millet/Cumbu)'
 };
 
+// Helper to filter and sort mandi prices based on district
+function processMandiPrices(records, district) {
+  if (!district) return records;
+  
+  // Filter for matching district
+  const districtRecords = records.filter(r => r.district?.toLowerCase() === district.toLowerCase());
+  
+  // If we have district-specific records, return them.
+  // Otherwise, return all state records so the UI shows data from other districts in the same state!
+  if (districtRecords.length > 0) {
+    return districtRecords;
+  }
+  
+  console.log(`[MandiService] No records found for district: ${district}. Returning state-wide records.`);
+  return records;
+}
+
 // ── Fetch current daily mandi prices ──────────────────────────────────────────
 export async function fetchMandiPrices(commodity, state, district, limit = 30) {
   const agmarkCommodity = COMMODITY_MAP[commodity?.toLowerCase()] || commodity;
-  const cacheKey = `${MANDI_CACHE_KEY}prices_${agmarkCommodity}_${state}_${district}`;
+  // Cache state-wide data so different districts can reuse the cached state data
+  const cacheKey = `${MANDI_CACHE_KEY}prices_${agmarkCommodity}_${state}`;
 
   // Check localStorage cache
   try {
@@ -32,18 +50,19 @@ export async function fetchMandiPrices(commodity, state, district, limit = 30) {
       const parsed = JSON.parse(cached);
       if (Date.now() - parsed.ts < CACHE_EXPIRY_MS) {
         console.log(`[MandiService] Cache HIT: ${cacheKey}`);
-        return parsed.data;
+        return processMandiPrices(parsed.data, district);
       }
     }
   } catch (e) { /* ignore */ }
 
   try {
-    const params = new URLSearchParams({ limit: String(limit) });
+    // We always query state-wide (no district filter to API) to ensure high availability.
+    // We increase limit slightly to 100 to get a broader state representation.
+    const params = new URLSearchParams({ limit: '100' });
     if (agmarkCommodity) params.set('commodity', agmarkCommodity);
     if (state) params.set('state', state);
-    if (district) params.set('district', district);
 
-    console.log(`[MandiService] Fetching prices: ${agmarkCommodity} in ${state}/${district}`);
+    console.log(`[MandiService] Fetching state-wide prices: ${agmarkCommodity} in ${state}`);
     const res = await fetch(`/api/mandi/prices?${params.toString()}`);
 
     if (res.ok) {
@@ -63,12 +82,12 @@ export async function fetchMandiPrices(commodity, state, district, limit = 30) {
           modalPrice: parseFloat(r.modal_price || r.Modal_Price || 0)
         }));
 
-        // Cache the parsed result
+        // Cache the full state-wide data
         try {
           localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: parsed }));
         } catch (e) { /* storage full */ }
 
-        return parsed;
+        return processMandiPrices(parsed, district);
       }
     }
   } catch (err) {
@@ -78,6 +97,7 @@ export async function fetchMandiPrices(commodity, state, district, limit = 30) {
   // No API data available — return empty array so UI shows "Data Not Available"
   return [];
 }
+
 
 // ── Fetch variety-wise prices ─────────────────────────────────────────────────
 export async function fetchVarietyPrices(commodity, variety, state, limit = 20) {
@@ -260,12 +280,23 @@ export async function fetchHistoricalPrices(commodity, state, district) {
     const params = new URLSearchParams({ limit: '500' }); // fetch more for better year coverage
     if (commodity) params.set('commodity', commodity);
     if (state) params.set('state', state);
-    if (district) params.set('district', district);
+    // Fetch state-wide historical prices (no district filter to API) to ensure reliability
     const url = `/api/mandi/variety?${params.toString()}`;
     const res = await fetch(url);
     if (res.ok) {
       const data = await res.json();
-      return data.records || [];
+      const records = data.records || [];
+      
+      if (district && records.length > 0) {
+        // Filter by district on client side
+        const districtRecords = records.filter(r => 
+          (r.district || r.District || '').toLowerCase() === district.toLowerCase()
+        );
+        if (districtRecords.length > 0) {
+          return districtRecords;
+        }
+      }
+      return records; // Return state-wide if district has no data or wasn't specified
     }
   } catch (err) {
     console.warn('[MandiService] Historical prices fetch failed:', err.message);

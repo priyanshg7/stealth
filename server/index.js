@@ -35,19 +35,21 @@ app.get('/api/health', (_req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════
-//  AGMARKNET - Current Daily Mandi Prices
-//  Resource: 9ef84268-d588-465a-a308-a864a43d0070
+//  AGMARKNET - Current Daily Mandi Prices (Sourced from Variety-wise Dataset)
+//  Resource: 35985678-0d79-46b4-9ed6-6f13308a1d24
+//  We use the Variety-wise dataset because it has much broader coverage
+//  (80+ million records) than the sparse daily prices dataset.
 // ═══════════════════════════════════════════════════════════════════════
 app.get('/api/mandi/prices', async (req, res) => {
   try {
     const { commodity, state, district, market, limit = 50, offset = 0 } = req.query;
 
-    // Build filter params
+    // Build filter params using correct capitalized field names
     const filters = [];
-    if (state) filters.push(`filters[state.keyword]=${encodeURIComponent(state)}`);
-    if (district) filters.push(`filters[district]=${encodeURIComponent(district)}`);
-    if (commodity) filters.push(`filters[commodity]=${encodeURIComponent(commodity)}`);
-    if (market) filters.push(`filters[market]=${encodeURIComponent(market)}`);
+    if (state) filters.push(`filters[State]=${encodeURIComponent(state)}`);
+    if (district) filters.push(`filters[District]=${encodeURIComponent(district)}`);
+    if (commodity) filters.push(`filters[Commodity]=${encodeURIComponent(commodity)}`);
+    if (market) filters.push(`filters[Market]=${encodeURIComponent(market)}`);
 
     const cacheKey = `mandi_prices_${commodity}_${state}_${district}_${market}_${limit}_${offset}`;
     const cached = getCached(cacheKey, 5 * 60 * 1000); // 5-minute TTL
@@ -56,13 +58,13 @@ app.get('/api/mandi/prices', async (req, res) => {
       return res.json(cached);
     }
 
-    const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${DATA_GOV_KEY}&format=json&limit=${limit}&offset=${offset}&${filters.join('&')}`;
+    const url = `https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24?api-key=${DATA_GOV_KEY}&format=json&limit=${limit}&offset=${offset}&sort[Arrival_Date]=desc&${filters.join('&')}`;
     console.log(`[AGMARKNET Prices] Fetching: ${url.replace(DATA_GOV_KEY, '***')}`);
 
     const response = await fetch(url);
     if (!response.ok) {
       console.error(`[AGMARKNET Prices] HTTP ${response.status}: ${response.statusText}`);
-      return res.status(response.status).json({ error: 'AGMARKNET API error', status: response.status });
+      return res.status(response.status).json({ error: 'AGMARKNET Prices API error', status: response.status });
     }
 
     const data = await response.json();
@@ -84,11 +86,11 @@ app.get('/api/mandi/variety', async (req, res) => {
     const { commodity, variety, state, district, market, limit = 50, offset = 0 } = req.query;
 
     const filters = [];
-    if (state) filters.push(`filters[state]=${encodeURIComponent(state)}`);
-    if (district) filters.push(`filters[district]=${encodeURIComponent(district)}`);
-    if (commodity) filters.push(`filters[commodity]=${encodeURIComponent(commodity)}`);
-    if (variety) filters.push(`filters[variety]=${encodeURIComponent(variety)}`);
-    if (market) filters.push(`filters[market]=${encodeURIComponent(market)}`);
+    if (state) filters.push(`filters[State]=${encodeURIComponent(state)}`);
+    if (district) filters.push(`filters[District]=${encodeURIComponent(district)}`);
+    if (commodity) filters.push(`filters[Commodity]=${encodeURIComponent(commodity)}`);
+    if (variety) filters.push(`filters[Variety]=${encodeURIComponent(variety)}`);
+    if (market) filters.push(`filters[Market]=${encodeURIComponent(market)}`);
 
     const cacheKey = `mandi_variety_${commodity}_${variety}_${state}_${district}_${limit}_${offset}`;
     const cached = getCached(cacheKey, 5 * 60 * 1000);
@@ -97,7 +99,7 @@ app.get('/api/mandi/variety', async (req, res) => {
       return res.json(cached);
     }
 
-    const url = `https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24?api-key=${DATA_GOV_KEY}&format=json&limit=${limit}&offset=${offset}&${filters.join('&')}`;
+    const url = `https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24?api-key=${DATA_GOV_KEY}&format=json&limit=${limit}&offset=${offset}&sort[Arrival_Date]=desc&${filters.join('&')}`;
     console.log(`[AGMARKNET Variety] Fetching: ${url.replace(DATA_GOV_KEY, '***')}`);
 
     const response = await fetch(url);
