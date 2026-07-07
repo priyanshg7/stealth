@@ -323,16 +323,113 @@ export function generateCropComparison(cropIds, farm, profile, weatherData, mand
   }).sort((a, b) => b.topScore - a.topScore);
 }
 
-// ── Gemini API Integration ───────────────────────────────────────────
-export const GEMINI_API_KEY = "AQ.Ab8RN6KTwDMI44Z6rXa6oTq6aeVFloKdC2L1thkHZnLFyD0oCA";
+// ── API Key Definitions ───────────────────────────────────────────────
+export const GEMINI_API_KEY = "AQ.Ab8RN6KGMLCyXFryTjdvB5f38xF_IVyDakyYh6jFP2DMFUNmVg";
+export const GROQ_API_KEY = "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";
 
 /**
- * Robustly calls Gemini API for agricultural recommendations.
- * Falls back to local database when quota is exceeded or offline.
+ * Strips markdown codeblock markers (e.g. ```json) to ensure clean JSON parsing.
+ */
+function cleanJsonResponse(text) {
+  let cleaned = text.trim();
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+  }
+  return cleaned;
+}
+
+/**
+ * Resilient multi-provider API router. Tries Groq 70B, then Groq 8B, then Gemini 2.0.
+ */
+async function callAIRouter(prompt) {
+  // 1. Try Groq (Llama-3.3-70b-versatile)
+  try {
+    console.log("[AI Router] Attempting Groq (llama-3.3-70b-versatile)...");
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.1
+      })
+    });
+    if (response.ok) {
+      const result = await response.json();
+      const text = result.choices?.[0]?.message?.content;
+      if (text) {
+        return JSON.parse(cleanJsonResponse(text));
+      }
+    } else {
+      console.warn(`[AI Router] Groq 70B failed with status: ${response.status}`);
+    }
+  } catch (e) {
+    console.warn("[AI Router] Groq 70B error:", e.message);
+  }
+
+  // 2. Try Groq (Llama-3.1-8b-instant)
+  try {
+    console.log("[AI Router] Attempting Groq (llama-3.1-8b-instant)...");
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.1
+      })
+    });
+    if (response.ok) {
+      const result = await response.json();
+      const text = result.choices?.[0]?.message?.content;
+      if (text) {
+        return JSON.parse(cleanJsonResponse(text));
+      }
+    } else {
+      console.warn(`[AI Router] Groq 8B failed with status: ${response.status}`);
+    }
+  } catch (e) {
+    console.warn("[AI Router] Groq 8B error:", e.message);
+  }
+
+  // 3. Try Gemini (gemini-2.0-flash with new API key)
+  try {
+    console.log("[AI Router] Attempting Gemini (gemini-2.0-flash)...");
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" }
+      })
+    });
+    if (response.ok) {
+      const result = await response.json();
+      const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        return JSON.parse(cleanJsonResponse(text));
+      }
+    } else {
+      console.warn(`[AI Router] Gemini failed with status: ${response.status}`);
+    }
+  } catch (e) {
+    console.warn("[AI Router] Gemini error:", e.message);
+  }
+
+  return null;
+}
+
+/**
+ * Robustly calls AI API for agricultural recommendations.
  */
 export async function getGeminiVarieties(season, state, soil, water) {
-  try {
-    const prompt = `You are an expert crop scientist in India. 
+  const prompt = `You are an expert crop scientist in India. 
 For a farm in state: "${state}", with soil: "${soil}", water sources: "${water}", and season: "${season}", suggest the 3 best crop varieties to plant for maximum profit.
 
 Return ONLY a JSON array of exactly 3 objects. Each object MUST have these exact keys:
@@ -343,42 +440,20 @@ Return ONLY a JSON array of exactly 3 objects. Each object MUST have these exact
 - "yield": e.g. "24".
 - "price": e.g. "2200".
 - "waterRequirement": e.g. 350 (integer in mm).
-- "badges": an array of 2 strings like "Gemini Recommended", "High Profit", "Water Efficient".`;
-    
-    const body = {
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: "application/json" }
-    };
-    
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    
-    if (response.ok) {
-      const result = await response.json();
-      const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) {
-        return JSON.parse(text);
-      }
-    }
-  } catch (e) {
-    console.warn("[Gemini API] Failed or Quota Exceeded. Falling back to local ICAR database:", e.message);
-  }
-  return null;
+- "badges": an array of 2 strings like "AI Recommended", "High Profit", "Water Efficient".`;
+  
+  return await callAIRouter(prompt);
 }
 
 /**
- * Robustly calls Gemini API for specific crop variety recommendations.
+ * Robustly calls AI API for specific crop variety recommendations.
  */
 export async function getGeminiVarietiesForCrop(crop, state, district, soil, water, lastCrop, preferredVariety = null) {
-  try {
-    let preferenceInstruction = preferredVariety 
-      ? `The farmer has specifically requested the variety "${preferredVariety}". Evaluate this variety and include it as the first recommendation, then suggest 2 alternatives.`
-      : `Suggest the 3 best high-yielding, profitable varieties.`;
+  let preferenceInstruction = preferredVariety 
+    ? `The farmer has specifically requested the variety "${preferredVariety}". Evaluate this variety and include it as the first recommendation, then suggest 2 alternatives.`
+    : `Suggest the 3 best high-yielding, profitable varieties.`;
 
-    const prompt = `You are an expert agronomist in India. 
+  const prompt = `You are an expert agronomist in India. 
 For a farm in ${district}, ${state}, with soil: "${soil}", irrigation: "${water}", and previously grew: "${lastCrop || 'Unknown'}". 
 I want to plant the crop: "${crop}". 
 ${preferenceInstruction}
@@ -400,28 +475,7 @@ Return ONLY a JSON array of exactly 3 objects (no markdown blocks, no text befor
 - "yield": e.g. "24 Qtl/Acre".
 - "badges": an array of 1 to 3 strings like "Best Fit", "Highest Profit", "Fast Harvest", "Water Efficient", etc.`;
 
-    const body = {
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: "application/json" }
-    };
-    
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    
-    if (response.ok) {
-      const result = await response.json();
-      const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) {
-        return JSON.parse(text);
-      }
-    }
-  } catch (e) {
-    console.warn("[Gemini API] Failed to fetch crop varieties:", e.message);
-  }
-  return null;
+  return await callAIRouter(prompt);
 }
 
 
