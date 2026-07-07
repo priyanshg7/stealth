@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Check, Volume2, Mic, MapPin, Plus, Trash2, Edit3, ArrowLeft, ArrowRight,
   Info, Cpu, Shield, Sparkles, PlusCircle, HelpCircle, Layers, Droplet,
@@ -8,27 +9,7 @@ import {
 import DashboardShell from './components/DashboardShell';
 import { fetchWeatherIntelligence } from './utils/weatherService';
 import { getCropStageByDas, generateCropSchedule } from './utils/farmScheduleEngine';
-
-// Firebase SDK Imports & Configuration
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'firebase/auth';
-
-const firebaseConfig = {
-  projectId: "kisanmitra-bpa7t",
-  appId: "1:919454579680:web:0e30b2d80764f293108985",
-  storageBucket: "kisanmitra-bpa7t.firebasestorage.app",
-  apiKey: "AIzaSyDfn0vSHZA6gYN-MBS5XE_ahZRVnz4x91k",
-  authDomain: "kisanmitra-bpa7t.firebaseapp.com",
-  messagingSenderId: "919454579680",
-  projectNumber: "919454579680"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
-googleProvider.addScope('email');
-googleProvider.addScope('profile');
-googleProvider.setCustomParameters({ prompt: 'select_account' });
+import { useAuth } from './contexts/AuthContext';
 
 // Static Data
 const LANGUAGES = [
@@ -545,19 +526,16 @@ const evaluateScheme = (scheme, profile, farm) => {
 };
 
 export default function App() {
-  const [view, setView] = useState(() => localStorage.getItem('km_jwt') ? 'DASHBOARD' : 'WELCOME');
+  const navigate = useNavigate();
+  const { jwtToken, setJwtToken, decodedToken, setDecodedToken, profile: authProfile, setProfile: setAuthProfile, isDemo, logout: authLogout } = useAuth();
+
+  const [view, setView] = useState('DASHBOARD');
   const [language, setLanguage] = useState(() => localStorage.getItem('km_language') || 'en');
   const [voiceGuide, setVoiceGuide] = useState(() => localStorage.getItem('km_voice_guide') === 'true');
   const [playingAudio, setPlayingAudio] = useState(null);
   
-  // Auth state
+  // Auth state (showGoogleDialog removed — now separate /demo route)
   const [mobileNumber, setMobileNumber] = useState('');
-  const [jwtToken, setJwtToken] = useState(localStorage.getItem('km_jwt') || '');
-  const [decodedToken, setDecodedToken] = useState(() => {
-    const saved = localStorage.getItem('km_decoded_jwt');
-    return saved ? JSON.parse(saved) : null;
-  });
-  const [showGoogleDialog, setShowGoogleDialog] = useState(false);
   const [showJwtInspector, setShowJwtInspector] = useState(false);
   const [authError, setAuthError] = useState(null);
   const [authLoading, setAuthLoading] = useState(false);
@@ -1570,101 +1548,16 @@ Instructions:
     localStorage.setItem('km_profile', JSON.stringify(profile));
   }, [profile]);
 
-  // Auto-save JWT
-  useEffect(() => {
-    if (jwtToken) {
-      localStorage.setItem('km_jwt', jwtToken);
-      localStorage.setItem('km_decoded_jwt', JSON.stringify(decodedToken));
-    } else {
-      localStorage.removeItem('km_jwt');
-      localStorage.removeItem('km_decoded_jwt');
-    }
-  }, [jwtToken, decodedToken]);
+  // JWT syncing is now handled by AuthContext
 
-  // Listen for Firebase Auth changes
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          const idToken = await firebaseUser.getIdToken();
-          const decoded = decodeJWT(idToken);
-          setJwtToken(idToken);
-          setDecodedToken(decoded);
-          
-          // Pre-fill profile from Google account data
-          setProfile(p => ({
-            ...p,
-            name: p.name || firebaseUser.displayName || '',
-            email: p.email || firebaseUser.email || '',
-            mobile: p.mobile || (firebaseUser.phoneNumber ? firebaseUser.phoneNumber.replace('+91', '').trim() : ''),
-            photo: firebaseUser.photoURL || p.photo || ''
-          }));
-          
-          // If we are on WELCOME step, advance to LANGUAGE selection
-          setView(v => v === 'WELCOME' ? 'LANGUAGE' : v);
-        } catch (error) {
-          console.error("Error fetching Firebase ID Token:", error);
-        }
-      }
-    });
-    return () => unsubscribe();
-  }, []);
+  // Firebase auth changes are now handled by AuthContext
 
 
-  const handleGoogleSignIn = async () => {
-    try {
-      setAuthError(null);
-      setAuthLoading(true);
-      const result = await signInWithPopup(auth, googleProvider);
-      const { user } = result;
-      const idToken = await user.getIdToken();
-      const decoded = decodeJWT(idToken);
-      
-      setJwtToken(idToken);
-      setDecodedToken(decoded);
-
-      // Pull every available field from Google account
-      setProfile(p => ({
-        ...p,
-        name: user.displayName || p.name || '',
-        email: user.email || p.email || '',
-        mobile: user.phoneNumber ? user.phoneNumber.replace('+91', '').trim() : p.mobile || '',
-        photo: user.photoURL || p.photo || '',
-      }));
-      setView('LANGUAGE');
-    } catch (err) {
-      console.error("Firebase Sign-In Error:", err);
-      setAuthError(err);
-    } finally {
-      setAuthLoading(false);
-    }
-  };
+  // Google Sign-In is now handled by LoginPage via AuthContext
 
   const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-    } catch (err) {
-      console.error("Sign Out Error:", err);
-    }
-    setJwtToken('');
-    setDecodedToken(null);
-    setProfile({
-      name: '',
-      mobile: '',
-      photo: '',
-      gender: '',
-      dob: '',
-      state: '',
-      district: '',
-      village: '',
-      pinCode: '',
-      experience: '',
-      occupation: 'Farmer',
-      ownership: 'Owner',
-      farmingMethod: ['Conventional'],
-      governmentId: ''
-    });
-    setView('WELCOME');
+    await authLogout();
+    navigate('/', { replace: true });
   };
 
   const triggerLocationDetection = () => {
@@ -1775,6 +1668,20 @@ Instructions:
 
   return (
     <div className={`h-screen bg-background text-on-surface flex flex-col font-sans ${view === 'DASHBOARD' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+
+      {/* Demo mode banner */}
+      {isDemo && (
+        <div className="demo-banner">
+          <span>🔬</span>
+          <span>Demo Environment — All data is simulated</span>
+          <button
+            onClick={handleSignOut}
+            className="ml-3 px-3 py-1 rounded-lg bg-amber-800/10 hover:bg-amber-800/20 text-amber-900 text-xs font-bold transition-colors"
+          >
+            Exit Demo
+          </button>
+        </div>
+      )}
       
       {/* TTS voice guide floating overlay */}
       {voiceGuide && (
@@ -1847,105 +1754,7 @@ Instructions:
         {/* View Routing */}
         <div className={`flex-1 flex ${view === 'DASHBOARD' ? 'flex-col w-full h-full' : 'justify-center items-center py-6 px-4 md:px-8'}`}>
           
-          {/* Welcome Screen */}
-          {view === 'WELCOME' && (
-            <div className="w-full max-w-5xl flex flex-col lg:flex-row items-center gap-10 py-8">
-              <div className="w-full lg:w-1/2 space-y-6 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary-container/40 text-on-secondary-container font-semibold text-sm">
-                  <Sparkles className="w-4 h-4 text-primary" /> Indian Farmers' Trusted Companion
-                </div>
-                <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-on-surface leading-tight">
-                  Your Digital Farm Companion, Built for Indian Fields
-                </h1>
-                <p className="text-lg md:text-xl text-on-surface-variant max-w-lg mx-auto lg:mx-0">
-                  Tailored crop recommendations, Soil health checks, Irrigation calendars, and direct government aid updates—all in your local language.
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-xl mx-auto lg:mx-0">
-                  {[
-                    { title: 'Personalized Plan', icon: 'assignment' },
-                    { title: 'Sowing Advices', icon: 'potted_plant' },
-                    { title: 'Irrigation Cycles', icon: 'water_drop' },
-                    { title: 'Market Mandi Prices', icon: 'storefront' }
-                  ].map((item, idx) => (
-                    <div key={idx} className="bg-white rounded-2xl p-4 border border-outline-variant/30 shadow-[0_2px_8px_rgba(15,23,42,0.04)] text-center">
-                      <div className="w-12 h-12 mx-auto rounded-full bg-primary-container/20 text-primary flex items-center justify-center mb-2">
-                        <span className="material-symbols-outlined text-2xl fill">{item.icon}</span>
-                      </div>
-                      <div className="text-xs font-bold text-on-surface">{item.title}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="w-full lg:w-[450px]">
-                <div className="bg-white rounded-card p-8 border border-outline-variant shadow-2xl relative overflow-hidden flex flex-col items-center">
-                  <div className="absolute top-0 left-0 w-2 h-full bg-primary"></div>
-                  
-                  {/* Decorative agricultural visual card */}
-                  <div className="w-full h-44 rounded-2xl overflow-hidden mb-6 relative">
-                    <img 
-                      className="w-full h-full object-cover" 
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-APngoDgqNeu9UGHzxO-EFIWrCb3ccrQAdjxEAgoUne7BImTAiOt9aNM-D7xN5EjCJnJYFcfDYh0FeS3cQeJnfej-mQUDp4OjzZKqjIILCchMqIbiDphBVCV69_JZ06GDvqYrI5RNmHtEkhttR_sqY-t8L19eUJlqScgF_vLGt0PFxhBtN-cfH9kggra2sXkrDfbbw0puK_zQVbQj1wGcPqBV5vHV4zo1FvM6rHjuOtxa1WHFaxkjvIoYGuSsUmolPQPVyngePbg" 
-                      alt="Agri background"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                      <p className="text-white text-md font-bold">KisanMitra is ready to boost your yield</p>
-                    </div>
-                  </div>
-
-                  <h2 className="font-display text-2xl font-bold text-on-surface mb-2">Start Your Onboarding</h2>
-                  <p className="text-sm text-on-surface-variant text-center mb-6">
-                    Connect your Google Account to automatically sync credentials and verify your identity.
-                  </p>
-                  
-                  {authError && (() => {
-                    const errorDetails = getFriendlyAuthErrorMessage(authError);
-                    return (
-                      <div className="w-full mb-4 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-950 text-xs flex items-start gap-2.5 animate-in fade-in slide-in-from-top-1 duration-200">
-                        <AlertCircle className="w-4 h-4 text-red-700 flex-shrink-0 mt-0.5" />
-                        <div className="flex-1">
-                          <p className="font-bold text-red-900">{errorDetails.title}</p>
-                          <p className="text-[11px] text-red-800 font-normal mt-0.5 leading-relaxed">{errorDetails.instructions}</p>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  <button 
-                    onClick={handleGoogleSignIn}
-                    disabled={authLoading}
-                    className="w-full border border-outline-variant bg-white hover:bg-surface-container text-on-surface font-bold h-[54px] rounded-xl flex items-center justify-center gap-3 shadow-md transition-all active:scale-[0.98] mb-3 disabled:opacity-50"
-                  >
-                    {authLoading ? (
-                      <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      <svg className="w-5 h-5" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                      </svg>
-                    )}
-                    <span>{authLoading ? 'Signing in...' : 'Sign in with Google'}</span>
-                  </button>
-
-                  <div className="w-full flex items-center my-3 text-xs text-on-surface-variant font-medium">
-                    <div className="flex-1 h-px bg-outline-variant/30"></div>
-                    <span className="px-3">OR</span>
-                    <div className="flex-1 h-px bg-outline-variant/30"></div>
-                  </div>
-
-                  <button 
-                    onClick={() => setShowGoogleDialog(true)}
-                    className="w-full border-2 border-dashed border-outline-variant bg-[#fdfdfd] hover:bg-[#f4fcf0] hover:border-primary text-on-surface-variant hover:text-primary font-bold h-[54px] rounded-xl flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
-                  >
-                    <span className="material-symbols-outlined text-lg">science</span>
-                    <span>Demo Mode (Mock Sign-In)</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Welcome screen removed — now served by /login route */}
 
           {/* OTP Screen */}
           {view === 'OTP' && (
@@ -3916,8 +3725,6 @@ Instructions:
               setSelectedCommunityPost={setSelectedCommunityPost}
               showAllTasksModal={showAllTasksModal}
               setShowAllTasksModal={setShowAllTasksModal}
-              activeDialogTask={activeDialogTask}
-              setActiveDialogTask={setActiveDialogTask}
               showRescheduleModal={showRescheduleModal}
               setShowRescheduleModal={setShowRescheduleModal}
               rescheduledTasks={rescheduledTasks}
@@ -3939,203 +3746,7 @@ Instructions:
 
         </div>
 
-        {/* Google Account Selector Dialog Simulation */}
-        {showGoogleDialog && (
-          <div className="fixed inset-0 z-[120] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-sm border border-outline-variant shadow-2xl overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in duration-200">
-              
-              {/* Header */}
-              <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                  </svg>
-                  <span className="font-semibold text-sm text-on-surface">Sign in with Google</span>
-                </div>
-                <button 
-                  onClick={() => setShowGoogleDialog(false)}
-                  className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1 rounded-full hover:bg-surface-container"
-                >
-                  <span className="material-symbols-outlined text-lg">close</span>
-                </button>
-              </div>
-
-              {/* Account Choice list */}
-              <div className="py-6 space-y-4">
-                <p className="text-xs text-on-surface-variant font-medium">Choose an account to continue to <strong>KisanMitra</strong></p>
-                
-                {/* Rajesh Kumar Account */}
-                <button
-                  onClick={() => {
-                    const account = {
-                      name: "Rajesh Kumar",
-                      email: "rajesh.kumar@gmail.com",
-                      picture: "https://images.unsplash.com/photo-1544005313-94ddf0286df2"
-                    };
-                    const token = generateMockJWT(account);
-                    setJwtToken(token);
-                    setDecodedToken({
-                      sub: "google-oauth2|1234567890",
-                      ...account,
-                      email_verified: true,
-                      iat: Math.floor(Date.now() / 1000),
-                      exp: Math.floor(Date.now() / 1000) + 3600
-                    });
-
-                    // Pre-fill full demo profile
-                    setProfile({
-                      name: "Rajesh Kumar",
-                      email: "rajesh.kumar@gmail.com",
-                      mobile: "9876543210",
-                      photo: "",
-                      gender: "Male",
-                      dob: "1985-04-12",
-                      state: "Maharashtra",
-                      district: "Nashik",
-                      village: "Pimpalgaon",
-                      pinCode: "422209",
-                      experience: "15",
-                      occupation: "Farmer",
-                      ownership: "Owner",
-                      farmingMethod: ["Conventional", "Organic"],
-                      governmentId: "AADHAAR-XXXX-7890"
-                    });
-
-                    // Seed 2 complete demo farms so FarmingDashboard renders immediately
-                    const demoFarms = [
-                      {
-                        name: "Rajesh Wheat Farm",
-                        state: "Maharashtra",
-                        district: "Nashik",
-                        village: "Pimpalgaon",
-                        pinCode: "422209",
-                        lat: "20.0059",
-                        lng: "73.7823",
-                        boundary: [],
-                        plots: 2,
-                        area: "4.5",
-                        unit: "Acres",
-                        crop: {
-                          name: "Wheat",
-                          variety: "GW 322",
-                          stage: "Growth",
-                          sowingDate: "2026-04-10",
-                          harvestDate: "2026-09-15",
-                          previousCrop: "Rice",
-                          farmingType: "Conventional"
-                        },
-                        soil: {
-                          type: "Black Clay",
-                          source: "card",
-                          ph: "6.8",
-                          carbon: "0.62",
-                          nitrogen: "High",
-                          phosphorus: "Medium",
-                          potassium: "Medium",
-                          micronutrients: "Zinc, Boron"
-                        },
-                        water: {
-                          sources: ["borewell", "canal"],
-                          irrigationMethods: ["drip"],
-                          availability: "Good",
-                          reliability: "Always Available",
-                          electricity: "Daytime Only",
-                          pumpType: "Solar",
-                          pumpCapacity: "5 HP"
-                        },
-                        machinery: ["tractor", "sprayer"],
-                        storage: ["Warehouse"],
-                        livestock: ["Cow"],
-                        labor: { type: "Both", count: "3–5" },
-                        transportation: ["Tractor"],
-                        internet: "Good",
-                        smartphone: "Farmer Uses App",
-                        nearbyRadius: "10 km",
-                        nearbyFacilities: ["Mandi", "Fertilizer Shop", "KVK"]
-                      },
-                      {
-                        name: "Sugarcane Field B",
-                        state: "Maharashtra",
-                        district: "Nashik",
-                        village: "Ozar",
-                        pinCode: "422206",
-                        lat: "20.0890",
-                        lng: "73.9120",
-                        boundary: [],
-                        plots: 1,
-                        area: "2.8",
-                        unit: "Acres",
-                        crop: {
-                          name: "Sugarcane",
-                          variety: "Co-86032",
-                          stage: "Flowering",
-                          sowingDate: "2025-12-01",
-                          harvestDate: "2026-11-20",
-                          previousCrop: "Soybean",
-                          farmingType: "Conventional"
-                        },
-                        soil: {
-                          type: "Red Loam",
-                          source: "manual",
-                          ph: "7.1",
-                          carbon: "0.48",
-                          nitrogen: "Medium",
-                          phosphorus: "High",
-                          potassium: "Medium",
-                          micronutrients: "Iron, Manganese"
-                        },
-                        water: {
-                          sources: ["canal"],
-                          irrigationMethods: ["drip", "flood"],
-                          availability: "Moderate",
-                          reliability: "Seasonal",
-                          electricity: "Daytime Only",
-                          pumpType: "Electric",
-                          pumpCapacity: "3 HP"
-                        },
-                        machinery: ["tractor", "harvester"],
-                        storage: ["Cold Storage"],
-                        livestock: [],
-                        labor: { type: "Hired", count: "5–10" },
-                        transportation: ["Tractor", "Truck"],
-                        internet: "Average",
-                        smartphone: "Farmer Uses App",
-                        nearbyRadius: "15 km",
-                        nearbyFacilities: ["Mandi", "Sugar Factory"]
-                      }
-                    ];
-
-                    setFarms(demoFarms);
-                    setSelectedFarmIndex(0);
-                    // Mark onboarding as done — go straight to the dashboard
-                    setSeasonPlanConfirmed(true);
-                    localStorage.setItem('km_season_confirmed', 'true');
-                    setShowGoogleDialog(false);
-                    setView('DASHBOARD');
-                  }}
-                  className="w-full flex items-center p-3 rounded-xl border border-outline-variant hover:bg-surface-container-low text-left gap-3 transition-all"
-                >
-                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold flex-shrink-0">
-                    R
-                  </div>
-                  <div className="flex-grow min-w-0">
-                    <h4 className="font-bold text-sm text-on-surface truncate">Rajesh Kumar</h4>
-                    <p className="text-xs text-on-surface-variant truncate">rajesh.kumar@gmail.com · Nashik, Maharashtra</p>
-                  </div>
-                  <span className="text-[10px] bg-primary-container/20 text-primary px-2.5 py-0.5 rounded-full font-bold flex-shrink-0">Demo Profile</span>
-                </button>
-              </div>
-              
-              <div className="text-[10px] text-on-surface-variant text-center pt-2 border-t border-surface-container-high">
-                To create a secure connection, Google will share your profile info with KisanMitra.
-              </div>
-
-            </div>
-          </div>
-        )}
+        {/* Google Account Selector Dialog removed — now served by /demo route */}
 
         {/* JWT Inspector Modal */}
         {showJwtInspector && jwtToken && (
