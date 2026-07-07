@@ -4,7 +4,7 @@ import {
   TrendingUp, ArrowUpDown, ChevronRight, Activity, MousePointerClick,
   AlertTriangle, RefreshCw, WifiOff
 } from 'lucide-react';
-import { fetchUpagSourceData, fetchCommercialMsp, fetchHistoricalPrices } from '../../../utils/mandiService';
+import { fetchUpagSourceData, fetchCommercialMsp, fetchHistoricalMspPrices } from '../../../utils/mandiService';
 
 // ── MSP year labels matching the merged MSP API columns ──
 const MSP_YEAR_FIELDS = [
@@ -141,13 +141,13 @@ export default function PriceTrendsTab({ mandi, activeFarm, liveMandiData }) {
       let priceRecords = [];
 
       if (stateName) {
-        priceRecords = await fetchHistoricalPrices(cropKey, stateName, districtName);
+        priceRecords = await fetchHistoricalMspPrices(cropKey, stateName, districtName);
         console.log(`[PriceTrendsTab] ${priceRecords.length} live variety price records for ${cropKey} in ${districtName || 'any district'}, ${stateName}`);
       }
 
       // If no state-specific records, try without state/district filter for broader data
       if (priceRecords.length === 0) {
-        priceRecords = await fetchHistoricalPrices(cropKey, '', '');
+        priceRecords = await fetchHistoricalMspPrices(cropKey, '', '');
         if (priceRecords.length > 0) {
           console.log(`[PriceTrendsTab] Fallback: got ${priceRecords.length} national variety records for ${cropKey}`);
         }

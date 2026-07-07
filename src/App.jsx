@@ -533,6 +533,7 @@ export default function App() {
   const [language, setLanguage] = useState(() => localStorage.getItem('km_language') || 'en');
   const [voiceGuide, setVoiceGuide] = useState(() => localStorage.getItem('km_voice_guide') === 'true');
   const [playingAudio, setPlayingAudio] = useState(null);
+  const [showDemoBanner, setShowDemoBanner] = useState(true);
   
   // Auth state (showGoogleDialog removed — now separate /demo route)
   const [mobileNumber, setMobileNumber] = useState('');
@@ -1681,15 +1682,24 @@ Instructions:
     <div className={`h-screen bg-background text-on-surface flex flex-col font-sans ${view === 'DASHBOARD' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
 
       {/* Demo mode banner */}
-      {isDemo && (
-        <div className="demo-banner">
-          <span>🔬</span>
-          <span>Demo Environment — All data is simulated</span>
+      {isDemo && showDemoBanner && (
+        <div className="demo-banner flex items-center justify-between">
+          <div className="flex-1 flex items-center justify-center gap-2 pl-6">
+            <span>🔬</span>
+            <span>Demo Environment — All data is simulated</span>
+            <button
+              onClick={handleSignOut}
+              className="ml-3 px-3 py-1 rounded-lg bg-amber-800/10 hover:bg-amber-800/20 text-amber-900 text-xs font-bold transition-colors"
+            >
+              Exit Demo
+            </button>
+          </div>
           <button
-            onClick={handleSignOut}
-            className="ml-3 px-3 py-1 rounded-lg bg-amber-800/10 hover:bg-amber-800/20 text-amber-900 text-xs font-bold transition-colors"
+            onClick={() => setShowDemoBanner(false)}
+            className="p-1 hover:bg-amber-800/10 rounded-lg text-amber-800 transition-colors flex items-center justify-center mr-2"
+            title="Dismiss Demo Banner"
           >
-            Exit Demo
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}
@@ -3679,6 +3689,7 @@ Instructions:
           {/* Annual Farm Planner Dashboard */}
           {(view === 'PLANNER' || view === 'DASHBOARD') && (
             <DashboardShell
+              isDemo={isDemo}
               profile={profile}
               setProfile={setProfile}
               language={language}

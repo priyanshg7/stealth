@@ -423,6 +423,94 @@ app.get('/api/mandi/msp/commercial', async (req, res) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════════════════
+//  AGMARKNET - Crop-specific Historical Prices for MSP Chart
+//  Queries representative dates for past years (2020-2025) using Arrival_Date filter
+// ═══════════════════════════════════════════════════════════════════════
+app.get('/api/mandi/historical-prices', async (req, res) => {
+  try {
+    const { commodity, state, district } = req.query;
+    if (!commodity || !state) {
+      return res.status(400).json({ error: 'Missing commodity or state parameter' });
+    }
+
+    const cacheKey = `historical_msp_prices_${commodity}_${state}_${district || 'all'}`;
+    const cached = getCached(cacheKey, 7 * 24 * 60 * 60 * 1000); // Cache for 7 days
+    if (cached) {
+      console.log(`[Historical Prices Cache HIT] ${cacheKey}`);
+      return res.json(cached);
+    }
+
+    // Determine the best representative month/day for the commodity
+    const commLower = commodity.toLowerCase();
+    const isRabi = commLower.includes('wheat') || commLower.includes('mustard') || 
+                   commLower.includes('gram') || commLower.includes('barley') || 
+                   commLower.includes('lentil') || commLower.includes('safflower') ||
+                   commLower.includes('chana');
+    
+    // Rabi crops: April 15 (04), Kharif crops: November 15 (11)
+    const day = 15;
+    const month = isRabi ? 4 : 11;
+    const years = [2020, 2021, 2022, 2023, 2024, 2025];
+    const records = [];
+
+    // Helper for fetch with retry to handle 429 rate limit
+    const fetchWithRetry = async (url, retries = 3, backoff = 1000) => {
+      for (let i = 0; i < retries; i++) {
+        const response = await fetch(url);
+        if (response.status === 429) {
+          const wait = backoff * Math.pow(2, i);
+          console.warn(`[Historical Prices API] Rate limited (429). Retrying in ${wait}ms...`);
+          await new Promise(resolve => setTimeout(resolve, wait));
+          continue;
+        }
+        return response;
+      }
+      return fetch(url);
+    };
+
+    // Helper to fetch sequentially to respect rate limits
+    for (const year of years) {
+      const dateStr = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+      const filters = [
+        `filters[State]=${encodeURIComponent(state)}`,
+        `filters[Commodity]=${encodeURIComponent(commodity)}`,
+        `filters[Arrival_Date]=${encodeURIComponent(dateStr)}`
+      ];
+      if (district) {
+        filters.push(`filters[District]=${encodeURIComponent(district)}`);
+      }
+
+      const url = `https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24?api-key=${DATA_GOV_KEY}&format=json&limit=100&${filters.join('&')}`;
+      console.log(`[Historical Prices API] Querying: ${dateStr} for ${commodity}`);
+      
+      try {
+        const response = await fetchWithRetry(url);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.records && data.records.length > 0) {
+            records.push(...data.records);
+          }
+        } else {
+          console.warn(`[Historical Prices API] Failed for ${dateStr}: ${response.status}`);
+        }
+      } catch (e) {
+        console.error(`[Historical Prices API] Error for ${dateStr}:`, e.message);
+      }
+      
+      // Delay 1000ms between requests to strictly prevent 429 rate limit
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    setCache(cacheKey, { records });
+    res.json({ records });
+  } catch (err) {
+    console.error('[Historical Prices Endpoint] Error:', err.message);
+    res.status(500).json({ error: 'Proxy error', message: err.message });
+  }
+});
+
+
 
 // ── Start server ─────────────────────────────────────────────────────
 app.listen(PORT, () => {

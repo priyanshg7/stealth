@@ -20,6 +20,7 @@ import FarmJourney from './subviews/FarmJourney';
 import RescheduleTaskModal from './subviews/RescheduleTaskModal';
 
 export default function DashboardShell({
+  isDemo,
   weatherData,
   weatherLoading,
   fetchWeather,
@@ -107,6 +108,7 @@ export default function DashboardShell({
       
       {/* Sidebar navigation drawer */}
       <Sidebar 
+        isDemo={isDemo}
         language={language}
         profile={profile}
         seasonPlanConfirmed={seasonPlanConfirmed}

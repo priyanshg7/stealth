@@ -303,3 +303,24 @@ export async function fetchHistoricalPrices(commodity, state, district) {
   }
   return [];
 }
+
+// ── Fetch Historical Variety Prices for MSP (using dedicated endpoint) ────────
+export async function fetchHistoricalMspPrices(commodity, state, district) {
+  try {
+    const params = new URLSearchParams();
+    if (commodity) params.set('commodity', commodity);
+    if (state) params.set('state', state);
+    if (district) params.set('district', district);
+    
+    const url = `/api/mandi/historical-prices?${params.toString()}`;
+    const res = await fetch(url);
+    if (res.ok) {
+      const data = await res.json();
+      return data.records || [];
+    }
+  } catch (err) {
+    console.warn('[MandiService] Historical MSP prices fetch failed:', err.message);
+  }
+  return [];
+}
+

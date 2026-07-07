@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { Cpu } from 'lucide-react';
 
 export default function Sidebar({
+  isDemo,
   language,
   profile,
   seasonPlanConfirmed,
@@ -210,6 +211,34 @@ export default function Sidebar({
               </div>
               <span className={`text-left truncate transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'flex-1 opacity-100 pr-3'}`}>
                 Inspect JWT
+              </span>
+            </button>
+          )}
+
+          {/* Exit Demo (only in demo environment) */}
+          {isDemo && (
+            <button
+              onClick={() => {
+                if (handleSignOut) handleSignOut();
+                setView('WELCOME');
+                setFarms([]);
+                setMobileNumber('');
+                setJwtToken('');
+                setDecodedToken(null);
+                setSeasonPlanConfirmed(false);
+                localStorage.removeItem('km_jwt');
+                localStorage.removeItem('km_decoded_jwt');
+                localStorage.removeItem('km_season_confirmed');
+              }}
+              title={sidebarCollapsed ? 'Exit Demo' : undefined}
+              className={`w-full flex items-center font-bold text-sm text-amber-700 bg-amber-50 hover:bg-amber-100 transition-colors rounded-xl overflow-hidden relative
+                ${sidebarCollapsed ? 'lg:rounded-none lg:bg-transparent lg:hover:bg-amber-50' : 'border border-amber-200'}`}
+            >
+              <div className="w-12 lg:w-[80px] h-12 flex-shrink-0 flex items-center justify-center">
+                <span className="material-symbols-outlined text-lg">science</span>
+              </div>
+              <span className={`text-left truncate transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'flex-1 opacity-100 pr-3'}`}>
+                Exit Demo
               </span>
             </button>
           )}
