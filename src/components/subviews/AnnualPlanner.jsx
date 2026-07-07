@@ -99,12 +99,14 @@ export default function AnnualPlanner({
   const [wizardCrops, setWizardCrops] = useState({ Kharif: null, Rabi: null, Zaid: null });
   const [seasonRecs, setSeasonRecs] = useState([]);
   const [loadingRecs, setLoadingRecs] = useState(false);
+  const [recommendationError, setRecommendationError] = useState(null);
 
   // Generate crop recommendations for the current wizard season step
   const loadRecommendations = useCallback(async () => {
     if (step !== 'wizard') return;
     setLoadingRecs(true);
     setSeasonRecs([]); // Clear previous recommendations to show loader
+    setRecommendationError(null);
 
     const currentSeason = SEASONS[wizardSeasonIndex];
     // Formulate a temporary farm object based on form parameters
@@ -184,82 +186,13 @@ export default function AnnualPlanner({
            setSeasonRecs(mappedGemini);
            setLoadingRecs(false);
            return;
-        }
-        
-        // Fallback to local
-        console.log(`[AnnualPlanner] Gemini failed for ${manualCrop}. Using local database.`);
-        const rankedRaw = generateRecommendations(manualCrop, tempFarm, profile, weatherData, null);
-        if (rankedRaw && rankedRaw.length > 0) {
-           const areaVal = parseFloat(setupForm.area) || 5.0;
-           const finalRecommendations = rankedRaw.map((v, idx) => {
-             const livePrice = v.livePrice || v.msp || 2275;
-             const profitPerAcre = Math.round(v.projectedProfit / areaVal) || 45000;
-             const badges = [];
-             if (idx === 0) badges.push('Best Fit');
-             if (v.waterRequirement < 400) badges.push('Water Efficient');
-             if (badges.length === 0) badges.push('Recommended');
-             
-             return {
-               ...v,
-               badges,
-               cropName: manualCrop,
-               yield: `${v.yieldPotential || 24} Qtl/Acre`,
-               duration: `${v.maturityDays || 120} days`,
-               water: `${v.waterRequirement || 350} mm`,
-               diseaseResistance: v.diseaseResistance >= 4 ? 'High' : (v.diseaseResistance >= 3 ? 'Medium' : 'Low'),
-               maturity: `${v.maturityDays || 120} days`,
-               suitableSoil: (v.suitableSoils || []).join(', ') || 'Clay Loam',
-               price: `₹${livePrice}/Qtl`,
-               marketDemand: v.exportDemand || 'High',
-               profitPerAcre
-             };
-           }).slice(0, 3);
-           
-           if (manualVariety) {
-             const prefLower = manualVariety.toLowerCase();
-             const matchedIdx = finalRecommendations.findIndex(v => v.name.toLowerCase().includes(prefLower));
-             if (matchedIdx > 0) {
-               const matched = finalRecommendations.splice(matchedIdx, 1)[0];
-               finalRecommendations.unshift(matched);
-             } else if (matchedIdx === -1) {
-               finalRecommendations.unshift({
-                 ...finalRecommendations[0],
-                 id: 'custom-' + Date.now(),
-                 name: manualVariety,
-                 description: `Custom farmer-selected variety. Evaluated based on baseline parameters for ${manualCrop}.`,
-                 badges: ['Farmer Selected']
-               });
-             }
-           }
-           setSeasonRecs(finalRecommendations);
-           setLoadingRecs(false);
-           return;
         } else {
-           // Failsafe for crops not in database
-           console.warn(`[AnnualPlanner] Crop ${manualCrop} not found in local database.`);
-           const genericRec = {
-             id: 'generic-' + Date.now(),
-             name: manualVariety || `Standard ${manualCrop} Variety`,
-             description: `Standard regional choice for ${manualCrop} matching typical local weather patterns.`,
-             profitPerAcre: 40000,
-             cropName: manualCrop,
-             whyThisTemplate: `This variety is a standard recommendation for ${manualCrop} given local configurations.`,
-             sowingMonth: currentSeason === 'Kharif' ? 'June' : (currentSeason === 'Rabi' ? 'November' : 'March'),
-             duration: '120 days',
-             water: '400 mm',
-             diseaseResistance: 'Medium',
-             marketDemand: 'Standard',
-             maturity: 'Medium',
-             suitableSoil: setupForm.soilType,
-             price: '₹2,100/Qtl',
-             yield: '20 Qtl/Acre',
-             badges: ['Best Fit'],
-             yieldPotential: 20,
-             livePrice: 2100,
-             seedRate: 40
-           };
-           setSeasonRecs([genericRec]);
+           // Pause and ask user for retry or local fallback
            setLoadingRecs(false);
+           setRecommendationError({
+             message: 'AI Service Rate Limited (Quota Exceeded)',
+             description: 'The Gemini AI variety recommendation engine returned a rate-limiting response (429). Silently falling back to generic placeholder templates is disabled to ensure data transparency.'
+           });
            return;
         }
       }
@@ -315,10 +248,122 @@ export default function AnnualPlanner({
         setSeasonRecs(mappedGemini);
         setLoadingRecs(false);
         return;
+      } else {
+         // Pause and ask user for retry or local fallback
+         setLoadingRecs(false);
+         setRecommendationError({
+           message: 'AI Service Rate Limited (Quota Exceeded)',
+           description: 'The Gemini AI variety recommendation engine returned a rate-limiting response (429). Silently falling back to generic placeholder templates is disabled to ensure data transparency.'
+         });
+         return;
       }
+    } catch (e) {
+      console.error("[AnnualPlanner] loadRecommendations error:", e);
+      setSeasonRecs([]); // Indicates error
+      setLoadingRecs(false);
+    }
+  }, [step, wizardSeasonIndex, setupForm, weatherData, profile, wizardPreferences]);
 
-      // Fall back to local ICAR database for generic seasonal crops
-      console.log(`[AnnualPlanner] Gemini API quota limit/error. Using local ICAR recommendations database.`);
+  const handleUseLocalFallback = () => {
+    setRecommendationError(null);
+    setLoadingRecs(true);
+    
+    const currentSeason = SEASONS[wizardSeasonIndex];
+    const tempFarm = {
+      state: setupForm.state,
+      district: setupForm.district,
+      soil: { type: setupForm.soilType },
+      water: { sources: [setupForm.irrigationSource.toLowerCase()] },
+      area: setupForm.area
+    };
+
+    let seasonalCrops = CROPS_LIST_IDS;
+    if (currentSeason === 'Kharif') {
+      seasonalCrops = ['rice', 'maize', 'cotton', 'soybean', 'bajra'];
+    } else if (currentSeason === 'Rabi') {
+      seasonalCrops = ['wheat', 'mustard', 'gram'];
+    } else {
+      seasonalCrops = ['bajra', 'maize'];
+    }
+
+    const manualCrop = wizardPreferences[currentSeason]?.crop;
+    const manualVariety = wizardPreferences[currentSeason]?.variety;
+
+    console.log(`[AnnualPlanner] Gemini failed or bypassed. Querying local database fallback for ${currentSeason}...`);
+    
+    if (manualCrop && manualCrop !== 'Other') {
+        const rankedRaw = generateRecommendations(manualCrop, tempFarm, profile, weatherData, null);
+        if (rankedRaw && rankedRaw.length > 0) {
+           const areaVal = parseFloat(setupForm.area) || 5.0;
+           const finalRecommendations = rankedRaw.map((v, idx) => {
+             const livePrice = v.livePrice || v.msp || 2275;
+             const profitPerAcre = Math.round(v.projectedProfit / areaVal) || 45000;
+             const badges = [];
+             if (idx === 0) badges.push('Best Fit');
+             if (v.waterRequirement < 400) badges.push('Water Efficient');
+             if (badges.length === 0) badges.push('Recommended');
+             
+             return {
+               ...v,
+               badges,
+               cropName: manualCrop,
+               yield: `${v.yieldPotential || 24} Qtl/Acre`,
+               duration: `${v.maturityDays || 120} days`,
+               water: `${v.waterRequirement || 350} mm`,
+               diseaseResistance: v.diseaseResistance >= 4 ? 'High' : (v.diseaseResistance >= 3 ? 'Medium' : 'Low'),
+               maturity: `${v.maturityDays || 120} days`,
+               suitableSoil: (v.suitableSoils || []).join(', ') || 'Clay Loam',
+               price: `₹${livePrice}/Qtl`,
+               marketDemand: v.exportDemand || 'High',
+               profitPerAcre
+             };
+           }).slice(0, 3);
+           
+           if (manualVariety) {
+             const prefLower = manualVariety.toLowerCase();
+             const matchedIdx = finalRecommendations.findIndex(v => v.name.toLowerCase().includes(prefLower));
+             if (matchedIdx > 0) {
+               const matched = finalRecommendations.splice(matchedIdx, 1)[0];
+               finalRecommendations.unshift(matched);
+             } else if (matchedIdx === -1) {
+               finalRecommendations.unshift({
+                 ...finalRecommendations[0],
+                 id: 'custom-' + Date.now(),
+                 name: manualVariety,
+                 description: `Custom farmer-selected variety. Evaluated based on baseline parameters for ${manualCrop}.`,
+                 badges: ['Farmer Selected']
+               });
+             }
+           }
+           setSeasonRecs(finalRecommendations);
+           setLoadingRecs(false);
+        } else {
+           console.warn(`[AnnualPlanner] Crop ${manualCrop} not found in local database.`);
+           const genericRec = {
+             id: 'generic-' + Date.now(),
+             name: manualVariety || `Standard ${manualCrop} Variety`,
+             description: `Standard regional choice for ${manualCrop} matching typical local weather patterns.`,
+             profitPerAcre: 40000,
+             cropName: manualCrop,
+             whyThisTemplate: `This variety is a standard recommendation for ${manualCrop} given local configurations.`,
+             sowingMonth: currentSeason === 'Kharif' ? 'June' : (currentSeason === 'Rabi' ? 'November' : 'March'),
+             duration: '120 days',
+             water: '400 mm',
+             diseaseResistance: 'Medium',
+             marketDemand: 'Standard',
+             maturity: 'Medium',
+             suitableSoil: setupForm.soilType,
+             price: '₹2,100/Qtl',
+             yield: '20 Qtl/Acre',
+             badges: ['Best Fit'],
+             yieldPotential: 20,
+             livePrice: 2100,
+             seedRate: 40
+           };
+           setSeasonRecs([genericRec]);
+           setLoadingRecs(false);
+        }
+    } else {
       const allVarieties = [];
       seasonalCrops.forEach(cId => {
         const cropRecs = generateRecommendations(cId, tempFarm, profile, weatherData, null);
@@ -335,12 +380,8 @@ export default function AnnualPlanner({
         .slice(0, 3);
       setSeasonRecs(filteredRecs);
       setLoadingRecs(false);
-    } catch (e) {
-      console.error("[AnnualPlanner] loadRecommendations error:", e);
-      setSeasonRecs([]); // Indicates error
-      setLoadingRecs(false);
     }
-  }, [step, wizardSeasonIndex, setupForm, weatherData, profile, wizardPreferences]);
+  };
 
   useEffect(() => {
     loadRecommendations();
@@ -1424,6 +1465,30 @@ export default function AnnualPlanner({
                 <p className="text-xs text-on-surface-variant max-w-sm text-center font-medium">
                   Analyzing soil parameters ({setupForm.soilType}), irrigation ({setupForm.irrigationSource}), and matching with local weather patterns.
                 </p>
+              </div>
+            ) : recommendationError ? (
+              <div className="flex flex-col items-center justify-center py-16 space-y-4 animate-fade-in">
+                <AlertCircle className="w-12 h-12 text-red-500" />
+                <p className="text-lg font-bold text-on-surface">
+                  {recommendationError.message}
+                </p>
+                <p className="text-sm text-on-surface-variant max-w-md text-center font-medium">
+                  {recommendationError.description}
+                </p>
+                <div className="flex gap-4 pt-2">
+                  <button 
+                    onClick={loadRecommendations}
+                    className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold text-sm flex items-center gap-2 hover:bg-primary-hover shadow-sm transition-all"
+                  >
+                    <RefreshCw className="w-4 h-4" /> Retry AI Analysis
+                  </button>
+                  <button 
+                    onClick={handleUseLocalFallback}
+                    className="px-6 py-2.5 rounded-xl bg-[#0c8a47] text-white hover:bg-[#096a36] font-bold text-sm flex items-center gap-2 shadow-xs transition-all"
+                  >
+                    <Layers className="w-4 h-4 text-white" /> Use Local ICAR Fallback
+                  </button>
+                </div>
               </div>
             ) : seasonRecs.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 space-y-4">

@@ -196,6 +196,216 @@ export const VARIETY_DATABASE = {
       msp: 4600, premiumGrade: false, exportDemand: 'High',
       keyTraits: ['Nitrogen fixing', 'Short duration', 'Rust tolerant']
     }
+  ],
+  ragi: [
+    {
+      id: 'gpu28', name: 'GPU-28', institution: 'UAS, Bangalore',
+      maturityDays: 110, yieldPotential: 16, seedRate: 4, spacingCm: '22.5×10',
+      waterRequirement: 300, irrigationCount: 2,
+      diseaseResistance: 4, pestResistance: 3, droughtTolerance: 4, floodTolerance: 2, heatTolerance: 4,
+      suitableSoils: ['Red Sandy', 'Loamy', 'Sandy Loam'],
+      suitableStates: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh', 'Maharashtra'],
+      cropRotationBonus: { gram: 8, mustard: 6 },
+      nutrientRequirement: { N: 60, P: 30, K: 30 },
+      organicAlternatives: { FYM: 5000, azotobacter: 3 },
+      msp: 3846, premiumGrade: false, exportDemand: 'Low',
+      keyTraits: ['Blast resistant', 'Nutrient rich', 'High calcium']
+    }
+  ],
+  garlic: [
+    {
+      id: 'g41', name: 'Yamuna Safed (G-41)', institution: 'NHRDF',
+      maturityDays: 140, yieldPotential: 50, seedRate: 200, spacingCm: '15×10',
+      waterRequirement: 500, irrigationCount: 10,
+      diseaseResistance: 3, pestResistance: 3, droughtTolerance: 2, floodTolerance: 1, heatTolerance: 2,
+      suitableSoils: ['Clay Loam', 'Sandy Loam', 'Loamy'],
+      suitableStates: ['Madhya Pradesh', 'Gujarat', 'Rajasthan', 'Uttar Pradesh'],
+      cropRotationBonus: { maize: 10, soybean: 8 },
+      nutrientRequirement: { N: 100, P: 50, K: 50 },
+      organicAlternatives: { FYM: 15000, vermicompost: 3000, neemCake: 500 },
+      msp: 6000, premiumGrade: true, exportDemand: 'High',
+      keyTraits: ['Large cloves', 'Good storage quality', 'Export quality']
+    }
+  ],
+  jowar: [
+    {
+      id: 'csh14', name: 'CSH-14 (Hybrid)', institution: 'ICAR-IIMR, Hyderabad',
+      maturityDays: 100, yieldPotential: 22, seedRate: 8, spacingCm: '45×15',
+      waterRequirement: 350, irrigationCount: 3,
+      diseaseResistance: 4, pestResistance: 3, droughtTolerance: 4, floodTolerance: 2, heatTolerance: 4,
+      suitableSoils: ['Black Cotton', 'Clay Loam', 'Loamy'],
+      suitableStates: ['Maharashtra', 'Karnataka', 'Andhra Pradesh', 'Madhya Pradesh'],
+      cropRotationBonus: { gram: 10, safflower: 8 },
+      nutrientRequirement: { N: 80, P: 40, K: 40 },
+      organicAlternatives: { FYM: 6000, azotobacter: 4, PSB: 3 },
+      msp: 3180, premiumGrade: false, exportDemand: 'Medium',
+      keyTraits: ['Grain mold resistant', 'Dual purpose (grain + fodder)', 'Drought escape']
+    }
+  ],
+  oat: [
+    {
+      id: 'kent', name: 'Kent (Fodder Oat)', institution: 'IGFRI / IARI',
+      maturityDays: 110, yieldPotential: 40, seedRate: 35, spacingCm: '25×5',
+      waterRequirement: 300, irrigationCount: 4,
+      diseaseResistance: 4, pestResistance: 3, droughtTolerance: 3, floodTolerance: 2, heatTolerance: 3,
+      suitableSoils: ['Loamy', 'Alluvial', 'Clay Loam'],
+      suitableStates: ['Punjab', 'Haryana', 'Uttar Pradesh', 'Rajasthan'],
+      cropRotationBonus: { rice: 10, maize: 8 },
+      nutrientRequirement: { N: 80, P: 40, K: 20 },
+      organicAlternatives: { FYM: 8000, vermicompost: 2000 },
+      msp: 2200, premiumGrade: false, exportDemand: 'Low',
+      keyTraits: ['Leafy growth', 'Excellent palatability', 'Fast regeneration']
+    }
+  ],
+  groundnut: [
+    {
+      id: 'kadiri6', name: 'Kadiri 6 (K-6)', institution: 'ANGRAU, Anantapur',
+      maturityDays: 105, yieldPotential: 18, seedRate: 85, spacingCm: '30×10',
+      waterRequirement: 400, irrigationCount: 4,
+      diseaseResistance: 3, pestResistance: 3, droughtTolerance: 4, floodTolerance: 1, heatTolerance: 4,
+      suitableSoils: ['Red Sandy Loam', 'Sandy'],
+      suitableStates: ['Andhra Pradesh', 'Karnataka', 'Tamil Nadu', 'Gujarat'],
+      cropRotationBonus: { ragi: 10, maize: 8 },
+      nutrientRequirement: { N: 25, P: 50, K: 40 },
+      organicAlternatives: { FYM: 5000, rhizobium: 4, PSB: 4 },
+      msp: 6780, premiumGrade: true, exportDemand: 'High',
+      keyTraits: ['High oil content (48%)', 'Drought tolerant', 'Bold kernels']
+    }
+  ],
+  sugarcane: [
+    {
+      id: 'co86032', name: 'Co 86032 (Nayan)', institution: 'SBI, Coimbatore',
+      maturityDays: 360, yieldPotential: 400, seedRate: 2500, spacingCm: '120×30',
+      waterRequirement: 1800, irrigationCount: 20,
+      diseaseResistance: 4, pestResistance: 3, droughtTolerance: 4, floodTolerance: 3, heatTolerance: 4,
+      suitableSoils: ['Clay Loam', 'Loamy', 'Black Cotton'],
+      suitableStates: ['Tamil Nadu', 'Karnataka', 'Maharashtra', 'Andhra Pradesh'],
+      cropRotationBonus: { moong: 15, urad: 12 },
+      nutrientRequirement: { N: 250, P: 120, K: 120 },
+      organicAlternatives: { FYM: 20000, vermicompost: 5000, azotobacter: 10, PSB: 10 },
+      msp: 3400, premiumGrade: true, exportDemand: 'Medium',
+      keyTraits: ['High sugar recovery', 'Ratoon crop suitability', 'Drought resistant']
+    }
+  ],
+  potato: [
+    {
+      id: 'kufrijyoti', name: 'Kufri Jyoti', institution: 'CPRI, Shimla',
+      maturityDays: 95, yieldPotential: 80, seedRate: 600, spacingCm: '60×20',
+      waterRequirement: 350, irrigationCount: 6,
+      diseaseResistance: 4, pestResistance: 3, droughtTolerance: 2, floodTolerance: 1, heatTolerance: 2,
+      suitableSoils: ['Sandy Loam', 'Loamy'],
+      suitableStates: ['Uttar Pradesh', 'West Bengal', 'Bihar', 'Punjab', 'Karnataka'],
+      cropRotationBonus: { maize: 8, 'green manure': 12 },
+      nutrientRequirement: { N: 120, P: 100, K: 120 },
+      organicAlternatives: { FYM: 15000, vermicompost: 4000, PSB: 5 },
+      msp: 1500, premiumGrade: false, exportDemand: 'Medium',
+      keyTraits: ['Late blight resistant', 'Wide adaptability', 'Good table purpose']
+    }
+  ],
+  onion: [
+    {
+      id: 'n53', name: 'N-53 (Kharif Onion)', institution: 'NHRDF / MPKV',
+      maturityDays: 100, yieldPotential: 100, seedRate: 4, spacingCm: '15×10',
+      waterRequirement: 400, irrigationCount: 8,
+      diseaseResistance: 3, pestResistance: 3, droughtTolerance: 3, floodTolerance: 2, heatTolerance: 4,
+      suitableSoils: ['Sandy Loam', 'Loamy', 'Clay Loam'],
+      suitableStates: ['Maharashtra', 'Gujarat', 'Karnataka', 'Tamil Nadu'],
+      cropRotationBonus: { soybean: 8, bajra: 6 },
+      nutrientRequirement: { N: 100, P: 50, K: 50 },
+      organicAlternatives: { FYM: 12000, vermicompost: 3000, neemCake: 400 },
+      msp: 2000, premiumGrade: false, exportDemand: 'High',
+      keyTraits: ['Flat globe shape', 'Dark red color', 'Matures early']
+    }
+  ],
+  moong: [
+    {
+      id: 'pusavishal', name: 'Pusa Vishal', institution: 'IARI, New Delhi',
+      maturityDays: 60, yieldPotential: 6, seedRate: 8, spacingCm: '30×10',
+      waterRequirement: 180, irrigationCount: 2,
+      diseaseResistance: 4, pestResistance: 3, droughtTolerance: 4, floodTolerance: 1, heatTolerance: 4,
+      suitableSoils: ['Sandy Loam', 'Loamy'],
+      suitableStates: ['Delhi', 'Punjab', 'Haryana', 'Uttar Pradesh', 'Rajasthan'],
+      cropRotationBonus: { wheat: 15, mustard: 12 },
+      nutrientRequirement: { N: 15, P: 40, K: 20 },
+      organicAlternatives: { FYM: 4000, rhizobium: 4, PSB: 3 },
+      msp: 8558, premiumGrade: false, exportDemand: 'Medium',
+      keyTraits: ['Extra short duration', 'Synchronous maturity', 'Yellow mosaic resistant']
+    }
+  ],
+  urad: [
+    {
+      id: 't9', name: 'T-9', institution: 'UPCAR, Uttar Pradesh',
+      maturityDays: 75, yieldPotential: 5, seedRate: 8, spacingCm: '30×10',
+      waterRequirement: 200, irrigationCount: 2,
+      diseaseResistance: 3, pestResistance: 3, droughtTolerance: 4, floodTolerance: 1, heatTolerance: 4,
+      suitableSoils: ['Loamy', 'Clay Loam'],
+      suitableStates: ['Uttar Pradesh', 'Madhya Pradesh', 'Rajasthan', 'Maharashtra'],
+      cropRotationBonus: { wheat: 12, mustard: 10 },
+      nutrientRequirement: { N: 15, P: 40, K: 20 },
+      organicAlternatives: { FYM: 4000, rhizobium: 4, PSB: 3 },
+      msp: 6950, premiumGrade: false, exportDemand: 'Medium',
+      keyTraits: ['Wide adaptability', 'Drought tolerant', 'Good protein content']
+    }
+  ],
+  lentil: [
+    {
+      id: 'pusavaibhav', name: 'Pusa Vaibhav', institution: 'IARI, New Delhi',
+      maturityDays: 120, yieldPotential: 6, seedRate: 15, spacingCm: '25×5',
+      waterRequirement: 180, irrigationCount: 1,
+      diseaseResistance: 4, pestResistance: 3, droughtTolerance: 4, floodTolerance: 1, heatTolerance: 3,
+      suitableSoils: ['Loamy', 'Clay Loam', 'Alluvial'],
+      suitableStates: ['Uttar Pradesh', 'Bihar', 'Madhya Pradesh', 'Rajasthan'],
+      cropRotationBonus: { rice: 12, maize: 10 },
+      nutrientRequirement: { N: 20, P: 40, K: 20 },
+      organicAlternatives: { FYM: 4000, rhizobium: 4, PSB: 3 },
+      msp: 6425, premiumGrade: false, exportDemand: 'Medium',
+      keyTraits: ['Rust resistant', 'Bold seeds', 'Nitrogen fixing']
+    }
+  ],
+  'bajra fodder': [
+    {
+      id: 'giantbajra', name: 'Giant Bajra', institution: 'IGFRI, Jhansi',
+      maturityDays: 75, yieldPotential: 35, seedRate: 6, spacingCm: '30×10',
+      waterRequirement: 250, irrigationCount: 3,
+      diseaseResistance: 4, pestResistance: 4, droughtTolerance: 4, floodTolerance: 1, heatTolerance: 4,
+      suitableSoils: ['Sandy Loam', 'Loamy'],
+      suitableStates: ['Uttar Pradesh', 'Rajasthan', 'Haryana', 'Madhya Pradesh'],
+      cropRotationBonus: { wheat: 5, gram: 7 },
+      nutrientRequirement: { N: 80, P: 40, K: 20 },
+      organicAlternatives: { FYM: 6000, azotobacter: 4 },
+      msp: 2500, premiumGrade: false, exportDemand: 'Low',
+      keyTraits: ['High green fodder yield', 'Sweet stem', 'Multi-cut potential']
+    }
+  ],
+  'jowar fodder': [
+    {
+      id: 'ssg593', name: 'SSG 59-3', institution: 'CCS HAU, Hisar',
+      maturityDays: 85, yieldPotential: 40, seedRate: 12, spacingCm: '30×10',
+      waterRequirement: 300, irrigationCount: 4,
+      diseaseResistance: 4, pestResistance: 3, droughtTolerance: 4, floodTolerance: 2, heatTolerance: 4,
+      suitableSoils: ['Loamy', 'Clay Loam', 'Sandy Loam'],
+      suitableStates: ['Haryana', 'Punjab', 'Rajasthan', 'Uttar Pradesh'],
+      cropRotationBonus: { wheat: 6, gram: 8 },
+      nutrientRequirement: { N: 80, P: 40, K: 20 },
+      organicAlternatives: { FYM: 8000, azotobacter: 4 },
+      msp: 3180, premiumGrade: false, exportDemand: 'Low',
+      keyTraits: ['Multi-cut (3-4 cuts)', 'High juicy stem', 'Excellent palatability']
+    }
+  ],
+  'maize fodder': [
+    {
+      id: 'africantall', name: 'African Tall', institution: 'MPKV, Rahuri',
+      maturityDays: 80, yieldPotential: 45, seedRate: 15, spacingCm: '30×10',
+      waterRequirement: 300, irrigationCount: 4,
+      diseaseResistance: 4, pestResistance: 3, droughtTolerance: 3, floodTolerance: 2, heatTolerance: 4,
+      suitableSoils: ['Loamy', 'Clay Loam', 'Alluvial'],
+      suitableStates: ['Maharashtra', 'Karnataka', 'Tamil Nadu', 'Gujarat'],
+      cropRotationBonus: { gram: 8, mustard: 6 },
+      nutrientRequirement: { N: 90, P: 50, K: 30 },
+      organicAlternatives: { FYM: 10000, azotobacter: 5 },
+      msp: 2090, premiumGrade: false, exportDemand: 'Low',
+      keyTraits: ['Tall growth (9-10 ft)', 'High protein fodder', 'Single cut']
+    }
   ]
 };
 
@@ -208,7 +418,21 @@ export const CROP_METADATA = {
   mustard: { season: 'Rabi', sowingWindow: 'Oct 10 – Oct 30', harvestWindow: 'Feb – Mar', idealTemp: '15-25°C', criticalStages: ['Rosette (30 DAS)', 'Flowering (55-60 DAS)', 'Siliqua Formation (80 DAS)'] },
   gram: { season: 'Rabi', sowingWindow: 'Oct 15 – Nov 15', harvestWindow: 'Feb – Mar', idealTemp: '10-25°C', criticalStages: ['Branching (30 DAS)', 'Flowering (50-55 DAS)', 'Pod Filling (75 DAS)'] },
   cotton: { season: 'Kharif', sowingWindow: 'Apr 15 – May 31', harvestWindow: 'Oct – Feb', idealTemp: '25-35°C', criticalStages: ['Squaring (45 DAS)', 'Flowering (60-70 DAS)', 'Boll Development (90-120 DAS)'] },
-  soybean: { season: 'Kharif', sowingWindow: 'Jun 20 – Jul 10', harvestWindow: 'Oct', idealTemp: '20-30°C', criticalStages: ['Flowering (35-40 DAS)', 'Pod Setting (50-55 DAS)', 'Grain Filling (65-75 DAS)'] }
+  soybean: { season: 'Kharif', sowingWindow: 'Jun 20 – Jul 10', harvestWindow: 'Oct', idealTemp: '20-30°C', criticalStages: ['Flowering (35-40 DAS)', 'Pod Setting (50-55 DAS)', 'Grain Filling (65-75 DAS)'] },
+  ragi: { season: 'Kharif', sowingWindow: 'Jun 1 – Jul 15', harvestWindow: 'Oct – Nov', idealTemp: '20-30°C', criticalStages: ['Tillering (20 DAS)', 'Flowering (55-60 DAS)', 'Grain Filling (80 DAS)'] },
+  garlic: { season: 'Rabi', sowingWindow: 'Oct 1 – Nov 15', harvestWindow: 'Feb – Mar', idealTemp: '15-25°C', criticalStages: ['Cloves development (60 DAS)', 'Bulb development (90-100 DAS)'] },
+  jowar: { season: 'Kharif/Rabi', sowingWindow: 'Jun – Jul / Oct – Nov', harvestWindow: 'Oct / Feb', idealTemp: '25-32°C', criticalStages: ['Boot stage (45 DAS)', 'Flowering (60 DAS)', 'Grain development (80 DAS)'] },
+  oat: { season: 'Rabi', sowingWindow: 'Oct 15 – Nov 15', harvestWindow: 'Feb – Mar', idealTemp: '15-20°C', criticalStages: ['Tillering (30 DAS)', 'Boot stage (60 DAS)', 'First cut (75-80 DAS)'] },
+  groundnut: { season: 'Kharif/Rabi', sowingWindow: 'Jun – Jul / Nov', harvestWindow: 'Oct / Mar', idealTemp: '22-30°C', criticalStages: ['Flowering (30-35 DAS)', 'Pegging (45-50 DAS)', 'Pod development (70-80 DAS)'] },
+  sugarcane: { season: 'Year-Round', sowingWindow: 'Jan – Feb / Oct – Nov', harvestWindow: 'Dec – Mar', idealTemp: '20-35°C', criticalStages: ['Tillering (60-120 DAS)', 'Grand growth (120-270 DAS)', 'Maturity (270-360 DAS)'] },
+  potato: { season: 'Rabi', sowingWindow: 'Oct 15 – Nov 10', harvestWindow: 'Feb', idealTemp: '15-20°C', criticalStages: ['Stolon formation (30 DAS)', 'Tuber initiation (45 DAS)', 'Tuber bulking (60-80 DAS)'] },
+  onion: { season: 'Kharif/Rabi', sowingWindow: 'Jun / Nov', harvestWindow: 'Oct / Mar', idealTemp: '15-25°C', criticalStages: ['Bulb initiation (50-60 DAS)', 'Bulb development (80-90 DAS)'] },
+  moong: { season: 'Zaid/Kharif', sowingWindow: 'Mar – Apr / Jun', harvestWindow: 'Jun / Sep', idealTemp: '25-35°C', criticalStages: ['Flowering (30 DAS)', 'Pod filling (45 DAS)'] },
+  urad: { season: 'Zaid/Kharif', sowingWindow: 'Mar – Apr / Jun', harvestWindow: 'Jun / Sep', idealTemp: '25-35°C', criticalStages: ['Flowering (30 DAS)', 'Pod filling (45 DAS)'] },
+  lentil: { season: 'Rabi', sowingWindow: 'Oct 15 – Nov 15', harvestWindow: 'Mar', idealTemp: '15-20°C', criticalStages: ['Flowering (50-55 DAS)', 'Pod filling (75-80 DAS)'] },
+  'bajra fodder': { season: 'Zaid/Kharif', sowingWindow: 'Mar – Apr / Jun', harvestWindow: 'Jun / Sep', idealTemp: '25-35°C', criticalStages: ['Vegetative growth (45 DAS)', 'First cut (60 DAS)'] },
+  'jowar fodder': { season: 'Zaid/Kharif', sowingWindow: 'Mar – Apr / Jun', harvestWindow: 'Jun / Sep', idealTemp: '25-35°C', criticalStages: ['Vegetative growth (45 DAS)', 'First cut (65 DAS)'] },
+  'maize fodder': { season: 'Zaid/Kharif', sowingWindow: 'Mar – Apr / Jun', harvestWindow: 'Jun / Sep', idealTemp: '20-30°C', criticalStages: ['Vegetative growth (45 DAS)', 'First cut (60 DAS)'] }
 };
 
 // ── Disease & Pest intelligence (weather-triggered) ───────────────────

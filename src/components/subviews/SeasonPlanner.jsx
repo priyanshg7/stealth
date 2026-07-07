@@ -117,6 +117,7 @@ export default function SeasonPlanner({
 
   const [gpsLoading, setGpsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
+  const [recommendationError, setRecommendationError] = useState(null);
   const [selectedVariety, setSelectedVariety] = useState(null);
   const [isFarmerSelected, setIsFarmerSelected] = useState(false);
   const [varietyMismatchWarning, setVarietyMismatchWarning] = useState(null);
@@ -253,6 +254,7 @@ export default function SeasonPlanner({
   const handleGenerateRecommendations = async () => {
     setIsGenerating(true);
     setVarietyMismatchWarning(null);
+    setRecommendationError(null);
     setIsFarmerSelected(!!formFields.preferredVariety);
 
     const crop = formFields.cropName.toLowerCase();
@@ -292,69 +294,114 @@ export default function SeasonPlanner({
           badges: v.badges || ['Recommended']
         };
       });
-    } else {
-      // Fallback to local ICAR database
-      console.log(`[SeasonPlanner] Gemini API quota limit/error. Using local ICAR recommendations database for ${crop}.`);
-      const rankedRaw = generateRecommendations(crop, activeFarm, profile, weatherData, null);
+
+      // Ensure we slice to top 3
+      finalRecommendations = finalRecommendations.slice(0, 3);
+      setRecommendations(finalRecommendations);
+      const selected = finalRecommendations[0];
+      setSelectedVariety(selected);
       
-      if (rankedRaw && rankedRaw.length > 0) {
-        finalRecommendations = mapRecommendationsToUi(rankedRaw, areaVal);
-        
-        // If farmer selected a specific variety, ensure it's at the top
-        if (formFields.preferredVariety) {
-          const prefLower = formFields.preferredVariety.toLowerCase();
-          const matchedIdx = finalRecommendations.findIndex(v => v.name.toLowerCase().includes(prefLower));
-          if (matchedIdx > 0) {
-            const matched = finalRecommendations.splice(matchedIdx, 1)[0];
-            finalRecommendations.unshift(matched);
-          } else if (matchedIdx === -1) {
-            // Variety not in database, we should still evaluate it using a mock entry based on top recommendation
-            const mockEntry = {
-               ...finalRecommendations[0],
-               id: 'custom-' + Date.now(),
-               name: formFields.preferredVariety,
-               description: `Custom farmer-selected variety. Evaluated based on baseline parameters for ${crop}.`,
-               badges: ['Farmer Selected']
-            };
-            finalRecommendations.unshift(mockEntry);
-          }
-        }
-      } else {
-         // Failsafe for crops not in database
-         console.warn(`[SeasonPlanner] Crop ${crop} not found in local database.`);
-         const genericRec = {
-           id: 'generic-' + Date.now(),
-           name: formFields.preferredVariety || `Standard ${formFields.cropName} Variety`,
-           description: `Standard regional choice for ${formFields.cropName} matching typical local weather patterns.`,
-           profitPerAcre: 40000,
-           whyThisTemplate: `This variety is a standard recommendation for ${formFields.cropName} given local configurations.`,
-           sowingMonth: 'November',
-           duration: '120 days',
-           water: '400 mm',
-           diseaseResistance: 'Medium',
-           marketDemand: 'Standard',
-           maturity: 'Medium',
-           suitableSoil: activeFarm.soil.type,
-           price: '₹2,100/Qtl',
-           yield: '20 Qtl/Acre',
-           badges: ['Best Fit'],
-           yieldPotential: 20,
-           livePrice: 2100,
-           seedRate: 40
-         };
-         finalRecommendations = [genericRec];
-      }
+      // Set common costs
+      const baseYield = selected.yieldPotential;
+      const basePrice = selected.livePrice;
+
+      setCosts({
+        seed: Math.round(areaVal * (40 * 45)),
+        fertilizer: Math.round(areaVal * 2500),
+        pesticide: Math.round(areaVal * 1200),
+        irrigation: Math.round(areaVal * 1000),
+        labor: Math.round(areaVal * 3200),
+        machinery: Math.round(areaVal * 2000),
+        transportation: Math.round(areaVal * 800),
+        misc: Math.round(areaVal * 600),
+        expectedPrice: basePrice,
+        expectedYield: baseYield
+      });
+
+      setIsGenerating(false);
+      setStep('recommendations');
+      setViewingActivePlan(false);
+    } else {
+      // Pause and ask user for retry or local fallback
+      setIsGenerating(false);
+      setRecommendationError({
+        message: 'AI Service Rate Limited (Quota Exceeded)',
+        description: 'The Gemini AI variety recommendation engine returned a rate-limiting response (429). Silently falling back to generic placeholder templates is disabled to ensure data transparency.'
+      });
+      setStep('recommendations');
+      setViewingActivePlan(false);
     }
-    
+  };
+
+  const handleUseLocalFallback = () => {
+    setRecommendationError(null);
+    const crop = formFields.cropName.toLowerCase();
+    const activeFarm = farms[selectedFarmIndex] || {
+      soil: { type: formFields.soilType || 'Loamy' },
+      water: { sources: [formFields.irrigationSource?.toLowerCase() || 'borewell'] },
+      area: formFields.area || '5',
+      state: profile?.state || 'Maharashtra',
+      district: profile?.district || 'Nashik'
+    };
+    const areaVal = parseFloat(formFields.area) || 5.0;
+
+    console.log(`[SeasonPlanner] Gemini failed or bypassed. Querying local ICAR variety database for ${crop}.`);
+    const rankedRaw = generateRecommendations(crop, activeFarm, profile, weatherData, null);
+    let finalRecommendations = [];
+
+    if (rankedRaw && rankedRaw.length > 0) {
+      finalRecommendations = mapRecommendationsToUi(rankedRaw, areaVal);
+      
+      // If farmer selected a specific variety, ensure it's at the top
+      if (formFields.preferredVariety) {
+        const prefLower = formFields.preferredVariety.toLowerCase();
+        const matchedIdx = finalRecommendations.findIndex(v => v.name.toLowerCase().includes(prefLower));
+        if (matchedIdx > 0) {
+          const matched = finalRecommendations.splice(matchedIdx, 1)[0];
+          finalRecommendations.unshift(matched);
+        } else if (matchedIdx === -1) {
+          // Variety not in database, we should still evaluate it using a mock entry based on top recommendation
+          const mockEntry = {
+             ...finalRecommendations[0],
+             id: 'custom-' + Date.now(),
+             name: formFields.preferredVariety,
+             description: `Custom farmer-selected variety. Evaluated based on baseline parameters for ${crop}.`,
+             badges: ['Farmer Selected']
+          };
+          finalRecommendations.unshift(mockEntry);
+        }
+      }
+    } else {
+       // Failsafe for custom typed-in crops that do not exist locally either
+       console.warn(`[SeasonPlanner] Crop ${crop} not found in local database.`);
+       const genericRec = {
+         id: 'generic-' + Date.now(),
+         name: formFields.preferredVariety || `Standard ${formFields.cropName} Variety`,
+         description: `Standard regional choice for ${formFields.cropName} matching typical local weather patterns.`,
+         profitPerAcre: 40000,
+         whyThisTemplate: `This variety is a standard recommendation for ${formFields.cropName} given local configurations.`,
+         sowingMonth: 'November',
+         duration: '120 days',
+         water: '400 mm',
+         diseaseResistance: 'Medium',
+         marketDemand: 'Standard',
+         maturity: 'Medium',
+         suitableSoil: activeFarm.soil.type,
+         price: '₹2,100/Qtl',
+         yield: '20 Qtl/Acre',
+         badges: ['Best Fit'],
+         yieldPotential: 20,
+         livePrice: 2100,
+         seedRate: 40
+       };
+       finalRecommendations = [genericRec];
+    }
+
     // Ensure we slice to top 3
     finalRecommendations = finalRecommendations.slice(0, 3);
     setRecommendations(finalRecommendations);
     const selected = finalRecommendations[0];
     setSelectedVariety(selected);
-    
-    // Set common costs
-    const baseYield = selected.yieldPotential;
-    const basePrice = selected.livePrice;
 
     setCosts({
       seed: Math.round(areaVal * (40 * 45)),
@@ -365,13 +412,11 @@ export default function SeasonPlanner({
       machinery: Math.round(areaVal * 2000),
       transportation: Math.round(areaVal * 800),
       misc: Math.round(areaVal * 600),
-      expectedPrice: basePrice,
-      expectedYield: baseYield
+      expectedPrice: selected.livePrice,
+      expectedYield: selected.yieldPotential
     });
 
-    setIsGenerating(false);
     setStep('recommendations');
-    setViewingActivePlan(false);
   };
 
 
@@ -1021,9 +1066,41 @@ export default function SeasonPlanner({
                     onChange={(e) => handleInputChange('cropName', e.target.value)}
                     className="w-full bg-[#f0f4f9] border border-transparent rounded-xl p-3 pr-10 text-xs font-semibold focus:outline-none focus:bg-white focus:border-primary appearance-none cursor-pointer text-on-surface"
                   >
-                    <option value="wheat">Wheat (गेहूं)</option>
-                    <option value="rice">Rice (धान)</option>
-                    <option value="maize">Maize (मक्का)</option>
+                    <optgroup label="── Cereals ──">
+                      <option value="wheat">Wheat (गेहूं)</option>
+                      <option value="rice">Rice (धान)</option>
+                      <option value="maize">Maize (मक्का)</option>
+                      <option value="bajra">Bajra (Pearl Millet)</option>
+                      <option value="jowar">Jowar (Sorghum)</option>
+                      <option value="ragi">Ragi (Finger Millet)</option>
+                      <option value="barley">Barley (Jau)</option>
+                      <option value="oat">Oat (Jai)</option>
+                    </optgroup>
+                    <optgroup label="── Pulses ──">
+                      <option value="gram">Gram / Chickpea (Chana)</option>
+                      <option value="lentil">Lentil (Masoor)</option>
+                      <option value="moong">Green Gram (Moong)</option>
+                      <option value="urad">Black Gram (Urad)</option>
+                    </optgroup>
+                    <optgroup label="── Oilseeds ──">
+                      <option value="soybean">Soybean</option>
+                      <option value="groundnut">Groundnut (Mungfali)</option>
+                      <option value="mustard">Mustard (Sarson)</option>
+                    </optgroup>
+                    <optgroup label="── Cash Crops ──">
+                      <option value="cotton">Cotton (Kapas)</option>
+                      <option value="sugarcane">Sugarcane (Ganna)</option>
+                    </optgroup>
+                    <optgroup label="── Vegetables ──">
+                      <option value="potato">Potato (Aloo)</option>
+                      <option value="onion">Onion (Pyaaz)</option>
+                      <option value="garlic">Garlic (Lahsun)</option>
+                    </optgroup>
+                    <optgroup label="── Fodder & Cover Crops ──">
+                      <option value="bajra fodder">Bajra Fodder</option>
+                      <option value="jowar fodder">Jowar Fodder</option>
+                      <option value="maize fodder">Maize Fodder</option>
+                    </optgroup>
                   </select>
                   <div className="absolute right-3 top-3 pointer-events-none text-on-surface-variant/80">
                     <Mic className="w-4 h-4" />
@@ -1307,7 +1384,7 @@ export default function SeasonPlanner({
       )}
 
       {/* ================= PAGE 2: CROP VARIETY RECOMMENDATIONS ================= */}
-      {step === 'recommendations' && recommendations && (
+      {step === 'recommendations' && (recommendations || recommendationError) && (
         <div className="space-y-6 animate-fade-in-up">
           <div className="flex items-center justify-between">
             <button
@@ -1324,93 +1401,119 @@ export default function SeasonPlanner({
                 Crop Recommendations
               </h3>
             </div>
-            <span className="bg-primary-container/10 border border-primary/20 text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase">
-              {recommendations.length} Varieties Evaluated
-            </span>
+            {recommendations && (
+              <span className="bg-primary-container/10 border border-primary/20 text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase">
+                {recommendations.length} Varieties Evaluated
+              </span>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {recommendations.map((v) => {
-              const isBestFit = v.badges.includes('Best Fit');
-              const estimatedProfitValue = Math.round(v.profitPerAcre * calculatedArea);
-              return (
-                <div 
-                  key={v.id}
-                  onClick={() => handleSelectVariety(v)}
-                  className={`cursor-pointer rounded-card border p-6 flex flex-col justify-between h-auto min-h-[450px] bg-white transition-all relative ${
-                    isBestFit 
-                      ? 'border-2 border-[#0c8a47] ring-1 ring-[#0c8a47]/20 shadow-md translate-y-[-2px]' 
-                      : 'border-outline-variant/60 hover:border-[#0c8a47]/40 hover:shadow-md'
-                  }`}
+          {recommendationError ? (
+            <div className="bg-white border border-outline-variant/60 rounded-3xl p-8 shadow-sm flex flex-col items-center justify-center py-16 space-y-4">
+              <AlertCircle className="w-12 h-12 text-red-500" />
+              <h4 className="text-lg font-bold text-on-surface">{recommendationError.message}</h4>
+              <p className="text-sm text-on-surface-variant max-w-md text-center font-medium">
+                {recommendationError.description}
+              </p>
+              <div className="flex gap-4 pt-2">
+                <button 
+                  onClick={handleGenerateRecommendations}
+                  className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold text-sm flex items-center gap-2 hover:bg-primary-hover shadow-sm transition-all"
                 >
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-start w-full">
-                      <h4 className="font-display font-extrabold text-lg text-on-surface">{v.name}</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {v.badges.map(b => (
-                          <span key={b} className={`text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                            b === 'Best Fit' ? 'bg-[#0c8a47] text-white' : 'bg-surface-container text-on-surface-variant border'
-                          }`}>
-                            {b}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-on-surface-variant leading-relaxed">
-                      {v.description}
-                    </p>
-
-                    {/* Estimated Net Profit Row */}
-                    <div className="space-y-1 bg-surface-container-low/40 p-2.5 rounded-xl border border-outline-variant/30">
-                      <span className="text-[10px] text-on-surface-variant font-bold flex items-center gap-1.5">
-                        <TrendingUp className="w-4 h-4 text-on-surface-variant" /> Estimated Net Profit
-                      </span>
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-2xl font-black text-[#0c8a47]">₹{estimatedProfitValue.toLocaleString()}</span>
-                        <span className="text-[11px] text-on-surface-variant font-bold">for {calculatedArea} {formFields.unit}</span>
-                      </div>
-                    </div>
-
-                    {/* Key Technical Details Grid */}
-                    <div className="grid grid-cols-2 gap-2 text-[10px] border-y border-outline-variant/40 py-2.5 font-bold text-on-surface-variant">
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Est. Yield</span> <span className="text-on-surface font-extrabold">{v.yield}</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Duration</span> <span className="text-on-surface font-extrabold">{v.duration}</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Water Req.</span> <span className="text-on-surface font-extrabold">{v.water}</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Disease Resist.</span> <span className="text-on-surface font-extrabold truncate block">{v.diseaseResistance}</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Maturity</span> <span className="text-on-surface font-extrabold">{v.maturity}</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Soil Type</span> <span className="text-on-surface font-extrabold">{v.suitableSoil}</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Sells Price</span> <span className="text-[#0c8a47] font-black">{v.price}</span></div>
-                      <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Market Demand</span> <span className="text-on-surface font-extrabold">{v.marketDemand}</span></div>
-                    </div>
-
-                    {/* Dynamic Agronomist "Why this?" text */}
-                    <div className="text-[11px] leading-relaxed text-on-surface-variant h-[90px] overflow-y-auto pr-1">
-                      <strong className="text-on-surface text-xs font-bold block mb-0.5">Why this?</strong>
-                      {v.whyThisTemplate ? getDynamicWhyThis(v.whyThisTemplate) : (
-                        <ul className="list-disc pl-4 space-y-1 text-on-surface-variant font-medium">
-                          {(v.explanations || []).map((exp, eIdx) => (
-                            <li key={eIdx}>{exp}</li>
+                  <RefreshCw className="w-4 h-4" /> Retry AI Analysis
+                </button>
+                <button 
+                  onClick={handleUseLocalFallback}
+                  className="px-6 py-2.5 rounded-xl bg-[#0c8a47] text-white hover:bg-[#096a36] font-bold text-sm flex items-center gap-2 shadow-xs transition-all"
+                >
+                  <Layers className="w-4 h-4 text-white" /> Use Local ICAR Fallback
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {recommendations.map((v) => {
+                const isBestFit = v.badges.includes('Best Fit');
+                const estimatedProfitValue = Math.round(v.profitPerAcre * calculatedArea);
+                return (
+                  <div 
+                    key={v.id}
+                    onClick={() => handleSelectVariety(v)}
+                    className={`cursor-pointer rounded-card border p-6 flex flex-col justify-between h-auto min-h-[450px] bg-white transition-all relative ${
+                      isBestFit 
+                        ? 'border-2 border-[#0c8a47] ring-1 ring-[#0c8a47]/20 shadow-md translate-y-[-2px]' 
+                        : 'border-outline-variant/60 hover:border-[#0c8a47]/40 hover:shadow-md'
+                    }`}
+                  >
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start w-full">
+                        <h4 className="font-display font-extrabold text-lg text-on-surface">{v.name}</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {v.badges.map(b => (
+                            <span key={b} className={`text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                              b === 'Best Fit' ? 'bg-[#0c8a47] text-white' : 'bg-surface-container text-on-surface-variant border'
+                            }`}>
+                              {b}
+                            </span>
                           ))}
-                        </ul>
-                      )}
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-on-surface-variant leading-relaxed">
+                        {v.description}
+                      </p>
+
+                      {/* Estimated Net Profit Row */}
+                      <div className="space-y-1 bg-surface-container-low/40 p-2.5 rounded-xl border border-outline-variant/30">
+                        <span className="text-[10px] text-on-surface-variant font-bold flex items-center gap-1.5">
+                          <TrendingUp className="w-4 h-4 text-on-surface-variant" /> Estimated Net Profit
+                        </span>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-2xl font-black text-[#0c8a47]">₹{estimatedProfitValue.toLocaleString()}</span>
+                          <span className="text-[11px] text-on-surface-variant font-bold">for {calculatedArea} {formFields.unit}</span>
+                        </div>
+                      </div>
+
+                      {/* Key Technical Details Grid */}
+                      <div className="grid grid-cols-2 gap-2 text-[10px] border-y border-outline-variant/40 py-2.5 font-bold text-on-surface-variant">
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Est. Yield</span> <span className="text-on-surface font-extrabold">{v.yield}</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Duration</span> <span className="text-on-surface font-extrabold">{v.duration}</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Water Req.</span> <span className="text-on-surface font-extrabold">{v.water}</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Disease Resist.</span> <span className="text-on-surface font-extrabold truncate block">{v.diseaseResistance}</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Maturity</span> <span className="text-on-surface font-extrabold">{v.maturity}</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Soil Type</span> <span className="text-on-surface font-extrabold">{v.suitableSoil}</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Sells Price</span> <span className="text-[#0c8a47] font-black">{v.price}</span></div>
+                        <div><span className="text-[8px] text-on-surface-variant/80 uppercase block">Market Demand</span> <span className="text-on-surface font-extrabold">{v.marketDemand}</span></div>
+                      </div>
+
+                      {/* Dynamic Agronomist "Why this?" text */}
+                      <div className="text-[11px] leading-relaxed text-on-surface-variant h-[90px] overflow-y-auto pr-1">
+                        <strong className="text-on-surface text-xs font-bold block mb-0.5">Why this?</strong>
+                        {v.whyThisTemplate ? getDynamicWhyThis(v.whyThisTemplate) : (
+                          <ul className="list-disc pl-4 space-y-1 text-on-surface-variant font-medium">
+                            {(v.explanations || []).map((exp, eIdx) => (
+                              <li key={eIdx}>{exp}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="pt-3">
+                      <button
+                        onClick={() => handleSelectVariety(v)}
+                        type="button"
+                        className="w-full bg-[#0c8a47] hover:bg-[#096a36] text-white text-xs font-black py-3 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-xs"
+                      >
+                        <Check className="w-4 h-4 text-white" />
+                        <span>View Complete Action Plan</span>
+                      </button>
                     </div>
                   </div>
-
-                  <div className="pt-3">
-                    <button
-                      onClick={() => handleSelectVariety(v)}
-                      type="button"
-                      className="w-full bg-[#0c8a47] hover:bg-[#096a36] text-white text-xs font-black py-3 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-xs"
-                    >
-                      <Check className="w-4 h-4 text-white" />
-                      <span>View Complete Action Plan</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
