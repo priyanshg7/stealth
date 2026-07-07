@@ -9,6 +9,11 @@ logger = logging.getLogger("kisanmitra_backend")
 
 # Retrieve API key dynamically
 import os
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 API_KEY = os.environ.get("GEMINI_API_KEY")
 
 class GeminiService:
