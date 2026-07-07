@@ -479,33 +479,39 @@ Return ONLY a JSON array of exactly 3 objects (no markdown blocks, no text befor
   return await callAIRouter(prompt);
 }
 
-/**
- * Robustly calls AI API to generate a detailed, farm-specific disease treatment plan.
- * Used by the Disease Diagnosis module to wrap the ONNX prediction with AI reasoning.
- */
 export async function generateDiseaseTreatmentPlan(crop, disease, areaAcres, weather, location) {
   const prompt = `You are an expert plant pathologist and agronomist in India. 
 The farmer is growing "${crop}" in "${location}" on a farm of size ${areaAcres} Acres.
 The deep learning model has diagnosed the crop with: "${disease}".
-Current weather conditions: ${weather?.current?.temp || 30}°C with ${weather?.current?.humidityMorning || 60}% humidity.
+Current weather conditions: ${weather?.current?.temp || 30}°C, ${weather?.current?.humidityMorning || 60}% humidity, ${weather?.forecast?.[0]?.rainProbability || 0}% rain probability.
 
 Create a highly detailed, scientific, and farm-specific treatment plan.
-For all treatments (organic and inorganic), calculate the EXACT ESTIMATED QUANTITIES required for a ${areaAcres} Acre farm.
+For all treatments (organic and inorganic), calculate the EXACT ESTIMATED QUANTITIES required for a ${areaAcres} Acre farm (e.g., product quantity, water quantity, number of spray tanks).
 
 Return ONLY a raw JSON object with these exact keys. Do NOT include markdown blocks like \`\`\`json.
-- "description": 2-3 sentences explaining what this disease is, why it occurred (factor in the weather), and how severe it is.
-- "symptoms": an array of 3-5 strings detailing key symptoms to look out for.
-- "inorganicCure": an object with:
-    - "name": generic chemical name + common brand names (e.g. "Propiconazole 25% EC (Tilt)").
-    - "application": detailed instructions including the exact quantity required to spray ${areaAcres} Acres (e.g., "Mix 1 Litre in 200 Litres of water for 2 acres").
-    - "warning": safety precautions in red.
-- "organicCure": an object with:
-    - "name": e.g. "Neem Oil 10000 ppm" or "Trichoderma viride".
-    - "application": exact quantity required for ${areaAcres} Acres.
-    - "warning": any limitations (e.g. "Less effective in severe outbreaks").
-- "schedule": an array of 2 objects representing a 2-week treatment plan. Each object must have:
-    - "week": string (e.g. "Week 1", "Week 2")
-    - "activity": string detailing the required action (e.g. "Apply inorganic spray", "Monitor for new spots")`;
+- "diagnosisSummary": object with keys: "diseaseName", "confidence" ("High"/"Medium"/"Low"), "severity" ("Low"/"Moderate"/"Severe"/"Critical"), "immediateAction" (1 short sentence), "canRecover" (short string like "Yes, with timely action").
+- "diseaseProfile": object with keys: "scientificName", "category" (e.g. "Fungal", "Bacterial", "Pest"), "affectedCropStage", "likelyCauses", "environmentalConditions", "spreadMethod", "earlySymptoms" (array of strings), "advancedSymptoms" (array of strings), "affectedParts", "economicImpact", "expectedYieldLoss", "recoveryExpectations".
+- "treatments": object with keys "inorganic" and "organic". Each is an array of treatment objects (provide at least 1-2 per category). Each treatment object MUST have keys:
+    - "productName": string (e.g. "Propiconazole 25% EC", "Neem Oil 10000 ppm").
+    - "activeIngredient": string.
+    - "purpose": string.
+    - "whyRecommended": string.
+    - "dosagePerAcre": string.
+    - "dosagePerLitreWater": string (if applicable).
+    - "totalQuantityForFarm": string (calculated for ${areaAcres} acres, e.g. "500 ml mixed in 200 Litres of water").
+    - "applicationMethod": string.
+    - "bestTiming": string (e.g. "Early morning or late evening").
+    - "numberOfApplications": string.
+    - "interval": string (e.g. "10-15 days").
+    - "precautions": array of strings.
+    - "safetyEquipment": array of strings.
+    - "preHarvestInterval": string.
+    - "irrigationConsiderations": string.
+    - "compatibility": string.
+    - "warnings": array of strings.
+- "schedule": an array of 4-6 objects representing the timeline. Each object must have keys: "stage" (e.g. "Immediate Action", "Follow-up", "Preventive"), "activity" (detailed explanation), "estimatedDate" (e.g. "Today", "Day 3", "Day 10"), "priorityLevel" ("High", "Medium", "Low").
+- "riskAssessment": object with keys: "weatherImpact" (e.g. "High humidity favors spread"), "shouldMonitor" (boolean), "explanation" (detailed string analyzing current temp/humidity vs disease).
+- "preventionAndBestPractices": array of objects, each with "title" (e.g. "Crop Rotation") and "description" (detailed string).`;
 
   return await callAIRouter(prompt);
 }
