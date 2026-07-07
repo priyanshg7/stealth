@@ -92,18 +92,18 @@ export default function Sidebar({
           bg-white border-r border-outline-variant/60 shadow-2xl
           transform transition-[width,transform] duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:static lg:translate-x-0 flex-shrink-0 h-screen
-          ${sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'}
-          w-[85vw] max-w-[320px] lg:w-72
+          lg:static lg:translate-x-0 flex-shrink-0 h-[100dvh]
+          w-[85vw] max-w-[320px]
+          ${sidebarCollapsed ? 'lg:w-[80px]' : 'lg:w-[280px]'}
         `}
       >
         {/* ── HEADER: Logo / Profile ── */}
         <div
-          className={`flex items-center border-b border-surface-container-high bg-gradient-to-br from-primary/5 to-transparent transition-all duration-300 overflow-hidden whitespace-nowrap
-            ${sidebarCollapsed ? 'lg:justify-center p-4 lg:gap-0' : 'p-4 gap-3'}`}
+          className={`flex items-center border-b border-surface-container-high bg-gradient-to-br from-primary/5 to-transparent transition-all duration-300 flex-shrink-0 overflow-hidden whitespace-nowrap
+            ${sidebarCollapsed ? 'p-4 lg:p-0 lg:h-[80px] lg:justify-center' : 'p-4 gap-3'}`}
         >
           {/* Avatar always visible */}
-          <div className="relative flex-shrink-0">
+          <div className="relative flex-shrink-0 flex items-center justify-center lg:w-[80px] lg:h-[80px]">
             <div className="w-10 h-10 rounded-full bg-primary/10 border-2 border-primary overflow-hidden flex items-center justify-center font-bold text-primary text-base">
               {profile.photo ? (
                 <img src={profile.photo} alt={profile.name} className="w-full h-full object-cover" />
@@ -111,11 +111,11 @@ export default function Sidebar({
                 <span>{profile.name ? profile.name[0] : 'R'}</span>
               )}
             </div>
-            <span className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 rounded-full border-2 border-white" />
+            <span className="absolute bottom-4 right-4 lg:bottom-[22px] lg:right-[22px] h-3 w-3 bg-green-500 rounded-full border-2 border-white" />
           </div>
 
           {/* Name + location — fades out when collapsed on desktop */}
-          <div className={`transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:hidden' : 'flex-1 opacity-100 w-auto min-w-0'}`}>
+          <div className={`transition-all duration-300 overflow-hidden flex flex-col justify-center ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'flex-1 opacity-100 w-auto min-w-0 pr-4'}`}>
             <h4 className="font-display font-bold text-on-surface text-sm leading-tight truncate">
               {profile.name || 'Ramesh Ji'}
             </h4>
@@ -142,7 +142,11 @@ export default function Sidebar({
         </div>
 
         {/* ── NAVIGATION ── */}
-        <nav ref={navRef} className="flex-1 overflow-y-auto py-3 space-y-0.5 no-scrollbar">
+        <nav 
+          ref={navRef} 
+          className="flex-1 overflow-y-auto overflow-x-hidden py-3 space-y-0.5 scroll-smooth
+          [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-outline-variant/30 hover:[&::-webkit-scrollbar-thumb]:bg-outline-variant/60 [&::-webkit-scrollbar-track]:bg-transparent"
+        >
           {NAV_ITEMS.map(item => {
             const isActive = activeDashboardTab === item.id;
             return (
@@ -151,31 +155,38 @@ export default function Sidebar({
                 onClick={() => handleNavClick(item.id)}
                 title={sidebarCollapsed ? tr(item.label, language) : undefined}
                 className={`
-                  w-full flex items-center font-semibold text-[15px] transition-all duration-300 whitespace-nowrap overflow-hidden min-h-[48px]
-                  ${sidebarCollapsed
-                    ? 'lg:justify-center px-4 py-3.5 justify-start gap-4 lg:gap-0'
-                    : 'px-4 py-3.5 gap-4'
-                  }
+                  w-full flex items-center font-semibold text-[15px] transition-colors duration-200 whitespace-nowrap overflow-hidden relative
                   ${isActive 
-                    ? 'bg-primary/10 text-primary border-l-4 border-primary' 
-                    : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface border-l-4 border-transparent'
+                    ? 'bg-primary/10 text-primary' 
+                    : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface'
                   }
                 `}
               >
-                <span className={`material-symbols-outlined text-xl flex-shrink-0 transition-all duration-300 ${isActive ? 'fill' : ''}`}>
-                  {item.icon}
-                </span>
-                <span className={`text-left truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:hidden' : 'flex-1 opacity-100 w-auto'}`}>
-                  {tr(item.label, language)}
-                </span>
-                {item.badge && item.badge > 0 && (
-                  <span className={`bg-primary text-white font-bold text-xs px-1.5 py-0.5 rounded-full transition-all duration-300 ${sidebarCollapsed ? 'lg:hidden' : 'flex-shrink-0 opacity-100'}`}>
-                    {item.badge}
+                {/* Active Indicator Line */}
+                <div className={`absolute left-0 top-0 bottom-0 w-1 transition-all duration-300 ${isActive ? 'bg-primary' : 'bg-transparent'}`} />
+
+                {/* Fixed width icon wrapper to ensure perfect centering */}
+                <div className="w-14 lg:w-[80px] h-12 flex-shrink-0 flex items-center justify-center">
+                  <span className={`material-symbols-outlined text-xl transition-all duration-300 ${isActive ? 'fill' : ''}`}>
+                    {item.icon}
                   </span>
-                )}
+                </div>
+                
+                {/* Text and Badge Container */}
+                <div className={`flex items-center justify-between transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'flex-1 opacity-100 pr-4'}`}>
+                  <span className="text-left truncate">
+                    {tr(item.label, language)}
+                  </span>
+                  {item.badge > 0 && (
+                    <span className="bg-primary text-white font-bold text-xs px-2 py-0.5 rounded-full flex-shrink-0 ml-2">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+
                 {/* Collapsed badge dot */}
-                {item.badge && item.badge > 0 && sidebarCollapsed && (
-                  <span className="hidden lg:block absolute right-2 top-2 h-2 w-2 bg-primary rounded-full" />
+                {item.badge > 0 && sidebarCollapsed && (
+                  <span className="hidden lg:block absolute right-[22px] top-[10px] h-2 w-2 bg-primary rounded-full shadow-sm ring-2 ring-white" />
                 )}
               </button>
             );
@@ -183,17 +194,21 @@ export default function Sidebar({
         </nav>
 
         {/* ── FOOTER: JWT Inspector + Sign Out ── */}
-        <div className={`border-t border-surface-container-high bg-white transition-all duration-300 p-3 space-y-1 overflow-hidden whitespace-nowrap`}>
+        <div className={`border-t border-surface-container-high bg-white transition-all duration-300 flex-shrink-0 overflow-hidden whitespace-nowrap space-y-1
+          ${sidebarCollapsed ? 'p-2 lg:p-0 lg:py-2' : 'p-3'}`}
+        >
           {/* JWT Inspector (only when token exists) */}
           {jwtToken && (
             <button
               onClick={() => setShowJwtInspector && setShowJwtInspector(true)}
               title={sidebarCollapsed ? 'Inspect JWT' : undefined}
-              className={`w-full flex items-center gap-3 p-2.5 rounded-xl font-semibold text-xs text-[#006e2d] bg-[#f0fdf4] hover:bg-[#dcfce7] border border-[#bbf7d0] transition-colors min-h-[48px]
-                ${sidebarCollapsed ? 'lg:justify-center' : ''}`}
+              className={`w-full flex items-center font-semibold text-xs text-[#006e2d] bg-[#f0fdf4] hover:bg-[#dcfce7] transition-colors rounded-xl overflow-hidden relative
+                ${sidebarCollapsed ? 'lg:rounded-none lg:bg-transparent lg:hover:bg-surface-container-low' : 'border border-[#bbf7d0]'}`}
             >
-              <Cpu className="w-4 h-4 flex-shrink-0" />
-              <span className={`truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:hidden' : 'opacity-100 w-auto'}`}>
+              <div className="w-12 lg:w-[80px] h-12 flex-shrink-0 flex items-center justify-center">
+                <Cpu className="w-4 h-4" />
+              </div>
+              <span className={`text-left truncate transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'flex-1 opacity-100 pr-3'}`}>
                 Inspect JWT
               </span>
             </button>
@@ -214,11 +229,13 @@ export default function Sidebar({
               localStorage.removeItem('km_season_confirmed');
             }}
             title={sidebarCollapsed ? 'Sign Out' : undefined}
-            className={`w-full flex items-center gap-3 p-2.5 rounded-xl font-bold text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors min-h-[48px]
-              ${sidebarCollapsed ? 'lg:justify-center' : ''}`}
+            className={`w-full flex items-center font-bold text-sm text-red-600 transition-colors rounded-xl overflow-hidden relative
+              ${sidebarCollapsed ? 'hover:bg-red-50 lg:rounded-none lg:hover:bg-red-50' : 'hover:bg-red-50 hover:text-red-700'}`}
           >
-            <span className="material-symbols-outlined text-lg flex-shrink-0">logout</span>
-            <span className={`truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:hidden' : 'opacity-100 w-auto'}`}>
+            <div className="w-12 lg:w-[80px] h-12 flex-shrink-0 flex items-center justify-center">
+              <span className="material-symbols-outlined text-lg">logout</span>
+            </div>
+            <span className={`text-left truncate transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'flex-1 opacity-100 pr-3'}`}>
               {tr("Sign Out / Reset", language)}
             </span>
           </button>

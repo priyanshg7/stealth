@@ -12,6 +12,27 @@ import { generateCropSchedule } from '../../utils/farmScheduleEngine';
 
 // Hardcoded CROP_VARIETIES and DEFAULT_VARIETY_DATA have been removed to use real-time AI recommendations.
 
+const FALLBACK_VARIETY = {
+  id: 'generic',
+  name: 'Standard Regional Variety',
+  description: 'Standard regional choice matching typical local weather patterns and soil specifications.',
+  profitPerAcre: 40000,
+  whyThisTemplate: 'This variety is a standard recommendation given local configurations.',
+  sowingMonth: 'November',
+  duration: '120 days',
+  water: '400 mm',
+  diseaseResistance: 'Medium',
+  marketDemand: 'Standard',
+  maturity: 'Medium',
+  suitableSoil: 'Alluvial / Clay Loam',
+  price: '₹2,100/Qtl',
+  yield: '20 Qtl/Acre',
+  badges: ['Best Fit'],
+  yieldPotential: 20,
+  livePrice: 2100,
+  seedRate: 40
+};
+
 
 export default function SeasonPlanner({
   profile,
@@ -334,7 +355,7 @@ export default function SeasonPlanner({
       const activeFarm = farms[selectedFarmIndex];
       const rankedRaw = generateRecommendations(cropKey, activeFarm, profile, weatherData, null);
       const ranked = mapRecommendationsToUi(rankedRaw, parseFloat(activeFarm.area) || 2.5);
-      const foundVariety = ranked.find(v => v.name.toLowerCase().includes(activeCrop.variety.toLowerCase())) || ranked[0] || DEFAULT_VARIETY_DATA[0];
+      const foundVariety = ranked.find(v => v.name.toLowerCase().includes(activeCrop.variety.toLowerCase())) || ranked[0] || FALLBACK_VARIETY;
       setSelectedVariety(foundVariety);
       setStep('plan');
       setViewingActivePlan(true);
@@ -349,7 +370,7 @@ export default function SeasonPlanner({
       const activeFarm = farms[selectedFarmIndex];
       const rankedRaw = generateRecommendations(cropKey, activeFarm, profile, weatherData, null);
       const ranked = mapRecommendationsToUi(rankedRaw, parseFloat(activeFarm.area) || 2.5);
-      const foundVariety = ranked.find(v => v.name.toLowerCase().includes(pastCrop.variety.toLowerCase())) || ranked[0] || DEFAULT_VARIETY_DATA[0];
+      const foundVariety = ranked.find(v => v.name.toLowerCase().includes(pastCrop.variety.toLowerCase())) || ranked[0] || FALLBACK_VARIETY;
       setSelectedVariety(foundVariety);
       setStep('plan');
       setViewingActivePlan(false);

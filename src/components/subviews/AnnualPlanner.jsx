@@ -144,7 +144,7 @@ export default function AnnualPlanner({
             yieldPotential: yieldVal,
             seedRate: 40,
             spacingCm: '20×5',
-            waterRequirement: 350,
+            waterRequirement: v.waterRequirement || 350,
             irrigationCount: 4,
             diseaseResistance: 4,
             pestResistance: 3,
@@ -159,8 +159,8 @@ export default function AnnualPlanner({
             msp: mspVal,
             livePrice: mspVal,
             projectedProfit,
-            badges: ['Gemini AI Recommended', 'Optimal Fit'],
-            cropName: currentSeason === 'Kharif' ? 'Rice' : (currentSeason === 'Rabi' ? 'Wheat' : 'Maize'),
+            badges: Array.isArray(v.badges) ? v.badges : ['Gemini AI Recommended', 'Optimal Fit'],
+            cropName: v.cropName || (currentSeason === 'Kharif' ? 'Rice' : (currentSeason === 'Rabi' ? 'Wheat' : 'Maize')),
             suitabilityScore: 90 - idx * 5
           };
         });

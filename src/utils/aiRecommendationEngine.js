@@ -332,7 +332,18 @@ export const GEMINI_API_KEY = "AQ.Ab8RN6KTwDMI44Z6rXa6oTq6aeVFloKdC2L1thkHZnLFyD
  */
 export async function getGeminiVarieties(season, state, soil, water) {
   try {
-    const prompt = `You are a crop scientist. For a farm in state: "${state}", with soil: "${soil}", water sources: "${water}", and season: "${season}", suggest 3 best crop varieties. Return ONLY a JSON array of 3 objects with keys: name, description, duration (in days), yield (in Qtl/Acre), price (in Rs/Qtl). Keep descriptions brief.`;
+    const prompt = `You are an expert crop scientist in India. 
+For a farm in state: "${state}", with soil: "${soil}", water sources: "${water}", and season: "${season}", suggest the 3 best crop varieties to plant for maximum profit.
+
+Return ONLY a JSON array of exactly 3 objects. Each object MUST have these exact keys:
+- "name": full name of the variety.
+- "cropName": the general crop name (e.g. "Wheat", "Rice", "Maize").
+- "description": 2-3 sentences explaining its traits and why it fits this farm.
+- "duration": e.g. "120 days".
+- "yield": e.g. "24".
+- "price": e.g. "2200".
+- "waterRequirement": e.g. 350 (integer in mm).
+- "badges": an array of 2 strings like "Gemini Recommended", "High Profit", "Water Efficient".`;
     
     const body = {
       contents: [{ parts: [{ text: prompt }] }],
