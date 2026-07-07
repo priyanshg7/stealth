@@ -30,14 +30,21 @@ export default function AnnualPlanner({
   setSeasonPlanConfirmed
 }) {
   const activeFarm = farms[selectedFarmIndex];
+  const hasActivePlan = !!activeFarm?.crop?.confirmedPlan;
 
   // ── Step State ──────────────────────────────────────────────────────
   // 'active-overview' | 'setup' | 'wizard' | 'strategy' | 'history'
   const [step, setStep] = useState(() => {
-    return (seasonPlanConfirmed && activeFarm?.crop?.confirmedPlan)
-      ? 'active-overview'
-      : 'setup';
+    return hasActivePlan ? 'active-overview' : 'setup';
   });
+
+  useEffect(() => {
+    if (hasActivePlan) {
+      setStep('active-overview');
+    } else if (step === 'active-overview') {
+      setStep('setup');
+    }
+  }, [selectedFarmIndex, hasActivePlan]);
   
   const [viewingHistoryPlan, setViewingHistoryPlan] = useState(false);
   const [historyPlanData, setHistoryPlanData] = useState(null);
@@ -614,7 +621,7 @@ export default function AnnualPlanner({
       {/* ── 1. SETUP PAGE ─────────────────────────────────────────────────── */}
       {step === 'setup' && (
         <div className="space-y-6">
-          {seasonPlanConfirmed && (
+          {hasActivePlan && (
             <div className="bg-warning-container/30 border border-warning/30 rounded-xl p-4 flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
               <div>

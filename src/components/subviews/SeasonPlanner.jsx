@@ -4,7 +4,8 @@ import {
   MapPin, ShoppingBag, Droplet, Layers, Sprout, 
   TrendingUp, ShieldAlert, FileText, Settings, Award, ArrowLeft,
   ChevronRight, RefreshCw, FileCheck, Clock, Mic, Compass,
-  ChevronDown, ChevronUp, Users, Wrench, Shield, DollarSign, CheckCircle2
+  ChevronDown, ChevronUp, Users, Wrench, Shield, DollarSign, CheckCircle2,
+  CheckSquare, Activity, ClipboardList, AlertTriangle
 } from 'lucide-react';
 import { generateRecommendations, getGeminiVarietiesForCrop } from '../../utils/aiRecommendationEngine';
 import { calculateNutrientPlan, parseSoilData } from '../../data/soilNutrientEngine';
@@ -46,11 +47,20 @@ export default function SeasonPlanner({
   setActiveDashboardTab,
   weatherData
 }) {
+  const activeFarm = farms[selectedFarmIndex];
+  const hasActivePlan = !!activeFarm?.crop?.confirmedPlan;
+
   const [step, setStep] = useState(() => {
-    return (seasonPlanConfirmed && farms[selectedFarmIndex]?.crop?.confirmedPlan) 
-      ? 'active-overview' 
-      : 'input';
+    return hasActivePlan ? 'active-overview' : 'input';
   }); // 'active-overview' | 'input' | 'recommendations' | 'plan' | 'history'
+
+  useEffect(() => {
+    if (hasActivePlan) {
+      setStep('active-overview');
+    } else if (step === 'active-overview') {
+      setStep('input');
+    }
+  }, [selectedFarmIndex, hasActivePlan]);
   const [activeTab, setActiveTab] = useState('saved'); // 'saved' | 'manual'
   const [selectedSavedFarmId, setSelectedSavedFarmId] = useState('');
   const [viewingActivePlan, setViewingActivePlan] = useState(false);
@@ -655,7 +665,6 @@ export default function SeasonPlanner({
     setStep('active-overview');
   };
 
-  const activeFarm = farms[selectedFarmIndex];
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12 animate-fade-in-up font-sans text-on-surface">
@@ -699,7 +708,7 @@ export default function SeasonPlanner({
         </div>
         
         {/* Clickable Green Banner box */}
-        {seasonPlanConfirmed && (
+        {hasActivePlan && (
           <div 
             onClick={handleViewActivePlan}
             className="cursor-pointer hover:bg-white/20 transition-all bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 flex flex-col items-center justify-center text-center flex-shrink-0 md:w-56 animate-fade-in"
@@ -866,7 +875,7 @@ export default function SeasonPlanner({
       {step === 'input' && (
         <div className="space-y-6 animate-fade-in-up">
           
-          {seasonPlanConfirmed && (
+          {hasActivePlan && (
             <div className="bg-warning-container/30 border border-warning/30 rounded-xl p-4 flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
               <div>
@@ -1389,7 +1398,7 @@ export default function SeasonPlanner({
               </span>
             )}
             
-            {!viewingActivePlan && seasonPlanConfirmed && (
+            {!viewingActivePlan && hasActivePlan && (
               <span className="text-xs bg-yellow-100 text-yellow-800 font-extrabold py-1.5 px-3 rounded-full border border-yellow-200">
                 New Plan Draft (Not Yet Implemented)
               </span>
