@@ -829,7 +829,7 @@ export default function SeasonPlanner({
       {step === 'history' && (
         <div className="space-y-6 animate-fade-in-up">
           <div className="flex items-center gap-3">
-            <button onClick={() => setStep('active-overview')} className="p-2 bg-surface-container rounded-full hover:bg-surface-container-high">
+            <button onClick={() => setStep(hasActivePlan ? 'active-overview' : 'input')} className="p-2 bg-surface-container rounded-full hover:bg-surface-container-high">
               <ArrowLeft className="w-5 h-5 text-on-surface" />
             </button>
             <h2 className="font-display font-extrabold text-2xl text-on-surface">Plan History</h2>
