@@ -217,6 +217,9 @@ export default function DashboardShell({
            {activeDashboardTab === 'diagnosis' && (
             <DiseaseDiagnosis 
               weatherData={weatherData}
+              farms={farms}
+              setFarms={setFarms}
+              selectedFarmIndex={selectedFarmIndex}
               activeFarm={farms[selectedFarmIndex]}
             />
           )}

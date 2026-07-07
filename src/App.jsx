@@ -1015,7 +1015,7 @@ export default function App() {
         tasks
       };
     }
-    const cropId = farm.crop?.name || 'wheat';
+    const cropId = (farm.crop?.name || 'wheat').toLowerCase();
     const cropDetails = CROPS.find(c => c.id === cropId) || { name: 'Wheat', icon: '🌾' };
     const cropStage = farm.crop?.stage || 'Vegetative / Growth';
     
@@ -1516,7 +1516,7 @@ Instructions:
       else if (navToken === 'tasks') setActiveDashboardTab('tasks');
       else if (navToken.startsWith('switch_')) {
         const targetCrop = navToken.replace('switch_', '');
-        const idx = farms.findIndex(f => f.crop?.name === targetCrop);
+        const idx = farms.findIndex(f => f.crop?.name?.toLowerCase() === targetCrop.toLowerCase());
         if (idx !== -1) {
           setSelectedFarmIndex(idx);
           setActiveDashboardTab('dashboard');

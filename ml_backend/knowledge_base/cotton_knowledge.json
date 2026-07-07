@@ -1,0 +1,385 @@
+{
+    "american_bollworm": {
+        "disease_name": "American Bollworm",
+        "scientific_name": "American Bollworm pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Cotton.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "anthracnose": {
+        "disease_name": "Anthracnose",
+        "scientific_name": "Anthracnose pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Cotton.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "aphid": {
+        "disease_name": "Aphid",
+        "scientific_name": "Aphid pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Cotton.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "bacterial_blight": {
+        "disease_name": "Bacterial Blight",
+        "scientific_name": "Bacterial Blight pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Cotton.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "bollworm": {
+        "disease_name": "Bollworm",
+        "scientific_name": "Bollworm pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Cotton.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "healthy": {
+        "disease_name": "Healthy",
+        "scientific_name": "N/A",
+        "pathogen_type": "None",
+        "symptoms": [
+            "No visible symptoms",
+            "Vigorous growth"
+        ],
+        "cause": "Optimal conditions",
+        "spread_method": "None",
+        "crop_stage_affected": "All",
+        "risk_level": "None",
+        "organic_treatment": "Continue regular maintenance and observation.",
+        "chemical_treatment": "None required.",
+        "recommended_products": [
+            "Standard NPK Fertilizers",
+            "Neem Oil (preventative)"
+        ],
+        "dosage_per_acre": 0.0,
+        "water_requirement_liters_per_acre": 0.0,
+        "estimated_recovery_time_days": 0,
+        "preventive_measures": [
+            "Crop rotation",
+            "Maintain soil health",
+            "Proper spacing"
+        ],
+        "safety_precautions": "Standard farming safety.",
+        "references": [
+            "KisanMitra Internal Best Practices"
+        ]
+    },
+    "leaf_curl": {
+        "disease_name": "Leaf Curl",
+        "scientific_name": "Leaf Curl pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Cotton.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "mealy_bug": {
+        "disease_name": "Mealy Bug",
+        "scientific_name": "Mealy Bug pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Cotton.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "pink_bollworm": {
+        "disease_name": "Pink Bollworm",
+        "scientific_name": "Pink Bollworm pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Cotton.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "red_bug": {
+        "disease_name": "Red Bug",
+        "scientific_name": "Red Bug pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Cotton.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "thrips": {
+        "disease_name": "Thrips",
+        "scientific_name": "Thrips pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Cotton.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "whitefly": {
+        "disease_name": "Whitefly",
+        "scientific_name": "Whitefly pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Cotton.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    }
+}

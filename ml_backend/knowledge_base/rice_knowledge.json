@@ -1,0 +1,162 @@
+{
+    "bacterial_blight": {
+        "disease_name": "Bacterial Blight",
+        "scientific_name": "Bacterial Blight pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Rice.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "brown_spot": {
+        "disease_name": "Brown Spot",
+        "scientific_name": "Brown Spot pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Rice.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "leaf_blast": {
+        "disease_name": "Leaf Blast",
+        "scientific_name": "Leaf Blast pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Rice.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "leaf_smut": {
+        "disease_name": "Leaf Smut",
+        "scientific_name": "Leaf Smut pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Rice.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "tungro": {
+        "disease_name": "Tungro",
+        "scientific_name": "Tungro pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Rice.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    }
+}

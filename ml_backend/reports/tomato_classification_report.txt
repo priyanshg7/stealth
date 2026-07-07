@@ -1,0 +1,16 @@
+                        precision    recall  f1-score   support
+
+        bacterial_spot     1.0000    0.9969    0.9984       318
+          early_blight     1.0000    0.9733    0.9865       150
+               healthy     1.0000    1.0000    1.0000       236
+           late_blight     0.9862    1.0000    0.9930       285
+             leaf_mold     1.0000    1.0000    1.0000       143
+          mosaic_virus     1.0000    1.0000    1.0000        56
+    septoria_leaf_spot     0.9925    1.0000    0.9963       266
+          spider_mites     1.0000    1.0000    1.0000       251
+           target_spot     1.0000    0.9953    0.9976       211
+yellow_leaf_curl_virus     1.0000    1.0000    1.0000       800
+
+              accuracy                         0.9978      2716
+             macro avg     0.9979    0.9965    0.9972      2716
+          weighted avg     0.9978    0.9978    0.9978      2716

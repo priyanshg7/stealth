@@ -1,0 +1,10 @@
+crop: corn
+batch_size: 32
+learning_rate: 0.001
+epochs: 50
+image_size: 224
+num_classes: 4
+model_architecture: efficientnet_b0
+pretrained: true
+metadata_path: data/processed/metadata.csv
+checkpoint_dir: models/checkpoints/corn/

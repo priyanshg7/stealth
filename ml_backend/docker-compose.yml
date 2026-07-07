@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  inference-api:
+    build: .
+    container_name: kisanmitra-inference-engine
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+    environment:
+      - WORKERS=4
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 1G

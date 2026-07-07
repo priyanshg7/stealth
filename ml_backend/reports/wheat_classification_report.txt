@@ -1,0 +1,17 @@
+                precision    recall  f1-score   support
+
+         aphid     0.9167    0.7586    0.8302        29
+    black_rust     0.8077    0.9130    0.8571        23
+     flag_smut     1.0000    0.9167    0.9565        12
+       healthy     0.9500    0.8636    0.9048        22
+   leaf_blight     0.8400    0.8077    0.8235        26
+     leaf_rust     1.0000    1.0000    1.0000        13
+          mite     0.9259    0.9259    0.9259        27
+powdery_mildew     0.7931    0.7667    0.7797        30
+          scab     0.8333    1.0000    0.9091        15
+      stem_fly     0.8462    1.0000    0.9167        22
+   yellow_rust     1.0000    1.0000    1.0000        13
+
+      accuracy                         0.8836       232
+     macro avg     0.9012    0.9048    0.9003       232
+  weighted avg     0.8871    0.8836    0.8827       232

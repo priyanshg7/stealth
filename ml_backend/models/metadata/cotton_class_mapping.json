@@ -1,0 +1,14 @@
+{
+    "american_bollworm": 0,
+    "anthracnose": 1,
+    "aphid": 2,
+    "bacterial_blight": 3,
+    "bollworm": 4,
+    "healthy": 5,
+    "leaf_curl": 6,
+    "mealy_bug": 7,
+    "pink_bollworm": 8,
+    "red_bug": 9,
+    "thrips": 10,
+    "whitefly": 11
+}

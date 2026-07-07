@@ -11,6 +11,13 @@ export default defineConfig({
         target: 'http://localhost:3001',
         changeOrigin: true,
         secure: false
+      },
+      // Proxy /ml-api requests to the local Python ML pipeline
+      '/ml-api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/ml-api/, '/api')
       }
     }
   }

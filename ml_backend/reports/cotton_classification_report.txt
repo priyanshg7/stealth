@@ -1,0 +1,18 @@
+                   precision    recall  f1-score   support
+
+american_bollworm     0.8333    0.7143    0.7692         7
+      anthracnose     1.0000    0.2500    0.4000         4
+            aphid     0.9677    0.9375    0.9524        32
+ bacterial_blight     0.9286    1.0000    0.9630        39
+         bollworm     0.0000    0.0000    0.0000         1
+          healthy     1.0000    0.9787    0.9892        47
+        leaf_curl     1.0000    1.0000    1.0000        36
+        mealy_bug     0.7857    0.8462    0.8148        13
+    pink_bollworm     1.0000    1.0000    1.0000         3
+          red_bug     1.0000    1.0000    1.0000        10
+           thrips     0.5714    0.8000    0.6667         5
+         whitefly     0.5000    0.5714    0.5333         7
+
+         accuracy                         0.9265       204
+        macro avg     0.7989    0.7582    0.7574       204
+     weighted avg     0.9293    0.9265    0.9224       204

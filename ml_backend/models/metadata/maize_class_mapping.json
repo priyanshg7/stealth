@@ -1,0 +1,9 @@
+{
+    "armyworm": 0,
+    "common_rust": 1,
+    "ear_rot": 2,
+    "fall_armyworm": 3,
+    "gray_leaf_spot": 4,
+    "healthy": 5,
+    "stem_borer": 6
+}

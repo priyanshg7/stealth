@@ -1,0 +1,138 @@
+[
+    {
+        "crop": "corn",
+        "version": "1.0.0",
+        "architecture": "efficientnet_b0",
+        "image_size": 224,
+        "accuracy": 0.9827,
+        "f1_score": 0.9758,
+        "classes": [
+            "common_rust",
+            "gray_leaf_spot",
+            "healthy",
+            "northern_leaf_blight"
+        ],
+        "export_date": "2026-07-04T02:06:03.411452",
+        "model_path": "models/onnx/corn_classifier.onnx"
+    },
+    {
+        "crop": "cotton",
+        "version": "1.0.0",
+        "architecture": "efficientnet_b0",
+        "image_size": 224,
+        "accuracy": 0.9265,
+        "f1_score": 0.7574,
+        "classes": [
+            "american_bollworm",
+            "anthracnose",
+            "aphid",
+            "bacterial_blight",
+            "bollworm",
+            "healthy",
+            "leaf_curl",
+            "mealy_bug",
+            "pink_bollworm",
+            "red_bug",
+            "thrips",
+            "whitefly"
+        ],
+        "export_date": "2026-07-04T02:06:10.794622",
+        "model_path": "models/onnx/cotton_classifier.onnx"
+    },
+    {
+        "crop": "maize",
+        "version": "1.0.0",
+        "architecture": "efficientnet_b0",
+        "image_size": 224,
+        "accuracy": 0.8509,
+        "f1_score": 0.8062,
+        "classes": [
+            "armyworm",
+            "common_rust",
+            "ear_rot",
+            "fall_armyworm",
+            "gray_leaf_spot",
+            "healthy",
+            "stem_borer"
+        ],
+        "export_date": "2026-07-04T02:06:17.806936",
+        "model_path": "models/onnx/maize_classifier.onnx"
+    },
+    {
+        "crop": "potato",
+        "version": "1.0.0",
+        "architecture": "efficientnet_b0",
+        "image_size": 224,
+        "accuracy": 1.0,
+        "f1_score": 1.0,
+        "classes": [
+            "early_blight",
+            "healthy",
+            "late_blight"
+        ],
+        "export_date": "2026-07-04T02:06:25.053897",
+        "model_path": "models/onnx/potato_classifier.onnx"
+    },
+    {
+        "crop": "rice",
+        "version": "1.0.0",
+        "architecture": "efficientnet_b0",
+        "image_size": 224,
+        "accuracy": 0.9858,
+        "f1_score": 0.9276,
+        "classes": [
+            "bacterial_blight",
+            "brown_spot",
+            "leaf_blast",
+            "leaf_smut",
+            "tungro"
+        ],
+        "export_date": "2026-07-04T02:06:33.377905",
+        "model_path": "models/onnx/rice_classifier.onnx"
+    },
+    {
+        "crop": "tomato",
+        "version": "1.0.0",
+        "architecture": "efficientnet_b0",
+        "image_size": 224,
+        "accuracy": 0.9978,
+        "f1_score": 0.9972,
+        "classes": [
+            "bacterial_spot",
+            "early_blight",
+            "healthy",
+            "late_blight",
+            "leaf_mold",
+            "mosaic_virus",
+            "septoria_leaf_spot",
+            "spider_mites",
+            "target_spot",
+            "yellow_leaf_curl_virus"
+        ],
+        "export_date": "2026-07-04T02:06:41.373420",
+        "model_path": "models/onnx/tomato_classifier.onnx"
+    },
+    {
+        "crop": "wheat",
+        "version": "1.0.0",
+        "architecture": "efficientnet_b3",
+        "image_size": 256,
+        "accuracy": 0.8836,
+        "f1_score": 0.9003,
+        "classes": [
+            "aphid",
+            "black_rust",
+            "flag_smut",
+            "healthy",
+            "leaf_blight",
+            "leaf_rust",
+            "mite",
+            "powdery_mildew",
+            "scab",
+            "stem_fly",
+            "yellow_rust"
+        ],
+        "export_date": "2026-07-04T02:06:53.394561",
+        "model_path": "models/onnx/wheat_classifier.onnx"
+    }
+]

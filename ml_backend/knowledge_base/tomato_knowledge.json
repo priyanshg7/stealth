@@ -1,0 +1,321 @@
+{
+    "bacterial_spot": {
+        "disease_name": "Bacterial Spot",
+        "scientific_name": "Bacterial Spot pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Tomato.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "early_blight": {
+        "disease_name": "Early Blight",
+        "scientific_name": "Early Blight pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Tomato.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "healthy": {
+        "disease_name": "Healthy",
+        "scientific_name": "N/A",
+        "pathogen_type": "None",
+        "symptoms": [
+            "No visible symptoms",
+            "Vigorous growth"
+        ],
+        "cause": "Optimal conditions",
+        "spread_method": "None",
+        "crop_stage_affected": "All",
+        "risk_level": "None",
+        "organic_treatment": "Continue regular maintenance and observation.",
+        "chemical_treatment": "None required.",
+        "recommended_products": [
+            "Standard NPK Fertilizers",
+            "Neem Oil (preventative)"
+        ],
+        "dosage_per_acre": 0.0,
+        "water_requirement_liters_per_acre": 0.0,
+        "estimated_recovery_time_days": 0,
+        "preventive_measures": [
+            "Crop rotation",
+            "Maintain soil health",
+            "Proper spacing"
+        ],
+        "safety_precautions": "Standard farming safety.",
+        "references": [
+            "KisanMitra Internal Best Practices"
+        ]
+    },
+    "late_blight": {
+        "disease_name": "Late Blight",
+        "scientific_name": "Late Blight pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Tomato.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "leaf_mold": {
+        "disease_name": "Leaf Mold",
+        "scientific_name": "Leaf Mold pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Tomato.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "mosaic_virus": {
+        "disease_name": "Mosaic Virus",
+        "scientific_name": "Mosaic Virus pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Tomato.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "septoria_leaf_spot": {
+        "disease_name": "Septoria Leaf Spot",
+        "scientific_name": "Septoria Leaf Spot pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Tomato.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "spider_mites": {
+        "disease_name": "Spider Mites",
+        "scientific_name": "Spider Mites pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Tomato.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "target_spot": {
+        "disease_name": "Target Spot",
+        "scientific_name": "Target Spot pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Tomato.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    },
+    "yellow_leaf_curl_virus": {
+        "disease_name": "Yellow Leaf Curl Virus",
+        "scientific_name": "Yellow Leaf Curl Virus pathogen spec.",
+        "pathogen_type": "Fungal / Bacterial / Viral (Pending Agronomist Review)",
+        "symptoms": [
+            "Lesions on leaves",
+            "Discoloration",
+            "Stunted growth"
+        ],
+        "cause": "High humidity, infected soil, or pests.",
+        "spread_method": "Wind, water splash, or insect vectors.",
+        "crop_stage_affected": "Vegetative to Fruiting",
+        "risk_level": "Moderate to High",
+        "organic_treatment": "Apply organic neem-based solutions or copper fungicides. Remove infected plant parts.",
+        "chemical_treatment": "Spray broad-spectrum fungicide or bactericide approved for Tomato.",
+        "recommended_products": [
+            "Product A",
+            "Product B"
+        ],
+        "dosage_per_acre": 1.5,
+        "water_requirement_liters_per_acre": 150.0,
+        "estimated_recovery_time_days": 14,
+        "preventive_measures": [
+            "Avoid overhead watering",
+            "Use resistant varieties",
+            "Clear plant debris"
+        ],
+        "safety_precautions": "Wear PPE when spraying. Observe pre-harvest intervals.",
+        "references": [
+            "Agricultural Extension Guidelines"
+        ]
+    }
+}

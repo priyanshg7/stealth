@@ -332,10 +332,11 @@ export const GROQ_API_KEY = "gsk_mESOaiB7fg1Vh15CQS1EWGdyb3FYp3IJzii1IPptiVkvbUf
  */
 function cleanJsonResponse(text) {
   let cleaned = text.trim();
-  if (cleaned.startsWith('```')) {
-    cleaned = cleaned.replace(/^```json\s*/i, '').replace(/```$/, '').trim();
-  }
-  return cleaned;
+  // Remove starting markdown
+  cleaned = cleaned.replace(/^```(?:json)?\s*/i, '');
+  // Remove ending markdown (and any trailing spaces/newlines)
+  cleaned = cleaned.replace(/\s*```\s*$/i, '');
+  return cleaned.trim();
 }
 
 /**
@@ -478,4 +479,33 @@ Return ONLY a JSON array of exactly 3 objects (no markdown blocks, no text befor
   return await callAIRouter(prompt);
 }
 
+/**
+ * Robustly calls AI API to generate a detailed, farm-specific disease treatment plan.
+ * Used by the Disease Diagnosis module to wrap the ONNX prediction with AI reasoning.
+ */
+export async function generateDiseaseTreatmentPlan(crop, disease, areaAcres, weather, location) {
+  const prompt = `You are an expert plant pathologist and agronomist in India. 
+The farmer is growing "${crop}" in "${location}" on a farm of size ${areaAcres} Acres.
+The deep learning model has diagnosed the crop with: "${disease}".
+Current weather conditions: ${weather?.current?.temp || 30}°C with ${weather?.current?.humidityMorning || 60}% humidity.
 
+Create a highly detailed, scientific, and farm-specific treatment plan.
+For all treatments (organic and inorganic), calculate the EXACT ESTIMATED QUANTITIES required for a ${areaAcres} Acre farm.
+
+Return ONLY a raw JSON object with these exact keys. Do NOT include markdown blocks like \`\`\`json.
+- "description": 2-3 sentences explaining what this disease is, why it occurred (factor in the weather), and how severe it is.
+- "symptoms": an array of 3-5 strings detailing key symptoms to look out for.
+- "inorganicCure": an object with:
+    - "name": generic chemical name + common brand names (e.g. "Propiconazole 25% EC (Tilt)").
+    - "application": detailed instructions including the exact quantity required to spray ${areaAcres} Acres (e.g., "Mix 1 Litre in 200 Litres of water for 2 acres").
+    - "warning": safety precautions in red.
+- "organicCure": an object with:
+    - "name": e.g. "Neem Oil 10000 ppm" or "Trichoderma viride".
+    - "application": exact quantity required for ${areaAcres} Acres.
+    - "warning": any limitations (e.g. "Less effective in severe outbreaks").
+- "schedule": an array of 2 objects representing a 2-week treatment plan. Each object must have:
+    - "week": string (e.g. "Week 1", "Week 2")
+    - "activity": string detailing the required action (e.g. "Apply inorganic spray", "Monitor for new spots")`;
+
+  return await callAIRouter(prompt);
+}
