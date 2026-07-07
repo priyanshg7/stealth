@@ -682,7 +682,7 @@ export default function App() {
   }, [selectedFarmIndex, farms.length, profile?.state, profile?.district]);
 
   // Gemini API & Speech Recognition States
-  const GROQ_API_KEY = "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";
+  const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
   const [isListening, setIsListening] = useState(false);
   const [translatedDashboardData, setTranslatedDashboardData] = useState(null);
   const [translating, setTranslating] = useState(false);

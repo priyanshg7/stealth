@@ -929,7 +929,7 @@ Guidelines:
       const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer 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`,
+          'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
