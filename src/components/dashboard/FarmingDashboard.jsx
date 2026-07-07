@@ -86,7 +86,7 @@ export default function FarmingDashboard({
 
         {/* Horizontal Farm Swapper */}
         <div className="space-y-2">
-          <span className="text-xs md:text-sm text-on-surface-variant font-bold uppercase tracking-wider block">My Farm Profiles</span>
+          <span className="text-xs md:text-sm text-on-surface-variant font-bold uppercase tracking-wider block">{t("My Farm Profiles", language)}</span>
           <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-2 -mx-4 px-4 md:mx-0 md:px-0">
             {farms.map((f, i) => (
               <button
@@ -135,7 +135,7 @@ export default function FarmingDashboard({
               <Sparkles className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-on-surface">Start Your Farming Journey</h2>
+              <h2 className="text-lg font-black text-on-surface">{t("Start Your Farming Journey", language)}</h2>
               <p className="text-xs text-on-surface-variant font-semibold mt-1">
                 Plan your seasons before you sow! Let AI guide your farm's schedule, predict diseases, analyze market prices, and optimize watering cycles.
               </p>
@@ -147,7 +147,7 @@ export default function FarmingDashboard({
             <div className="bg-white p-5 rounded-2xl border border-outline-variant hover:border-primary/50 transition-all shadow-xs space-y-3 flex flex-col justify-between">
               <div>
                 <span className="text-[11px] md:text-xs text-primary font-black uppercase tracking-wider">Recommended workflow</span>
-                <h3 className="font-extrabold text-base text-on-surface mt-1">Create Annual Farm Plan</h3>
+                <h3 className="font-extrabold text-base text-on-surface mt-1">{t("Create Annual Farm Plan", language)}</h3>
                 <p className="text-xs text-on-surface-variant font-medium mt-1">
                   Plan your entire year across Kharif, Rabi, and Zaid seasons. Auto-calculates optimal crop rotations to replenish soil nutrients.
                 </p>
@@ -168,7 +168,7 @@ export default function FarmingDashboard({
             <div className="bg-white p-5 rounded-2xl border border-outline-variant hover:border-primary/50 transition-all shadow-xs space-y-3 flex flex-col justify-between">
               <div>
                 <span className="text-[11px] md:text-xs text-on-surface-variant font-black uppercase tracking-wider">Single crop cycle</span>
-                <h3 className="font-extrabold text-base text-on-surface mt-1">Create Seasonal Plan</h3>
+                <h3 className="font-extrabold text-base text-on-surface mt-1">{t("Create Seasonal Plan", language)}</h3>
                 <p className="text-xs text-on-surface-variant font-medium mt-1">
                   Quickly set up a schedule for a single season. Generates localized irrigation alerts, weather advisory, and weekly diagnostics.
                 </p>
@@ -211,7 +211,7 @@ export default function FarmingDashboard({
       {dashboardData && (
         <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-xs space-y-2">
           <h2 className="text-sm font-extrabold text-on-surface uppercase tracking-wider text-primary flex items-center gap-1.5">
-            <BadgeInfo size={16} /> Daily Farm Advisor Overview
+            <BadgeInfo size={16} /> {t("Daily Farm Advisor Overview", language)}
           </h2>
           <p className="text-sm font-medium leading-relaxed text-on-surface-variant">
             Your crop is progressing <strong className="text-primary">normally</strong> and is healthy. 
