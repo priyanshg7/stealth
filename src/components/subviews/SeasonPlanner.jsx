@@ -4,7 +4,7 @@ import {
   MapPin, ShoppingBag, Droplet, Layers, Sprout, 
   TrendingUp, ShieldAlert, FileText, Settings, Award, ArrowLeft,
   ChevronRight, RefreshCw, FileCheck, Clock, Mic, Compass,
-  ChevronDown, ChevronUp, Users, Wrench, Shield, DollarSign
+  ChevronDown, ChevronUp, Users, Wrench, Shield, DollarSign, CheckCircle2
 } from 'lucide-react';
 import { generateRecommendations, getGeminiVarietiesForCrop } from '../../utils/aiRecommendationEngine';
 import { calculateNutrientPlan, parseSoilData } from '../../data/soilNutrientEngine';
