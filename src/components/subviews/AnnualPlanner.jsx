@@ -202,7 +202,15 @@ export default function AnnualPlanner({
   const [activeSeasonTab, setActiveSeasonTab] = useState('Kharif');
   const [activeStrategyWorkspace, setActiveStrategyWorkspace] = useState('overview');
   const [nutrientMode, setNutrientMode] = useState('conventional');
-  const [savedPlansHistory, setSavedPlansHistory] = useState(() => JSON.parse(localStorage.getItem('km_annual_plans_history') || '[]'));
+  const [savedPlansHistory, setSavedPlansHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem('km_annual_plans_history');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.warn("Failed to parse km_annual_plans_history", e);
+      return [];
+    }
+  });
 
   // ── Handlers ────────────────────────────────────────────────────────
   const handleStartWizard = () => {
@@ -389,21 +397,24 @@ export default function AnnualPlanner({
 
     const updatedFarms = [...farms];
     if (updatedFarms[selectedFarmIndex]) {
+      updatedFarms[selectedFarmIndex] = { ...updatedFarms[selectedFarmIndex] };
       // Archive old crop if present
       const oldCrop = updatedFarms[selectedFarmIndex].crop;
       if (oldCrop && oldCrop.name) {
-        if (!updatedFarms[selectedFarmIndex].cropHistory) {
-          updatedFarms[selectedFarmIndex].cropHistory = [];
-        }
-        const isDuplicate = updatedFarms[selectedFarmIndex].cropHistory.some(
+        let newCropHistory = updatedFarms[selectedFarmIndex].cropHistory 
+          ? [...updatedFarms[selectedFarmIndex].cropHistory] 
+          : [];
+          
+        const isDuplicate = newCropHistory.some(
           h => h.name === oldCrop.name && h.sowingDate === oldCrop.sowingDate
         );
         if (!isDuplicate) {
-          updatedFarms[selectedFarmIndex].cropHistory.push({
+          newCropHistory = [...newCropHistory, {
             ...oldCrop,
             archivedAt: new Date().toISOString()
-          });
+          }];
         }
+        updatedFarms[selectedFarmIndex].cropHistory = newCropHistory;
       }
 
       updatedFarms[selectedFarmIndex].crop = {
@@ -641,9 +652,18 @@ export default function AnnualPlanner({
                 <Sparkles className="w-3.5 h-3.5" />
                 Master Farm Assistant
               </span>
-              <h2 className="font-display font-black text-3xl text-on-surface mt-4 tracking-tight">
-                Plan Your Farming Year
-              </h2>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4">
+                <h2 className="font-display font-black text-3xl text-on-surface tracking-tight">
+                  Plan Your Farming Year
+                </h2>
+                <button
+                  onClick={() => setStep('history')}
+                  className="bg-white/80 hover:bg-white text-primary border border-primary/20 font-extrabold px-4 py-2 rounded-xl text-xs transition-all flex items-center gap-2 shadow-sm"
+                >
+                  <ClipboardList className="w-4 h-4" />
+                  Plan History
+                </button>
+              </div>
               <p className="text-sm text-on-surface-variant font-medium mt-2 max-w-xl leading-relaxed">
                 Establish an intelligent crop rotation, monthly activities, and resource budgets for the entire year. We'll guide you step-by-step.
               </p>

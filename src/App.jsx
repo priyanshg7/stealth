@@ -609,7 +609,7 @@ export default function App() {
         const updated = [...prevFarms];
         const activeFarm = updated[selectedFarmIndex];
         if (activeFarm && activeFarm.crop?.confirmedPlan?.tasks) {
-          activeFarm.crop.confirmedPlan.tasks = activeFarm.crop.confirmedPlan.tasks.map((t) => {
+          const updatedTasks = activeFarm.crop.confirmedPlan.tasks.map((t) => {
             const isCompleted = next.includes(t.id);
             return {
               ...t,
@@ -617,6 +617,17 @@ export default function App() {
               completedAt: isCompleted ? (t.completedAt || new Date().toISOString()) : null
             };
           });
+
+          updated[selectedFarmIndex] = {
+            ...activeFarm,
+            crop: {
+              ...activeFarm.crop,
+              confirmedPlan: {
+                ...activeFarm.crop.confirmedPlan,
+                tasks: updatedTasks
+              }
+            }
+          };
         }
         return updated;
       });

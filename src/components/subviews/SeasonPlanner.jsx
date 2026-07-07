@@ -565,20 +565,25 @@ export default function SeasonPlanner({
     const sName = locParts[2]?.trim() || 'Rajasthan';
 
     if (updatedFarms[selectedFarmIndex]) {
+      updatedFarms[selectedFarmIndex] = { ...updatedFarms[selectedFarmIndex] };
       const oldCrop = updatedFarms[selectedFarmIndex].crop;
+      
       if (oldCrop && oldCrop.name) {
-        if (!updatedFarms[selectedFarmIndex].cropHistory) {
-          updatedFarms[selectedFarmIndex].cropHistory = [];
-        }
-        const isDuplicate = updatedFarms[selectedFarmIndex].cropHistory.some(
+        let newCropHistory = updatedFarms[selectedFarmIndex].cropHistory 
+          ? [...updatedFarms[selectedFarmIndex].cropHistory] 
+          : [];
+          
+        const isDuplicate = newCropHistory.some(
           h => h.name === oldCrop.name && h.sowingDate === oldCrop.sowingDate
         );
+        
         if (!isDuplicate) {
-          updatedFarms[selectedFarmIndex].cropHistory.push({
+          newCropHistory = [...newCropHistory, {
             ...oldCrop,
             archivedAt: new Date().toISOString()
-          });
+          }];
         }
+        updatedFarms[selectedFarmIndex].cropHistory = newCropHistory;
       }
 
       updatedFarms[selectedFarmIndex].crop = {
@@ -910,13 +915,21 @@ export default function SeasonPlanner({
             </button>
           </div>
 
-          {/* Centered Single Crop Title */}
-          <div className="text-center space-y-1.5 py-2">
+          {/* Centered Single Crop Title & History Button */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 py-2 border-b border-outline-variant/30 pb-4">
             <h3 className="font-display font-extrabold text-xl text-on-surface">Single Crop Recommendation</h3>
-            <p className="text-xs text-on-surface-variant font-medium">
-              Choose a saved farm or enter details manually for a single crop plan.
-            </p>
+            <button
+              onClick={() => setStep('history')}
+              className="bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-extrabold px-4 py-2 rounded-xl text-xs transition-all flex items-center gap-2"
+            >
+              <ClipboardList className="w-4 h-4" />
+              Plan History
+            </button>
           </div>
+          
+          <p className="text-xs text-on-surface-variant font-medium">
+            Choose a saved farm or enter details manually for a single crop plan.
+          </p>
 
           {/* Tab Selector rounded bar */}
           <div className="bg-[#f0f4f9] p-1 rounded-full flex border border-slate-200 max-w-lg mx-auto shadow-2xs">
