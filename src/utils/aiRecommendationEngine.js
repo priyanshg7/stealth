@@ -324,7 +324,7 @@ export function generateCropComparison(cropIds, farm, profile, weatherData, mand
 }
 
 // ── API Key Definitions ───────────────────────────────────────────────
-export const GEMINI_API_KEY = "AQ.Ab8RN6KGMLCyXFryTjdvB5f38xF_IVyDakyYh6jFP2DMFUNmVg";
+export const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 export const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
 /**

@@ -7,9 +7,9 @@ from api.schemas.decision import GeminiDiseaseInfo
 
 logger = logging.getLogger("kisanmitra_backend")
 
-# Retrieve API key dynamically or hardcode as requested for testing
-# Usually you would do os.environ.get("GEMINI_API_KEY")
-API_KEY = "AQ.Ab8RN6J_OCTm4pe3ViHRBhLzJbLGskHIP25dAjwdTa7b91SPLg"
+# Retrieve API key dynamically
+import os
+API_KEY = os.environ.get("GEMINI_API_KEY")
 
 class GeminiService:
     def __init__(self):
