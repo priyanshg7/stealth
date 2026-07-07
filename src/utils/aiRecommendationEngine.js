@@ -358,3 +358,59 @@ export async function getGeminiVarieties(season, state, soil, water) {
   return null;
 }
 
+/**
+ * Robustly calls Gemini API for specific crop variety recommendations.
+ */
+export async function getGeminiVarietiesForCrop(crop, state, district, soil, water, lastCrop, preferredVariety = null) {
+  try {
+    let preferenceInstruction = preferredVariety 
+      ? `The farmer has specifically requested the variety "${preferredVariety}". Evaluate this variety and include it as the first recommendation, then suggest 2 alternatives.`
+      : `Suggest the 3 best high-yielding, profitable varieties.`;
+
+    const prompt = `You are an expert agronomist in India. 
+For a farm in ${district}, ${state}, with soil: "${soil}", irrigation: "${water}", and previously grew: "${lastCrop || 'Unknown'}". 
+I want to plant the crop: "${crop}". 
+${preferenceInstruction}
+
+Return ONLY a JSON array of exactly 3 objects (no markdown blocks, no text before or after). Each object MUST have these exact keys:
+- "id": a unique short lowercase string identifier.
+- "name": full name of the variety.
+- "description": 2-3 sentences explaining its traits.
+- "profitPerAcre": estimated profit in rupees (integer).
+- "whyThisTemplate": 2-3 sentences explaining why it fits this specific farm's soil, water, and location.
+- "sowingMonth": e.g. "November".
+- "duration": e.g. "120 days".
+- "water": e.g. "350 mm".
+- "diseaseResistance": e.g. "High (Stripe Rust Resistant)".
+- "marketDemand": e.g. "High".
+- "maturity": e.g. "Medium Maturity".
+- "suitableSoil": e.g. "Clay Loam".
+- "price": e.g. "₹2,400/Qtl".
+- "yield": e.g. "24 Qtl/Acre".
+- "badges": an array of 1 to 3 strings like "Best Fit", "Highest Profit", "Fast Harvest", "Water Efficient", etc.`;
+
+    const body = {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { responseMimeType: "application/json" }
+    };
+    
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        return JSON.parse(text);
+      }
+    }
+  } catch (e) {
+    console.warn("[Gemini API] Failed to fetch crop varieties:", e.message);
+  }
+  return null;
+}
+
+

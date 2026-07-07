@@ -100,7 +100,7 @@ export default function Sidebar({
         {/* ── HEADER: Logo / Profile ── */}
         <div
           className={`flex items-center border-b border-surface-container-high bg-gradient-to-br from-primary/5 to-transparent transition-all duration-300 overflow-hidden whitespace-nowrap
-            ${sidebarCollapsed ? 'lg:justify-center p-4' : 'p-4 gap-3'}`}
+            ${sidebarCollapsed ? 'lg:justify-center p-4 lg:gap-0' : 'p-4 gap-3'}`}
         >
           {/* Avatar always visible */}
           <div className="relative flex-shrink-0">
@@ -115,7 +115,7 @@ export default function Sidebar({
           </div>
 
           {/* Name + location — fades out when collapsed on desktop */}
-          <div className={`flex-1 transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:opacity-0 lg:w-0' : 'opacity-100 w-auto min-w-0'}`}>
+          <div className={`transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:hidden' : 'flex-1 opacity-100 w-auto min-w-0'}`}>
             <h4 className="font-display font-bold text-on-surface text-sm leading-tight truncate">
               {profile.name || 'Ramesh Ji'}
             </h4>
@@ -153,7 +153,7 @@ export default function Sidebar({
                 className={`
                   w-full flex items-center font-semibold text-[15px] transition-all duration-300 whitespace-nowrap overflow-hidden min-h-[48px]
                   ${sidebarCollapsed
-                    ? 'lg:justify-center px-4 py-3.5 justify-start gap-4'
+                    ? 'lg:justify-center px-4 py-3.5 justify-start gap-4 lg:gap-0'
                     : 'px-4 py-3.5 gap-4'
                   }
                   ${isActive 
@@ -165,11 +165,11 @@ export default function Sidebar({
                 <span className={`material-symbols-outlined text-xl flex-shrink-0 transition-all duration-300 ${isActive ? 'fill' : ''}`}>
                   {item.icon}
                 </span>
-                <span className={`flex-1 text-left truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:opacity-0 lg:w-0' : 'opacity-100 w-auto'}`}>
+                <span className={`text-left truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:hidden' : 'flex-1 opacity-100 w-auto'}`}>
                   {tr(item.label, language)}
                 </span>
                 {item.badge && item.badge > 0 && (
-                  <span className={`bg-primary text-white font-bold text-xs px-1.5 py-0.5 rounded-full flex-shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'lg:opacity-0 lg:w-0 lg:px-0' : 'opacity-100'}`}>
+                  <span className={`bg-primary text-white font-bold text-xs px-1.5 py-0.5 rounded-full transition-all duration-300 ${sidebarCollapsed ? 'lg:hidden' : 'flex-shrink-0 opacity-100'}`}>
                     {item.badge}
                   </span>
                 )}
@@ -193,7 +193,7 @@ export default function Sidebar({
                 ${sidebarCollapsed ? 'lg:justify-center' : ''}`}
             >
               <Cpu className="w-4 h-4 flex-shrink-0" />
-              <span className={`truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:opacity-0 lg:w-0' : 'opacity-100 w-auto'}`}>
+              <span className={`truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:hidden' : 'opacity-100 w-auto'}`}>
                 Inspect JWT
               </span>
             </button>
@@ -218,7 +218,7 @@ export default function Sidebar({
               ${sidebarCollapsed ? 'lg:justify-center' : ''}`}
           >
             <span className="material-symbols-outlined text-lg flex-shrink-0">logout</span>
-            <span className={`truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:opacity-0 lg:w-0' : 'opacity-100 w-auto'}`}>
+            <span className={`truncate transition-all duration-300 ${sidebarCollapsed ? 'lg:hidden' : 'opacity-100 w-auto'}`}>
               {tr("Sign Out / Reset", language)}
             </span>
           </button>

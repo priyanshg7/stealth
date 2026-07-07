@@ -6,191 +6,12 @@ import {
   ChevronRight, RefreshCw, FileCheck, Clock, Mic, Compass,
   ChevronDown, ChevronUp, Users, Wrench, Shield, DollarSign
 } from 'lucide-react';
-import { generateRecommendations } from '../../utils/aiRecommendationEngine';
+import { generateRecommendations, getGeminiVarietiesForCrop } from '../../utils/aiRecommendationEngine';
 import { calculateNutrientPlan, parseSoilData } from '../../data/soilNutrientEngine';
 import { generateCropSchedule } from '../../utils/farmScheduleEngine';
 
-const CROP_VARIETIES = {
-  wheat: [
-    {
-      id: 'dbw187',
-      name: 'Karan Vandana (DBW 187)',
-      description: 'Karan Vandana (DBW 187) is a high-yielding wheat variety popular for its rich gluten quality and excellent resistance to rust diseases. It is highly resistant to lodging.',
-      profitPerAcre: 57000,
-      whyThisTemplate: 'DBW 187 is highly suited for {location} due to its resistance to heat stress. Your \'{soil}\' provides the perfect texture for root development, and \'{irrigation}\' supports the critical crown root initiation phase. This variety commands a premium price, maximizing profitability. Following \'{lastCrop}\' (last crop), wheat forms a beneficial rotation, though nutrient replenishment (especially N and P) will be vital.',
-      sowingMonth: 'November',
-      duration: '120 days',
-      water: '350 mm',
-      diseaseResistance: 'High (Stripe Rust Resistant)',
-      marketDemand: 'Very High (Premium Chapati Maker)',
-      maturity: 'Medium Maturity (120 days)',
-      suitableSoil: 'Clay / Loamy Clay',
-      price: '₹2,400/Qtl',
-      yield: '24 Qtl/Acre',
-      badges: ['Best Fit', 'Highest Profit', 'Organic Friendly']
-    },
-    {
-      id: 'gw322',
-      name: 'Lok-1 (GW 322)',
-      description: 'GW 322 is an early-to-medium maturing variety, widely grown for its excellent chapati baking quality. It matures rapidly, escaping late terminal heat.',
-      profitPerAcre: 47200,
-      whyThisTemplate: 'GW 322 is a stable performer for {location}. Its short duration makes it fit well with your crop rotation cycles, following \'{lastCrop}\' to utilize remaining soil nutrients. The \'{soil}\' helps maintain adequate root coolness, and it performs moderately under \'{irrigation}\'.',
-      sowingMonth: 'November - December',
-      duration: '115 days',
-      water: '320 mm',
-      diseaseResistance: 'Medium (Rust Susceptible)',
-      marketDemand: 'High (Standard Mandi Staple)',
-      maturity: 'Early Maturity (115 days)',
-      suitableSoil: 'Black Cotton / Clay Loam',
-      price: '₹2,250/Qtl',
-      yield: '20 Qtl/Acre',
-      badges: ['Fast Harvest', 'Water Efficient']
-    },
-    {
-      id: 'hd3086',
-      name: 'Pusa Gautami (HD 3086)',
-      description: 'HD 3086 is a heat-tolerant wheat variety characterized by high yields and excellent flour quality. It is highly resistant to yellow rust.',
-      profitPerAcre: 50000,
-      whyThisTemplate: 'HD 3086 is recommended for {location} as it tolerates temperature fluctuations during grain filling. Excellent water utilization efficiency under \'{irrigation}\' systems and adapts nicely to \'{soil}\'.',
-      sowingMonth: 'November',
-      duration: '125 days',
-      water: '280 mm',
-      diseaseResistance: 'High (Powdery Mildew Resistant)',
-      marketDemand: 'High (Milling Premium)',
-      maturity: 'Medium-Late (125 days)',
-      suitableSoil: 'Alluvial / Clay Loam',
-      price: '₹2,300/Qtl',
-      yield: '21 Qtl/Acre',
-      badges: ['Water Efficient', 'Best Fit']
-    }
-  ],
-  rice: [
-    {
-      id: 'pb1121',
-      name: 'Pusa Basmati 1121',
-      description: 'Pusa Basmati 1121 is renowned for its extra-long slender grains, excellent aroma, and high cooking quality. It is a tall variety and known for its high market value.',
-      profitPerAcre: 57100,
-      whyThisTemplate: 'Pusa Basmati 1121 is an excellent choice for {location}, given the assured \'{irrigation}\' which is crucial for this water-intensive variety. The \'{soil}\' of your farm is ideal for water retention, minimizing seepage losses. This variety commands a premium price, maximizing profitability. Following \'{lastCrop}\' (last crop), rice forms a beneficial rotation, though nutrient replenishment (especially N and P) will be vital.',
-      sowingMonth: 'July',
-      duration: '145 days',
-      water: '1200 mm',
-      diseaseResistance: 'Medium (Blast Susceptible)',
-      marketDemand: 'Very High (Export & Domestic Premium)',
-      maturity: 'Late Maturity (145 days)',
-      suitableSoil: 'Clay Soil',
-      price: '₹4,200/Qtl',
-      yield: '28 Qtl/Acre',
-      badges: ['Highest Profit', 'Organic Friendly']
-    },
-    {
-      id: 'pb1509',
-      name: 'Pusa Basmati 1509',
-      description: 'Pusa Basmati 1509 is an early maturing Basmati variety, known for its good yield, aroma, and excellent cooking quality. It is a semi-dwarf plant, making it less prone to lodging.',
-      profitPerAcre: 69900,
-      whyThisTemplate: 'Pusa Basmati 1509 is well-suited for {location} due to its shorter duration, allowing for a timely \'{lastCrop}\' (last crop) rotation. Your \'{soil}\' is excellent for maintaining consistent moisture from \'{irrigation}\'. This variety offers good yield potential with less water than Pusa Basmati 1121, making it efficient while still fetching premium Basmati prices.',
-      sowingMonth: 'July',
-      duration: '118 days',
-      water: '980 mm',
-      diseaseResistance: 'High (Bacterial Blight Resistant)',
-      marketDemand: 'High (Fast turnaround Basmati)',
-      maturity: 'Early Maturity (118 days)',
-      suitableSoil: 'Clay Soil',
-      price: '₹4,200/Qtl',
-      yield: '28 Qtl/Acre',
-      badges: ['Best Fit', 'Fast Harvest', 'Water Efficient']
-    },
-    {
-      id: 'pr126',
-      name: 'PR 126',
-      description: 'PR 126 is a high-yielding, short-duration, semi-dwarf, non-Basmati rice variety developed for regions needing quick turnaround. It has good resistance to major diseases and pests.',
-      profitPerAcre: 54500,
-      whyThisTemplate: 'PR 126 is an excellent fit for {location}, especially with \'{irrigation}\' as it requires less water than Basmati. Your \'{soil}\' is well-suited for its robust growth. Its short duration facilitates easy rotation with \'{lastCrop}\' (last crop), allowing for timely preparation for the next season while providing a high yield for stable income.',
-      sowingMonth: 'July',
-      duration: '92 days',
-      water: '800 mm',
-      diseaseResistance: 'High (Resistant to 10 pathotypes of blight)',
-      marketDemand: 'Medium (Local consumption)',
-      maturity: 'Short Maturity (92 days)',
-      suitableSoil: 'Clay Soil',
-      price: '₹2,100/Qtl',
-      yield: '25 Qtl/Acre',
-      badges: ['Fast Harvest', 'Water Efficient']
-    },
-    {
-      id: 'arize6444',
-      name: 'Arize 6444 Gold (Hybrid)',
-      description: 'Arize 6444 Gold is a popular high-yielding hybrid rice variety known for its excellent grain quality, strong plant vigor, and good tolerance to major diseases. It offers a significant yield advantage.',
-      profitPerAcre: 68100,
-      whyThisTemplate: 'Arize 6444 Gold is a strong recommendation for {location}, especially with \'{irrigation}\' that ensures the consistent water supply critical for this high-yielding hybrid. Your \'{soil}\' provides excellent nutrient and water retention. Despite \'{lastCrop}\' (last crop), the robust nature of this hybrid, combined with proper fertilization, will allow for maximum yield and profitability.',
-      sowingMonth: 'July',
-      duration: '132 days',
-      water: '1050 mm',
-      diseaseResistance: 'Very High (Hybrid vigor against Blast)',
-      marketDemand: 'High (Bulk production)',
-      maturity: 'Medium Maturity (132 days)',
-      suitableSoil: 'Clay Soil',
-      price: '₹2,300/Qtl',
-      yield: '30 Qtl/Acre',
-      badges: ['Highest Profit', 'Best Fit']
-    }
-  ],
-  maize: [
-    {
-      id: 'pmh1',
-      name: 'PMH 1 (Punjab Maize Hybrid)',
-      description: 'Top-performing hybrid maize with strong stalks. Excellent lodging resistance makes it resilient to heavy monsoon winds.',
-      profitPerAcre: 48000,
-      whyThisTemplate: 'PMH 1 is optimized for {location} conditions. Your \'{soil}\' holds critical fertilizer bases effectively, and \'{irrigation}\' satisfies moisture phases easily. Excellent rotation following \'{lastCrop}\' to suppress pest cycles.',
-      sowingMonth: 'June - July',
-      duration: '110 days',
-      water: '500 mm',
-      diseaseResistance: 'High (Stalk Rot Resistant)',
-      marketDemand: 'High (Industrial Starch & Feed)',
-      maturity: 'Medium Maturity (110 days)',
-      suitableSoil: 'Sandy Loam / Clay Loam',
-      price: '₹1,850/Qtl',
-      yield: '32 Qtl/Acre',
-      badges: ['Best Fit', 'Highest Profit', 'Organic Friendly']
-    },
-    {
-      id: 'deccan103',
-      name: 'Deccan Double Hybrid 103',
-      description: 'Robust double-cross hybrid. Tolerates moderate moisture deficits and matures rapidly, making it cost-efficient.',
-      profitPerAcre: 39200,
-      whyThisTemplate: 'Deccan 103 offers a quick harvest cycle in {location}. It performs extremely well under moderate water constraints in \'{irrigation}\', and the short duration ensures timely field clearing for \'{lastCrop}\' preparations.',
-      sowingMonth: 'June',
-      duration: '105 days',
-      water: '450 mm',
-      diseaseResistance: 'Medium (Leaf Blight Resistant)',
-      marketDemand: 'Moderate (Local poultry sector)',
-      maturity: 'Early Maturity (105 days)',
-      suitableSoil: 'Alluvial / Loam',
-      price: '₹1,800/Qtl',
-      yield: '28 Qtl/Acre',
-      badges: ['Fast Harvest', 'Water Efficient']
-    }
-  ]
-};
+// Hardcoded CROP_VARIETIES and DEFAULT_VARIETY_DATA have been removed to use real-time AI recommendations.
 
-const DEFAULT_VARIETY_DATA = [
-  {
-    id: 'generic',
-    name: 'Standard Regional Variety',
-    description: 'Standard regional choice matching typical local weather patterns and soil specifications.',
-    profitPerAcre: 40000,
-    whyThisTemplate: 'This variety is a standard recommendation for {location} given local base configurations of \'{soil}\' and \'{irrigation}\' resources.',
-    sowingMonth: 'November',
-    duration: '120 days',
-    water: '400 mm',
-    diseaseResistance: 'Medium',
-    marketDemand: 'Standard',
-    maturity: 'Medium',
-    suitableSoil: 'Alluvial / Clay Loam',
-    price: '₹2,100/Qtl',
-    yield: '20 Qtl/Acre',
-    badges: ['Best Fit']
-  }
-];
 
 export default function SeasonPlanner({
   profile,
@@ -204,12 +25,19 @@ export default function SeasonPlanner({
   setActiveDashboardTab,
   weatherData
 }) {
-  const [step, setStep] = useState('input'); // 'input' | 'recommendations' | 'plan'
+  const [step, setStep] = useState(() => {
+    return (seasonPlanConfirmed && farms[selectedFarmIndex]?.crop?.confirmedPlan) 
+      ? 'active-overview' 
+      : 'input';
+  }); // 'active-overview' | 'input' | 'recommendations' | 'plan' | 'history'
   const [activeTab, setActiveTab] = useState('saved'); // 'saved' | 'manual'
   const [selectedSavedFarmId, setSelectedSavedFarmId] = useState('');
   const [viewingActivePlan, setViewingActivePlan] = useState(false);
+  const [viewingHistoryPlan, setViewingHistoryPlan] = useState(false);
+  const [historyCropData, setHistoryCropData] = useState(null);
   const [fertilizerMode, setFertilizerMode] = useState('conventional');
   const [profitScenario, setProfitScenario] = useState('realistic');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Collapsible sections state for the Blueprint Page
   const [collapsed, setCollapsed] = useState({
@@ -391,7 +219,11 @@ export default function SeasonPlanner({
   };
 
   // Recommendations Generation using AI Recommendation Engine
-  const handleGenerateRecommendations = () => {
+  const handleGenerateRecommendations = async () => {
+    setIsGenerating(true);
+    setVarietyMismatchWarning(null);
+    setIsFarmerSelected(!!formFields.preferredVariety);
+
     const crop = formFields.cropName.toLowerCase();
     const activeFarm = farms[selectedFarmIndex] || {
       soil: { type: formFields.soilType || 'Loamy' },
@@ -400,77 +232,71 @@ export default function SeasonPlanner({
       state: profile?.state || 'Maharashtra',
       district: profile?.district || 'Nashik'
     };
-
     const areaVal = parseFloat(formFields.area) || 5.0;
 
-    if (formFields.preferredVariety) {
-      // Farmer Preferred Variety Workflow
-      setIsFarmerSelected(true);
-      const varietyData = CROP_VARIETIES[crop]?.find(v => v.id === formFields.preferredVariety);
-      
-      if (varietyData) {
-        // Simple mismatch detection logic
-        let warning = null;
-        if (activeFarm.water?.sources?.[0]?.toLowerCase() === 'rainfed' && varietyData.water && parseInt(varietyData.water) > 800) {
-          warning = `Warning: ${varietyData.name} requires high water (${varietyData.water}). Your rainfed system may not be sufficient, risking crop stress.`;
-        } else if (varietyData.suitableSoil && !varietyData.suitableSoil.toLowerCase().includes(activeFarm.soil?.type?.toLowerCase().split(' ')[0] || 'none')) {
-          warning = `Notice: ${varietyData.name} is ideally suited for ${varietyData.suitableSoil}, but your soil is ${activeFarm.soil?.type}. Consider extra soil conditioning.`;
-        }
+    let aiRecommendations = await getGeminiVarietiesForCrop(
+      crop,
+      activeFarm.state,
+      activeFarm.district,
+      activeFarm.soil.type,
+      activeFarm.water.sources[0],
+      formFields.lastCrop,
+      formFields.preferredVariety
+    );
+
+    let finalRecommendations = [];
+    if (aiRecommendations && Array.isArray(aiRecommendations) && aiRecommendations.length > 0) {
+      // Map AI recommendations to UI format
+      finalRecommendations = aiRecommendations.map(v => {
+        const livePrice = parseFloat(v.price?.replace(/[^0-9]/g, '')) || 2275;
+        const yieldPotential = parseFloat(v.yield) || 24;
+        const profitPerAcre = v.profitPerAcre || Math.round(yieldPotential * livePrice * 0.4);
         
-        setVarietyMismatchWarning(warning);
-        
-        const mappedVariety = {
-          ...varietyData,
-          yieldPotential: parseFloat(varietyData.yield) || 24,
-          livePrice: parseFloat(varietyData.price?.replace(/[^0-9]/g, '')) || 2275,
-          seedRate: 40
+        return {
+          ...v,
+          yieldPotential,
+          livePrice,
+          seedRate: 40,
+          profitPerAcre,
+          badges: v.badges || ['Recommended']
         };
-        
-        setRecommendations([mappedVariety]);
-        setSelectedVariety(mappedVariety);
-        
-        const baseYield = mappedVariety.yieldPotential || 24;
-        const basePrice = mappedVariety.livePrice || mappedVariety.msp || 2275;
-
-        setCosts({
-          seed: Math.round(areaVal * (mappedVariety.seedRate * 45 || 1500)),
-          fertilizer: Math.round(areaVal * 2500),
-          pesticide: Math.round(areaVal * 1200),
-          irrigation: Math.round(areaVal * 1000),
-          labor: Math.round(areaVal * 3200),
-          machinery: Math.round(areaVal * 2000),
-          transportation: Math.round(areaVal * 800),
-          misc: Math.round(areaVal * 600),
-          expectedPrice: basePrice,
-          expectedYield: baseYield
-        });
-        
-        // Skip recommendations list and go directly to blueprint
-        setStep('blueprint');
-        setViewingActivePlan(false);
-        return;
-      }
+      });
+    } else {
+      // Fallback if AI fails
+      console.warn("Falling back to generic recommendations.");
+      const genericRec = {
+        id: 'generic-' + Date.now(),
+        name: formFields.preferredVariety || 'Standard Regional Variety',
+        description: 'Standard regional choice matching typical local weather patterns and soil specifications.',
+        profitPerAcre: 40000,
+        whyThisTemplate: 'This variety is a standard recommendation given local configurations.',
+        sowingMonth: 'November',
+        duration: '120 days',
+        water: '400 mm',
+        diseaseResistance: 'Medium',
+        marketDemand: 'Standard',
+        maturity: 'Medium',
+        suitableSoil: activeFarm.soil.type,
+        price: '₹2,100/Qtl',
+        yield: '20 Qtl/Acre',
+        badges: ['Best Fit'],
+        yieldPotential: 20,
+        livePrice: 2100,
+        seedRate: 40
+      };
+      finalRecommendations = [genericRec];
     }
-
-    // AI Recommended Workflow
-    setIsFarmerSelected(false);
-    setVarietyMismatchWarning(null);
-
-    // Calculate ranked AI recommendations
-    const rankedRaw = generateRecommendations(crop, activeFarm, profile, weatherData, null);
-    const ranked = mapRecommendationsToUi(rankedRaw, areaVal);
-    setRecommendations(ranked);
     
-    const selected = ranked[0] || DEFAULT_VARIETY_DATA[0];
+    setRecommendations(finalRecommendations);
+    const selected = finalRecommendations[0];
     setSelectedVariety(selected);
-    setStep('recommendations');
-    setViewingActivePlan(false);
-
-    const baseYield = selected.yieldPotential || 24;
-    const basePrice = selected.livePrice || selected.msp || 2275;
+    
+    // Set common costs
+    const baseYield = selected.yieldPotential;
+    const basePrice = selected.livePrice;
 
     setCosts({
-      seed: Math.round(areaVal * (selected.seedRate * 45 || 1500)),
+      seed: Math.round(areaVal * (40 * 45)),
       fertilizer: Math.round(areaVal * 2500),
       pesticide: Math.round(areaVal * 1200),
       irrigation: Math.round(areaVal * 1000),
@@ -481,6 +307,10 @@ export default function SeasonPlanner({
       expectedPrice: basePrice,
       expectedYield: baseYield
     });
+
+    setIsGenerating(false);
+    setStep('recommendations');
+    setViewingActivePlan(false);
   };
 
 
@@ -508,6 +338,23 @@ export default function SeasonPlanner({
       setSelectedVariety(foundVariety);
       setStep('plan');
       setViewingActivePlan(true);
+      setViewingHistoryPlan(false);
+      setHistoryCropData(null);
+    }
+  };
+
+  const handleViewHistoryPlan = (pastCrop) => {
+    if (pastCrop?.confirmedPlan) {
+      const cropKey = pastCrop.name.toLowerCase();
+      const activeFarm = farms[selectedFarmIndex];
+      const rankedRaw = generateRecommendations(cropKey, activeFarm, profile, weatherData, null);
+      const ranked = mapRecommendationsToUi(rankedRaw, parseFloat(activeFarm.area) || 2.5);
+      const foundVariety = ranked.find(v => v.name.toLowerCase().includes(pastCrop.variety.toLowerCase())) || ranked[0] || DEFAULT_VARIETY_DATA[0];
+      setSelectedVariety(foundVariety);
+      setStep('plan');
+      setViewingActivePlan(false);
+      setViewingHistoryPlan(true);
+      setHistoryCropData(pastCrop);
     }
   };
 
@@ -781,9 +628,10 @@ export default function SeasonPlanner({
 
     setSeasonPlanConfirmed(true);
     setViewingActivePlan(false);
+    setViewingHistoryPlan(false);
     localStorage.setItem('km_season_confirmed', 'true');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setStep('input');
+    setStep('active-overview');
   };
 
   const activeFarm = farms[selectedFarmIndex];
@@ -844,9 +692,169 @@ export default function SeasonPlanner({
         )}
       </div>
 
+      {/* ================= PAGE 0: ACTIVE PLAN OVERVIEW ================= */}
+      {step === 'active-overview' && activeFarm?.crop?.confirmedPlan && (
+        <div className="space-y-6 animate-fade-in-up">
+          <div className="bg-white rounded-card border-2 border-primary/20 shadow-md overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+              <CheckCircle2 className="w-48 h-48 text-primary" />
+            </div>
+            
+            <div className="p-8 relative z-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-2xl">{activeFarm.crop.confirmedPlan.cropIcon || '🌱'}</span>
+                </div>
+                <div>
+                  <h2 className="font-display font-extrabold text-2xl text-on-surface">Active Seasonal Plan</h2>
+                  <p className="text-sm text-on-surface-variant font-medium">Currently tracking and generating daily tasks.</p>
+                </div>
+                <div className="ml-auto flex flex-col items-end gap-2">
+                   <span className="bg-[#e6f4ea] text-[#0f5132] px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-1 border border-[#cbf0d7]">
+                     <span className="w-2 h-2 rounded-full bg-[#0f5132] animate-pulse" />
+                     Live Status
+                   </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4">
+                  <div className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Crop & Variety</div>
+                  <div className="font-bold text-sm text-on-surface">{activeFarm.crop.name}</div>
+                  <div className="text-xs text-primary font-semibold truncate">{activeFarm.crop.variety}</div>
+                </div>
+                <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4">
+                  <div className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Target Farm</div>
+                  <div className="font-bold text-sm text-on-surface">{activeFarm.name}</div>
+                  <div className="text-xs text-on-surface-variant truncate">{activeFarm.area} {activeFarm.unit}</div>
+                </div>
+                <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4">
+                  <div className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Current Stage</div>
+                  <div className="font-bold text-sm text-on-surface">{activeFarm.crop.stage}</div>
+                  <div className="text-xs text-on-surface-variant">{activeFarm.crop.growthProgress || 0}% Completed</div>
+                </div>
+                <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4">
+                  <div className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Est. Harvest</div>
+                  <div className="font-bold text-sm text-on-surface">{new Date(activeFarm.crop.harvestDate).toLocaleDateString()}</div>
+                  <div className="text-xs text-on-surface-variant">{activeFarm.crop.confirmedPlan.harvestDays} Days Total</div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={handleViewActivePlan}
+                  className="bg-primary hover:bg-[#004e20] text-white font-extrabold px-6 py-3 rounded-xl text-xs shadow-md transition-all flex items-center gap-2"
+                >
+                  <FileText className="w-4 h-4" />
+                  View Active Blueprint
+                </button>
+                <button
+                  onClick={() => setActiveDashboardTab('dashboard')}
+                  className="bg-white border-2 border-primary/20 text-primary hover:bg-primary/5 font-extrabold px-6 py-3 rounded-xl text-xs transition-all flex items-center gap-2"
+                >
+                  <CheckSquare className="w-4 h-4" />
+                  View Today's Tasks
+                </button>
+                <button
+                  onClick={() => setActiveDashboardTab('journey')}
+                  className="bg-white border-2 border-primary/20 text-primary hover:bg-primary/5 font-extrabold px-6 py-3 rounded-xl text-xs transition-all flex items-center gap-2"
+                >
+                  <Activity className="w-4 h-4" />
+                  Farm Journey
+                </button>
+                
+                <div className="flex-grow"></div>
+                
+                <button
+                  onClick={() => setStep('history')}
+                  className="bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-extrabold px-6 py-3 rounded-xl text-xs transition-all flex items-center gap-2"
+                >
+                  <ClipboardList className="w-4 h-4" />
+                  Plan History
+                </button>
+                
+                <button
+                  onClick={() => {
+                    if (window.confirm("Creating a new plan will replace your current active plan. The old plan will be saved in your history. Do you want to continue?")) {
+                      setStep('input');
+                    }
+                  }}
+                  className="bg-white border border-outline-variant hover:border-error/40 hover:text-error text-on-surface-variant font-extrabold px-6 py-3 rounded-xl text-xs transition-all flex items-center gap-2"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Create New Plan
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= HISTORY LIST ================= */}
+      {step === 'history' && (
+        <div className="space-y-6 animate-fade-in-up">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setStep('active-overview')} className="p-2 bg-surface-container rounded-full hover:bg-surface-container-high">
+              <ArrowLeft className="w-5 h-5 text-on-surface" />
+            </button>
+            <h2 className="font-display font-extrabold text-2xl text-on-surface">Plan History</h2>
+          </div>
+          
+          <div className="bg-white rounded-card border border-outline-variant/60 shadow-sm overflow-hidden">
+             {(!activeFarm?.cropHistory || activeFarm.cropHistory.length === 0) ? (
+                <div className="p-12 text-center text-on-surface-variant">
+                   <ClipboardList className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                   <p className="font-bold">No historical plans found.</p>
+                   <p className="text-xs mt-1">Previous plans will appear here when you create new ones.</p>
+                </div>
+             ) : (
+                <div className="divide-y divide-outline-variant/30">
+                  {activeFarm.cropHistory.slice().reverse().map((pastCrop, i) => (
+                    <div key={i} className="p-6 hover:bg-surface-container-lowest transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
+                          <span className="text-lg">{pastCrop.confirmedPlan?.cropIcon || '🌾'}</span>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-bold text-base text-on-surface">{pastCrop.name} <span className="text-on-surface-variant text-sm font-medium">({pastCrop.variety})</span></h3>
+                            <span className="bg-surface-container-high text-on-surface-variant px-2 py-0.5 rounded text-[10px] font-bold uppercase">Archived</span>
+                          </div>
+                          <p className="text-xs text-on-surface-variant">
+                            Sown: {new Date(pastCrop.sowingDate).toLocaleDateString()} · 
+                            Archived: {new Date(pastCrop.archivedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleViewHistoryPlan(pastCrop)}
+                        className="bg-white border border-outline-variant hover:border-primary/40 text-primary font-bold px-5 py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2 flex-shrink-0"
+                      >
+                        <FileText className="w-4 h-4" />
+                        View Archive
+                      </button>
+                    </div>
+                  ))}
+                </div>
+             )}
+          </div>
+        </div>
+      )}
+
       {/* ================= PAGE 1: INPUT FORM (LANDING PAGE - ALWAYS VISIBLE TO PLAN AGAIN) ================= */}
       {step === 'input' && (
         <div className="space-y-6 animate-fade-in-up">
+          
+          {seasonPlanConfirmed && (
+            <div className="bg-warning-container/30 border border-warning/30 rounded-xl p-4 flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-on-surface">You already have an active plan.</p>
+                <p className="text-[10px] text-on-surface-variant mt-0.5">Creating a new plan here will archive the existing one.</p>
+              </div>
+              <button onClick={() => setStep('active-overview')} className="ml-auto text-xs font-bold text-primary hover:underline">Cancel</button>
+            </div>
+          )}
           
           {/* 1. New: Year-Long Planning Promo Card */}
           <div className="bg-[#e6f4ea] border border-[#cbf0d7] rounded-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
@@ -955,21 +963,19 @@ export default function SeasonPlanner({
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-on-surface-variant">Preferred Variety (Optional)</label>
                 <div className="relative">
-                  <select
+                  <input
+                    type="text"
                     value={formFields.preferredVariety}
                     onChange={(e) => handleInputChange('preferredVariety', e.target.value)}
-                    className="w-full bg-[#f0f4f9] border border-transparent rounded-xl p-3 pr-10 text-xs font-semibold focus:outline-none focus:bg-white focus:border-primary appearance-none cursor-pointer text-on-surface"
-                  >
-                    <option value="">Let AI Recommend Best Variety</option>
-                    {CROP_VARIETIES[formFields.cropName]?.map(variety => (
-                      <option key={variety.id} value={variety.id}>{variety.name}</option>
-                    ))}
-                  </select>
+                    disabled={activeTab === 'saved'}
+                    className="w-full bg-[#f0f4f9] border border-transparent rounded-xl p-3 pr-10 text-xs font-semibold focus:outline-none focus:bg-white focus:border-primary text-on-surface disabled:opacity-70"
+                    placeholder="e.g. Lok-1"
+                  />
                   <div className="absolute right-3 top-3 pointer-events-none text-on-surface-variant/80">
-                    <ChevronDown className="w-4 h-4" />
+                    <Mic className="w-4 h-4" />
                   </div>
                 </div>
-                <span className="block text-[10px] text-on-surface-variant font-medium">Select a specific variety to bypass recommendations, or leave blank for AI guidance.</span>
+                <span className="block text-[10px] text-on-surface-variant font-medium">Type a specific variety to evaluate, or leave blank for AI guidance.</span>
               </div>
 
               {/* Land Area */}
@@ -1216,11 +1222,11 @@ export default function SeasonPlanner({
             <div className="flex justify-start pt-4 border-t border-outline-variant/40 gap-4">
               <button
                 onClick={handleGenerateRecommendations}
-                disabled={activeTab === 'saved' && farms.length === 0}
+                disabled={(activeTab === 'saved' && farms.length === 0) || isGenerating}
                 className="bg-primary hover:bg-[#004e20] text-white font-extrabold px-6 py-3 rounded-xl text-xs flex items-center gap-2 shadow-md transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
               >
-                <Sparkles className="w-4 h-4 text-white" />
-                <span>Get Variety Recommendations</span>
+                {isGenerating ? <RefreshCw className="w-4 h-4 text-white animate-spin" /> : <Sparkles className="w-4 h-4 text-white" />}
+                <span>{isGenerating ? 'Analyzing Farm Data...' : 'Get Variety Recommendations'}</span>
               </button>
             </div>
           </div>

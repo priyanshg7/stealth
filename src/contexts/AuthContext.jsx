@@ -362,7 +362,7 @@ export function AuthProvider({ children }) {
     if (!persona) return false;
 
     // Backup current production data
-    const keysToBackup = ['km_jwt', 'km_decoded_jwt', 'km_profile', 'km_farms', 'km_season_confirmed', 'km_selected_farm_index', 'km_completed_tasks', 'km_rescheduled_tasks'];
+    const keysToBackup = ['km_jwt', 'km_decoded_jwt', 'km_profile', 'km_farms', 'km_season_confirmed', 'km_selected_farm_index', 'km_completed_tasks', 'km_rescheduled_tasks', 'km_active_tab'];
     keysToBackup.forEach(key => {
       const val = localStorage.getItem(key);
       if (val) localStorage.setItem('km_backup_' + key, val);
@@ -383,6 +383,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem('km_selected_farm_index', '0');
     localStorage.setItem('km_completed_tasks', '[]');
     localStorage.setItem('km_rescheduled_tasks', '{}');
+    localStorage.setItem('km_active_tab', 'dashboard');
 
     return true;
   }, []);

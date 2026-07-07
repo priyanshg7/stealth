@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import ErrorBoundary from './ErrorBoundary';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -94,6 +94,14 @@ export default function DashboardShell({
   startSpeechRecognition,
   allSchemes
 }) {
+  const scrollContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo(0, 0); // instantly scroll to top
+    }
+  }, [activeDashboardTab]);
+
   return (
     <div className="flex-grow w-full flex bg-background text-on-surface relative h-screen overflow-hidden font-sans">
       
@@ -124,7 +132,7 @@ export default function DashboardShell({
       />
 
       {/* Main content body container */}
-      <div className="flex-grow flex flex-col min-w-0 h-full overflow-y-auto overflow-x-hidden relative transition-all duration-300">
+      <div ref={scrollContainerRef} className="flex-grow flex flex-col min-w-0 h-full overflow-y-auto overflow-x-hidden relative transition-all duration-300">
         
         {/* Top command bar */}
         <Header 
@@ -289,6 +297,8 @@ export default function DashboardShell({
               language={language}
               setActiveDashboardTab={setActiveDashboardTab}
               setFarms={setFarms}
+              seasonPlanConfirmed={seasonPlanConfirmed}
+              setSeasonPlanConfirmed={setSeasonPlanConfirmed}
             />
           )}
 

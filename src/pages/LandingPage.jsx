@@ -39,9 +39,15 @@ function RevealDiv({ className = '', children, stagger = false, ...props }) {
 // ────────────────────────────────────────────────────────────
 function Navbar() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, demoLogin } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleDemoClick = () => {
+    setMobileMenuOpen(false);
+    demoLogin('rajesh');
+    navigate('/app');
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -90,7 +96,7 @@ function Navbar() {
               {isAuthenticated ? 'Open App' : 'Login'}
             </button>
             <button
-              onClick={() => navigate('/demo')}
+              onClick={handleDemoClick}
               className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-primary hover:bg-secondary transition-colors shadow-md hover:shadow-lg active:scale-[0.97]"
             >
               Try Demo
@@ -128,7 +134,7 @@ function Navbar() {
                 {isAuthenticated ? 'Open App' : 'Login'}
               </button>
               <button
-                onClick={() => { setMobileMenuOpen(false); navigate('/demo'); }}
+                onClick={handleDemoClick}
                 className="w-full px-5 py-3 rounded-xl text-sm font-bold text-white bg-primary hover:bg-secondary shadow-md"
               >
                 Try Demo
@@ -146,6 +152,12 @@ function Navbar() {
 // ────────────────────────────────────────────────────────────
 function HeroSection() {
   const navigate = useNavigate();
+  const { demoLogin } = useAuth();
+  
+  const handleDemoClick = () => {
+    demoLogin('rajesh');
+    navigate('/app');
+  };
 
   const trustBadges = [
     { icon: <Cpu className="w-3.5 h-3.5" />, label: 'AI-Powered' },
@@ -186,7 +198,7 @@ function HeroSection() {
                 <ArrowRight className="w-4.5 h-4.5" />
               </button>
               <button
-                onClick={() => navigate('/demo')}
+                onClick={handleDemoClick}
                 className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-primary bg-white border-2 border-primary/20 hover:border-primary/40 hover:bg-primary-container/10 transition-all flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined text-lg">play_circle</span>
@@ -625,6 +637,12 @@ function FAQSection() {
 // ────────────────────────────────────────────────────────────
 function CTASection() {
   const navigate = useNavigate();
+  const { demoLogin } = useAuth();
+  
+  const handleDemoClick = () => {
+    demoLogin('rajesh');
+    navigate('/app');
+  };
 
   return (
     <section className="landing-cta-gradient py-20 md:py-28 px-4 sm:px-6 lg:px-8">
@@ -644,7 +662,7 @@ function CTASection() {
             <ArrowRight className="w-4.5 h-4.5" />
           </button>
           <button
-            onClick={() => navigate('/demo')}
+            onClick={handleDemoClick}
             className="w-full sm:w-auto px-10 py-4 rounded-2xl text-base font-bold text-white border-2 border-white/30 hover:border-white/60 hover:bg-white/10 transition-all flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-lg">play_circle</span>

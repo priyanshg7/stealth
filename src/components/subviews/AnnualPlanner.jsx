@@ -25,13 +25,22 @@ export default function AnnualPlanner({
   weatherData,
   language,
   setActiveDashboardTab,
-  setFarms
+  setFarms,
+  seasonPlanConfirmed,
+  setSeasonPlanConfirmed
 }) {
   const activeFarm = farms[selectedFarmIndex];
 
   // ── Step State ──────────────────────────────────────────────────────
-  // 'setup' | 'wizard' | 'strategy'
-  const [step, setStep] = useState('setup');
+  // 'active-overview' | 'setup' | 'wizard' | 'strategy' | 'history'
+  const [step, setStep] = useState(() => {
+    return (seasonPlanConfirmed && activeFarm?.crop?.confirmedPlan)
+      ? 'active-overview'
+      : 'setup';
+  });
+  
+  const [viewingHistoryPlan, setViewingHistoryPlan] = useState(false);
+  const [historyPlanData, setHistoryPlanData] = useState(null);
   
   // Preferred Crops & Varieties (Hybrid Planning)
   const [wizardPreferences, setWizardPreferences] = useState({
@@ -416,15 +425,32 @@ export default function AnnualPlanner({
       objective: setupForm.farmingObjective,
       crops: Object.entries(wizardCrops).map(([s, c]) => `${s}: ${c?.name || 'Fallow'}`).join(', '),
       cost: strategyData.financialSummary.totalCost,
-      profit: strategyData.financialSummary.netProfit
+      profit: strategyData.financialSummary.netProfit,
+      fullStrategy: strategyData,
+      wizardCrops: wizardCrops,
+      setupForm: setupForm
     };
 
     const updatedHistory = [newPlanRecord, ...savedPlansHistory];
     setSavedPlansHistory(updatedHistory);
     localStorage.setItem('km_annual_plans_history', JSON.stringify(updatedHistory));
 
+    setSeasonPlanConfirmed(true);
     alert('🎉 Annual Farming Strategy saved successfully! Your daily work checklist on the Dashboard has been updated with these tasks.');
-    setActiveDashboardTab('dashboard');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setStep('active-overview');
+  };
+
+  const handleViewHistoryPlan = (pastPlan) => {
+    if (pastPlan.fullStrategy) {
+      setStrategyData(pastPlan.fullStrategy);
+      setWizardCrops(pastPlan.wizardCrops);
+      setSetupForm(pastPlan.setupForm || setupForm);
+      setViewingHistoryPlan(true);
+      setStep('strategy');
+    } else {
+      alert("This historical plan was saved in a previous version and cannot be fully viewed in read-only mode.");
+    }
   };
 
   const handleDuplicatePlan = (pastPlan) => {
@@ -435,9 +461,169 @@ export default function AnnualPlanner({
   return (
     <div className="space-y-8 animate-fade-in-up font-sans max-w-6xl mx-auto pb-12">
       
+      {/* ── 0. ACTIVE PLAN OVERVIEW ─────────────────────────────────────────────────── */}
+      {step === 'active-overview' && activeFarm?.crop?.confirmedPlan && (
+        <div className="space-y-6 animate-fade-in-up">
+          <div className="bg-white rounded-card border-2 border-primary/20 shadow-md overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+              <CheckCircle2 className="w-48 h-48 text-primary" />
+            </div>
+            
+            <div className="p-8 relative z-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-2xl">{activeFarm.crop.confirmedPlan.cropIcon || '🌱'}</span>
+                </div>
+                <div>
+                  <h2 className="font-display font-extrabold text-2xl text-on-surface">Active Farming Plan</h2>
+                  <p className="text-sm text-on-surface-variant font-medium">Currently driving your farm dashboard.</p>
+                </div>
+                <div className="ml-auto flex flex-col items-end gap-2">
+                   <span className="bg-[#e6f4ea] text-[#0f5132] px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-1 border border-[#cbf0d7]">
+                     <span className="w-2 h-2 rounded-full bg-[#0f5132] animate-pulse" />
+                     Live Status
+                   </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4">
+                  <div className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Active Crop</div>
+                  <div className="font-bold text-sm text-on-surface">{activeFarm.crop.name}</div>
+                  <div className="text-xs text-primary font-semibold truncate">{activeFarm.crop.variety}</div>
+                </div>
+                <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4">
+                  <div className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Target Farm</div>
+                  <div className="font-bold text-sm text-on-surface">{activeFarm.name}</div>
+                  <div className="text-xs text-on-surface-variant truncate">{activeFarm.area} {activeFarm.unit}</div>
+                </div>
+                <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4">
+                  <div className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Current Stage</div>
+                  <div className="font-bold text-sm text-on-surface">{activeFarm.crop.stage}</div>
+                  <div className="text-xs text-on-surface-variant">{activeFarm.crop.growthProgress || 0}% Completed</div>
+                </div>
+                <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4">
+                  <div className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Last Updated</div>
+                  <div className="font-bold text-sm text-on-surface">{new Date().toLocaleDateString()}</div>
+                  <div className="text-xs text-on-surface-variant">Active Tracking</div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => setActiveDashboardTab('dashboard')}
+                  className="bg-primary hover:bg-[#004e20] text-white font-extrabold px-6 py-3 rounded-xl text-xs shadow-md transition-all flex items-center gap-2"
+                >
+                  <CheckSquare className="w-4 h-4" />
+                  View Today's Tasks
+                </button>
+                <button
+                  onClick={() => setActiveDashboardTab('journey')}
+                  className="bg-white border-2 border-primary/20 text-primary hover:bg-primary/5 font-extrabold px-6 py-3 rounded-xl text-xs transition-all flex items-center gap-2"
+                >
+                  <Activity className="w-4 h-4" />
+                  Farm Journey
+                </button>
+                
+                <div className="flex-grow"></div>
+                
+                <button
+                  onClick={() => setStep('history')}
+                  className="bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-extrabold px-6 py-3 rounded-xl text-xs transition-all flex items-center gap-2"
+                >
+                  <ClipboardList className="w-4 h-4" />
+                  Plan History
+                </button>
+                
+                <button
+                  onClick={() => {
+                    if (window.confirm("Creating a new plan will replace your current active plan. The old plan will be saved in your history. Do you want to continue?")) {
+                      setStep('setup');
+                    }
+                  }}
+                  className="bg-white border border-outline-variant hover:border-error/40 hover:text-error text-on-surface-variant font-extrabold px-6 py-3 rounded-xl text-xs transition-all flex items-center gap-2"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Create New Plan
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 0.5. PLAN HISTORY ─────────────────────────────────────────────────── */}
+      {step === 'history' && (
+        <div className="space-y-6 animate-fade-in-up">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setStep('active-overview')} className="p-2 bg-surface-container rounded-full hover:bg-surface-container-high">
+              <ArrowLeft className="w-5 h-5 text-on-surface" />
+            </button>
+            <h2 className="font-display font-extrabold text-2xl text-on-surface">Annual Plan History</h2>
+          </div>
+          
+          <div className="bg-white rounded-card border border-outline-variant/60 shadow-sm overflow-hidden">
+             {(!savedPlansHistory || savedPlansHistory.length === 0) ? (
+                <div className="p-12 text-center text-on-surface-variant">
+                   <ClipboardList className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                   <p className="font-bold">No historical plans found.</p>
+                   <p className="text-xs mt-1">Previous annual plans will appear here.</p>
+                </div>
+             ) : (
+                <div className="divide-y divide-outline-variant/30">
+                  {savedPlansHistory.map((pastPlan, i) => (
+                    <div key={i} className="p-6 hover:bg-surface-container-lowest transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0 text-primary">
+                          <Calendar className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-bold text-base text-on-surface">{pastPlan.farmName}</h3>
+                            <span className="bg-surface-container-high text-on-surface-variant px-2 py-0.5 rounded text-[10px] font-bold uppercase">Archived</span>
+                          </div>
+                          <p className="text-xs text-on-surface-variant font-bold">
+                            Created: {pastPlan.date}
+                          </p>
+                          <p className="text-xs text-on-surface-variant mt-1">
+                            {pastPlan.crops}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 flex-shrink-0">
+                        {pastPlan.fullStrategy ? (
+                          <button
+                            onClick={() => handleViewHistoryPlan(pastPlan)}
+                            className="bg-white border border-outline-variant hover:border-primary/40 text-primary font-bold px-5 py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2"
+                          >
+                            <FileText className="w-4 h-4" />
+                            View Archive
+                          </button>
+                        ) : (
+                           <span className="text-xs text-on-surface-variant/50 italic py-2.5">Data Unavailable</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+             )}
+          </div>
+        </div>
+      )}
+
       {/* ── 1. SETUP PAGE ─────────────────────────────────────────────────── */}
       {step === 'setup' && (
         <div className="space-y-6">
+          {seasonPlanConfirmed && (
+            <div className="bg-warning-container/30 border border-warning/30 rounded-xl p-4 flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-on-surface">You already have an active farming plan.</p>
+                <p className="text-[10px] text-on-surface-variant mt-0.5">Creating a new annual plan will override your current active dashboard tasks.</p>
+              </div>
+              <button onClick={() => setStep('active-overview')} className="ml-auto text-xs font-bold text-primary hover:underline">Cancel</button>
+            </div>
+          )}
           {/* Header */}
           <div className="bg-gradient-to-br from-primary/10 via-white to-secondary/5 border border-primary/20 rounded-3xl p-8 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
@@ -1004,38 +1190,7 @@ export default function AnnualPlanner({
             </button>
           </div>
 
-          {/* Saved annual plans history log */}
-          {savedPlansHistory.length > 0 && (
-            <div className="bg-white border border-outline-variant/60 rounded-3xl p-8 shadow-sm space-y-6">
-              <h3 className="font-display font-extrabold text-lg text-on-surface flex items-center gap-2">
-                <ClipboardList className="w-5 h-5 text-primary" /> 
-                Past Annual Plans
-              </h3>
-              <div className="grid gap-4">
-                {savedPlansHistory.map(plan => (
-                  <div key={plan.id} className="p-5 border border-outline-variant/50 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface-container-lowest hover:border-primary/30 transition-colors">
-                    <div>
-                      <strong className="text-on-surface text-base block font-black">Plan - {plan.date}</strong>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                          Obj: {plan.objective}
-                        </span>
-                        <span className="text-[10px] font-bold bg-surface-container-high text-on-surface-variant px-2 py-0.5 rounded-full">
-                          Crops: {plan.crops}
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleDuplicatePlan(plan)}
-                      className="text-sm font-bold text-primary border-2 border-primary/20 hover:border-primary hover:bg-primary/5 px-4 py-2 rounded-xl transition-all whitespace-nowrap"
-                    >
-                      Duplicate Plan
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Removed saved annual plans history log from here, it now lives in the 'history' step */}
         </div>
       )}
 
@@ -1190,24 +1345,48 @@ export default function AnnualPlanner({
           {/* Header Controls */}
           <div className="bg-white border border-outline-variant/60 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
+              <div className="flex items-center gap-2 text-primary mb-2">
+                <button 
+                  onClick={() => {
+                    if (viewingHistoryPlan) {
+                      setStep('history');
+                      setViewingHistoryPlan(false);
+                    } else {
+                      setStep('setup');
+                    }
+                  }} 
+                  className="flex items-center gap-1.5 text-xs font-bold hover:underline bg-primary/10 px-2 py-1 rounded-md"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  Back to {viewingHistoryPlan ? 'History' : 'Setup'}
+                </button>
+                {viewingHistoryPlan && (
+                  <span className="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 ml-2">
+                    <ClipboardList className="w-3.5 h-3.5" />
+                    Read Only (Archived)
+                  </span>
+                )}
+              </div>
               <h2 className="font-display font-black text-2xl text-on-surface">Annual Farming Strategy</h2>
               <p className="text-sm text-on-surface-variant font-medium mt-1">Complete optimized roadmap for {setupForm.area} {setupForm.unit} in {setupForm.district}</p>
             </div>
-            <div className="flex gap-3 w-full sm:w-auto">
-              <button 
-                onClick={() => setStep('setup')}
-                className="flex-1 sm:flex-none bg-surface-container-low border border-outline-variant text-on-surface hover:bg-surface-container font-bold text-sm px-5 py-3 rounded-2xl transition-all"
-              >
-                Start Over
-              </button>
-              <button 
-                onClick={handleSaveAnnualPlan}
-                className="flex-1 sm:flex-none bg-primary hover:bg-primary-dark text-white font-black text-sm px-6 py-3 rounded-2xl shadow-md transition-all flex items-center justify-center gap-2"
-              >
-                <CheckSquare className="w-4 h-4" />
-                Save & Activate
-              </button>
-            </div>
+            {!viewingHistoryPlan && (
+              <div className="flex gap-3 w-full sm:w-auto">
+                <button 
+                  onClick={() => setStep('setup')}
+                  className="flex-1 sm:flex-none bg-surface-container-low border border-outline-variant text-on-surface hover:bg-surface-container font-bold text-sm px-5 py-3 rounded-2xl transition-all"
+                >
+                  Start Over
+                </button>
+                <button 
+                  onClick={handleSaveAnnualPlan}
+                  className="flex-1 sm:flex-none bg-primary hover:bg-primary-dark text-white font-black text-sm px-6 py-3 rounded-2xl shadow-md transition-all flex items-center justify-center gap-2"
+                >
+                  <CheckSquare className="w-4 h-4" />
+                  Save & Activate
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Continuous Vertical "Final Year-Long Plan" */}
