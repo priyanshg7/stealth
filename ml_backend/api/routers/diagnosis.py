@@ -1,6 +1,10 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 import io
 from PIL import Image
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 from api.services.inference_engine import InferenceEngine
 
@@ -13,9 +17,12 @@ async def predict(
     crop: str = Form(...)
 ):
     try:
+        logger.info(f"Received inference request for crop: {crop}. Filename: {image.filename}")
         contents = await image.read()
         pil_image = Image.open(io.BytesIO(contents))
-    except Exception:
+        logger.info(f"Successfully loaded image {image.filename} into PIL.")
+    except Exception as e:
+        logger.error(f"Failed to read or parse image: {e}")
         raise HTTPException(status_code=400, detail="Invalid image file format")
         
     try:
