@@ -529,7 +529,13 @@ export default function App() {
   const navigate = useNavigate();
   const { jwtToken, setJwtToken, decodedToken, setDecodedToken, profile: authProfile, setProfile: setAuthProfile, isDemo, logout: authLogout } = useAuth();
 
-  const [view, setView] = useState('DASHBOARD');
+  const [view, setView] = useState(() => {
+    const savedFarms = localStorage.getItem('km_farms');
+    if (!savedFarms || JSON.parse(savedFarms).length === 0) {
+      return 'WELCOME';
+    }
+    return 'DASHBOARD';
+  });
   const [language, setLanguage] = useState(() => localStorage.getItem('km_language') || 'en');
   const [voiceGuide, setVoiceGuide] = useState(() => localStorage.getItem('km_voice_guide') === 'true');
   const [playingAudio, setPlayingAudio] = useState(null);
