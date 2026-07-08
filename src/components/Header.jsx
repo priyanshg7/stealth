@@ -1,5 +1,6 @@
 import { t } from '../utils/translations';
 import React, { useEffect } from 'react';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Header({
   activeDashboardTab,
@@ -75,6 +76,11 @@ export default function Header({
 
       {/* Right Side: Lang Switcher, Voice Helper, Notifications */}
       <div className="flex items-center gap-2 md:gap-3">
+        
+        {/* Language Switcher */}
+        <div className="hidden sm:block w-32 border border-outline-variant/60 rounded-xl overflow-hidden hover:bg-surface-container bg-surface-container-low transition-colors">
+          <LanguageSwitcher className="w-full h-full py-1.5" />
+        </div>
         
         {/* Notification Button */}
         <button 

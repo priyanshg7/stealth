@@ -26,6 +26,19 @@
   <body class="bg-background text-on-surface antialiased min-h-screen">
     <div id="google_translate_element" style="display: none;"></div>
     <script>
+      (function() {
+        try {
+          var savedLang = localStorage.getItem('km_language');
+          if (savedLang) {
+            document.cookie = "googtrans=/en/" + savedLang + "; path=/";
+            if (window.location.hostname !== 'localhost') {
+              document.cookie = "googtrans=/en/" + savedLang + "; path=/; domain=" + window.location.hostname;
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <script>
       function googleTranslateElementInit() {
         new google.translate.TranslateElement({
           pageLanguage: 'en',

@@ -661,6 +661,17 @@ export default function App() {
 
   // Sync state to localStorage
   useEffect(() => { localStorage.setItem('km_language', language); }, [language]);
+
+  // Listen for language changes from LanguageSwitcher component
+  useEffect(() => {
+    const handleLanguageChange = (e) => {
+      if (e.detail && typeof e.detail === 'string') {
+        setLanguage(e.detail);
+      }
+    };
+    window.addEventListener('kmLanguageChange', handleLanguageChange);
+    return () => window.removeEventListener('kmLanguageChange', handleLanguageChange);
+  }, []);
   useEffect(() => { localStorage.setItem('km_voice_guide', voiceGuide); }, [voiceGuide]);
   useEffect(() => { localStorage.setItem('km_farms', JSON.stringify(farms)); }, [farms]);
   useEffect(() => { localStorage.setItem('km_selected_farm_index', selectedFarmIndex); }, [selectedFarmIndex]);
