@@ -92,7 +92,7 @@ function Navbar() {
             {!isAuthenticated && (
               <button
                 onClick={handleDemoClick}
-                className="px-5 py-2.5 rounded-xl text-sm font-bold text-on-surface-variant hover:text-primary hover:bg-primary-container/10 transition-colors flex items-center gap-1.5"
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-primary hover:bg-secondary shadow-sm transition-colors flex items-center gap-1.5"
               >
                 <span className="material-symbols-outlined notranslate text-lg">science</span>
                 Try Demo
@@ -133,7 +133,7 @@ function Navbar() {
               {!isAuthenticated && (
                 <button
                   onClick={handleDemoClick}
-                  className="w-full px-5 py-3 rounded-xl text-sm font-bold text-on-surface-variant border border-outline-variant/30 hover:bg-surface-container flex items-center justify-center gap-2"
+                  className="w-full px-5 py-3 rounded-xl text-sm font-bold text-white bg-primary hover:bg-secondary shadow-sm transition-colors flex items-center justify-center gap-2"
                 >
                   <span className="material-symbols-outlined notranslate text-lg">science</span>
                   Try Demo
@@ -202,6 +202,13 @@ function HeroSection() {
               >
                 Get Started
                 <ArrowRight className="w-4.5 h-4.5" />
+              </button>
+              <button
+                onClick={handleDemoClick}
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-white bg-primary hover:bg-secondary transition-all shadow-lg hover:shadow-xl active:scale-[0.97] flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined notranslate text-lg">science</span>
+                Try Demo
               </button>
             </div>
 
