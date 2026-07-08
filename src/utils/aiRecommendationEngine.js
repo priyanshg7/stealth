@@ -402,18 +402,9 @@ async function callAIRouter(prompt) {
   // 3. Try Gemini (gemini-2.0-flash with new API key)
   try {
     console.log("[AI Router] Attempting Gemini (gemini-2.0-flash)...");
-    let url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-    const headers = { 'Content-Type': 'application/json' };
-    
-    if (GEMINI_API_KEY && GEMINI_API_KEY.startsWith('AIza')) {
-      url += `?key=${GEMINI_API_KEY}`;
-    } else if (GEMINI_API_KEY) {
-      headers['Authorization'] = `Bearer ${GEMINI_API_KEY}`;
-    }
-
-    const response = await fetch(url, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
-      headers: headers,
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: { responseMimeType: "application/json" }
