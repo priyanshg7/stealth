@@ -1,8 +1,6 @@
 import { t } from '../utils/translations';
 import React, { useEffect } from 'react';
 
-import LanguageSwitcher from './LanguageSwitcher';
-
 export default function Header({
   activeDashboardTab,
   profile,
@@ -78,19 +76,6 @@ export default function Header({
       {/* Right Side: Lang Switcher, Voice Helper, Notifications */}
       <div className="flex items-center gap-2 md:gap-3">
         
-        {/* Language Dropdown Selector via Custom LanguageSwitcher */}
-        <div className="flex items-center gap-1.5 bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 rounded-xl pr-1.5 transition-colors">
-          <LanguageSwitcher className="w-[120px] md:w-[140px] h-[48px] rounded-l-xl" />
-          <div className="h-6 w-px bg-outline-variant/50"></div>
-          <button
-            onClick={() => window.location.reload()}
-            className="p-2 rounded-lg hover:bg-black/5 text-primary flex items-center justify-center transition-colors"
-            title="Refresh Translation"
-          >
-            <span className="material-symbols-outlined notranslate text-lg">refresh</span>
-          </button>
-        </div>
-
         {/* Notification Button */}
         <button 
           onClick={() => setActiveDashboardTab('notifications')}
