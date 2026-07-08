@@ -23,8 +23,8 @@ export default function DiseaseDiagnosis({ weatherData, activeFarm, farms, setFa
   const fileInputRef = useRef(null);
 
   const currentCrop = farmSource === 'saved' ? (activeFarm?.crop?.name || 'Wheat') : manualCrop;
-  const rawLocation = farmSource === 'saved' ? `${activeFarm?.village || ''} ${activeFarm?.district || ''} ${activeFarm?.state || ''}`.trim() : manualLocation;
-  const currentLocation = rawLocation.replace(/\s+/g, ', ') || 'Unknown Location';
+  const savedLocation = [activeFarm?.village, activeFarm?.district, activeFarm?.state].filter(Boolean).join(', ');
+  const currentLocation = farmSource === 'saved' ? (savedLocation || 'Unknown Location') : (manualLocation || 'Unknown Location');
   const currentArea = farmSource === 'saved' ? (activeFarm?.area || 1) : 1;
 
   const handleImageUpload = (e) => {
@@ -471,7 +471,7 @@ export default function DiseaseDiagnosis({ weatherData, activeFarm, farms, setFa
             <label className="text-sm font-bold text-gray-700">Location*</label>
             {farmSource === 'saved' ? (
               <div className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 flex justify-between items-center text-sm">
-                <span className="font-semibold text-gray-700">{activeFarm?.location || 'Unknown'}</span>
+                <span className="font-semibold text-gray-700">{currentLocation}</span>
                 <span className="material-symbols-outlined notranslate text-gray-400 text-lg">lock</span>
               </div>
             ) : (
