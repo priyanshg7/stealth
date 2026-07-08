@@ -97,12 +97,22 @@ Return ONLY a raw JSON object with these exact keys. Do NOT include markdown blo
 - "riskAssessment": object with keys: "weatherImpact" (e.g. "High humidity favors spread"), "shouldMonitor" (boolean), "explanation" (detailed string analyzing current temp/humidity vs disease).
 - "preventionAndBestPractices": array of objects, each with "title" (e.g. "Crop Rotation") and "description" (detailed string).`;
 
+  let url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+
+  if (GEMINI_API_KEY.startsWith('AIza')) {
+    url += `?key=${GEMINI_API_KEY}`;
+  } else {
+    // Treat as OAuth token
+    headers['Authorization'] = `Bearer ${GEMINI_API_KEY}`;
+  }
+
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: headers,
       body: JSON.stringify({
         contents: [
           {
