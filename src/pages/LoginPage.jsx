@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ArrowLeft, AlertCircle, Sparkles } from 'lucide-react';
@@ -47,6 +47,41 @@ export default function LoginPage() {
       navigate(redirect, { replace: true });
     }
   };
+
+  useEffect(() => {
+    if (!document.getElementById('google-translate-script')) {
+      window.googleTranslateElementInit = () => {
+        if (window.google && window.google.translate) {
+          new window.google.translate.TranslateElement(
+            {
+              pageLanguage: 'en',
+              includedLanguages: 'en,hi,mr,pa,gu,ta,te,bn,kn,ml,or,as,ur',
+              layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
+            },
+            'google_translate_element_login'
+          );
+
+          const checkExist = setInterval(() => {
+            const googleSelect = document.querySelector('.goog-te-combo');
+            if (googleSelect) {
+              googleSelect.addEventListener('change', () => {
+                setTimeout(() => {
+                  window.location.reload();
+                }, 500);
+              });
+              clearInterval(checkExist);
+            }
+          }, 300);
+        }
+      };
+
+      const script = document.createElement('script');
+      script.id = 'google-translate-script';
+      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-on-surface font-sans flex flex-col">
@@ -100,6 +135,17 @@ export default function LoginPage() {
                 </div>
               );
             })()}
+
+            {/* Language Preference */}
+            <div className="mb-6">
+              <label className="block text-[11px] font-bold text-on-surface-variant mb-2 uppercase tracking-wider text-center">
+                Select Your Language / अपनी भाषा चुनें
+              </label>
+              <div className="relative group w-full h-[54px] bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 rounded-xl px-4 flex items-center justify-between text-sm font-bold text-on-surface cursor-pointer overflow-hidden transition-colors">
+                <div id="google_translate_element_login" className="notranslate w-full h-full flex items-center z-10 relative"></div>
+                <span className="material-symbols-outlined notranslate absolute right-4 pointer-events-none text-xl text-primary z-0 opacity-50 group-hover:opacity-100 transition-opacity">translate</span>
+              </div>
+            </div>
 
             {/* Google Sign-In */}
             <button
