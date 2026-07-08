@@ -1,6 +1,8 @@
 import { t } from '../utils/translations';
 import React, { useEffect } from 'react';
 
+import LanguageSwitcher from './LanguageSwitcher';
+
 export default function Header({
   activeDashboardTab,
   profile,
@@ -16,32 +18,6 @@ export default function Header({
   startSpeechRecognition,
   handleVoiceCommand
 }) {
-  useEffect(() => {
-    const initTranslate = () => {
-      if (document.querySelector('#google_translate_element_header .goog-te-combo')) return;
-      new window.google.translate.TranslateElement(
-        {
-          pageLanguage: 'en',
-          includedLanguages: 'en,hi,mr,pa,gu,ta,te,bn,kn,ml,or,as,ur',
-          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
-        },
-        'google_translate_element_header'
-      );
-    };
-
-    if (window.google && window.google.translate && window.google.translate.TranslateElement) {
-      initTranslate();
-    } else {
-      window.googleTranslateElementInit = initTranslate;
-      if (!document.getElementById('google-translate-script')) {
-        const script = document.createElement('script');
-        script.id = 'google-translate-script';
-        script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-        script.async = true;
-        document.body.appendChild(script);
-      }
-    }
-  }, []);
 
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-surface-container-high px-4 py-3 flex items-center justify-between gap-4 shadow-sm">
@@ -102,11 +78,8 @@ export default function Header({
       {/* Right Side: Lang Switcher, Voice Helper, Notifications */}
       <div className="flex items-center gap-2 md:gap-3">
         
-        {/* Language Dropdown Selector via Google Translate */}
-        <div className="relative group min-w-[100px] h-[48px] bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 rounded-xl px-2 flex items-center justify-between text-[13px] md:text-sm font-bold text-on-surface cursor-pointer overflow-hidden">
-          <div id="google_translate_element_header" className="notranslate w-full flex items-center z-10 relative"></div>
-          <span className="material-symbols-outlined notranslate absolute right-2 pointer-events-none text-xs text-on-surface-variant z-0">arrow_drop_down</span>
-        </div>
+        {/* Language Dropdown Selector via Custom LanguageSwitcher */}
+        <LanguageSwitcher className="w-[140px] md:w-[160px] h-[48px] bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 rounded-xl" />
 
         {/* Notification Button */}
         <button 
