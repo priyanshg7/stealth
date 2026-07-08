@@ -89,6 +89,15 @@ function Navbar() {
 
           {/* Desktop CTAs */}
           <div className="hidden md:flex items-center gap-3">
+            {!isAuthenticated && (
+              <button
+                onClick={handleDemoClick}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-on-surface-variant hover:text-primary hover:bg-primary-container/10 transition-colors flex items-center gap-1.5"
+              >
+                <span className="material-symbols-outlined notranslate text-lg">science</span>
+                Try Demo
+              </button>
+            )}
             <button
               onClick={() => navigate(isAuthenticated ? '/app' : '/login')}
               className="px-5 py-2.5 rounded-xl text-sm font-bold text-primary hover:bg-primary-container/20 transition-colors"
@@ -121,6 +130,15 @@ function Navbar() {
               </a>
             ))}
             <div className="pt-3 flex flex-col gap-2">
+              {!isAuthenticated && (
+                <button
+                  onClick={handleDemoClick}
+                  className="w-full px-5 py-3 rounded-xl text-sm font-bold text-on-surface-variant border border-outline-variant/30 hover:bg-surface-container flex items-center justify-center gap-2"
+                >
+                  <span className="material-symbols-outlined notranslate text-lg">science</span>
+                  Try Demo
+                </button>
+              )}
               <button
                 onClick={() => { setMobileMenuOpen(false); navigate(isAuthenticated ? '/app' : '/login'); }}
                 className="w-full px-5 py-3 rounded-xl text-sm font-bold text-primary border border-primary/30 hover:bg-primary-container/20"
