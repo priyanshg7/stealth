@@ -1648,25 +1648,27 @@ Guidelines:
           ) : (
             <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
               {eligibleSchemes.slice(0, 5).map(sch => (
-                <div key={sch.slug || sch.name} className="p-3.5 rounded-xl border border-outline-variant/60 bg-surface-container-low/20 flex flex-col justify-between gap-3">
+                <div key={sch.slug || sch.name} className="p-4 rounded-xl border border-outline-variant/60 bg-white shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-3">
                   <div className="flex justify-between items-start gap-3">
-                    <div>
-                      <h4 className="font-bold text-xs text-on-surface leading-tight hover:text-primary cursor-pointer" onClick={() => setSelectedSchemeForDetails(sch)}>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-sm text-on-surface leading-tight hover:text-primary cursor-pointer" onClick={() => setSelectedSchemeForDetails(sch)}>
                         {sch.name}
                       </h4>
-                      <span className="text-[10px] text-primary font-bold mt-1 block">Benefit: {sch.benefits}</span>
+                      <span className="text-xs text-on-surface-variant font-medium mt-1.5 block line-clamp-2 leading-relaxed">
+                        <strong className="text-primary">Benefit:</strong> {sch.benefits}
+                      </span>
                     </div>
-                    <span className="text-[9px] font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full shrink-0">
+                    <span className="text-[10px] font-extrabold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full shrink-0">
                       Eligible
                     </span>
                   </div>
-                  <div className="flex justify-between items-center pt-2 border-t border-surface-container-high">
-                    <span className="text-[9px] text-on-surface-variant font-semibold">Docs Ready: {getDocProgress(sch).percent}%</span>
-                    <div className="flex gap-2">
-                      <button onClick={() => setSelectedSchemeForDetails(sch)} className="text-[10px] font-extrabold text-primary hover:underline">
+                  <div className="flex justify-between items-center pt-3 border-t border-surface-container-high">
+                    <span className="text-[11px] text-on-surface-variant font-bold">Docs Ready: {getDocProgress(sch).percent}%</span>
+                    <div className="flex gap-3">
+                      <button onClick={() => setSelectedSchemeForDetails(sch)} className="text-xs font-extrabold text-primary hover:underline">
                         Apply Now
                       </button>
-                      <button onClick={() => startAIChat(sch)} className="text-[10px] font-extrabold text-on-surface-variant hover:text-primary">
+                      <button onClick={() => startAIChat(sch)} className="text-xs font-extrabold text-on-surface-variant hover:text-primary">
                         Ask AI
                       </button>
                     </div>
@@ -1693,32 +1695,34 @@ Guidelines:
               {likelyEligibleSchemes.slice(0, 5).map(sch => {
                 const badge = getStatusBadge(sch.status);
                 return (
-                  <div key={sch.slug || sch.name} className="p-3.5 rounded-xl border border-outline-variant/60 bg-surface-container-low/20 flex flex-col justify-between gap-3">
+                  <div key={sch.slug || sch.name} className="p-4 rounded-xl border border-outline-variant/60 bg-white shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between gap-3">
                     <div className="flex justify-between items-start gap-3">
-                      <div>
-                        <h4 className="font-bold text-xs text-on-surface leading-tight hover:text-primary cursor-pointer" onClick={() => setSelectedSchemeForDetails(sch)}>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-sm text-on-surface leading-tight hover:text-primary cursor-pointer" onClick={() => setSelectedSchemeForDetails(sch)}>
                           {sch.name}
                         </h4>
-                        <span className="text-[10px] text-on-surface-variant font-bold mt-1 block">Benefit: {sch.benefits}</span>
+                        <span className="text-xs text-on-surface-variant font-medium mt-1.5 block line-clamp-2 leading-relaxed">
+                          <strong className="text-on-surface">Benefit:</strong> {sch.benefits}
+                        </span>
                       </div>
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 border ${badge.bg}`}>
+                      <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full shrink-0 border ${badge.bg}`}>
                         {badge.label}
                       </span>
                     </div>
 
                     {sch.missingInfo.length > 0 && (
-                      <div className="text-[9px] text-amber-800 bg-amber-50 p-2 rounded-lg leading-relaxed font-semibold">
+                      <div className="text-[11px] text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-100 leading-relaxed font-semibold">
                         ⚠️ <strong>Configure Profile details to verify:</strong> {sch.missingInfo.join(', ')}
                       </div>
                     )}
 
-                    <div className="flex justify-between items-center pt-2 border-t border-surface-container-high">
-                      <span className="text-[9px] text-on-surface-variant font-semibold">Ready: {getDocProgress(sch).percent}%</span>
-                      <div className="flex gap-2">
-                        <button onClick={() => setSelectedSchemeForDetails(sch)} className="text-[10px] font-extrabold text-primary hover:underline">
+                    <div className="flex justify-between items-center pt-3 border-t border-surface-container-high">
+                      <span className="text-[11px] text-on-surface-variant font-bold">Ready: {getDocProgress(sch).percent}%</span>
+                      <div className="flex gap-3">
+                        <button onClick={() => setSelectedSchemeForDetails(sch)} className="text-xs font-extrabold text-primary hover:underline">
                           Verify & Apply
                         </button>
-                        <button onClick={() => startAIChat(sch)} className="text-[10px] font-extrabold text-on-surface-variant hover:text-primary">
+                        <button onClick={() => startAIChat(sch)} className="text-xs font-extrabold text-on-surface-variant hover:text-primary">
                           Ask AI
                         </button>
                       </div>
