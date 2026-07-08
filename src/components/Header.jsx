@@ -1,5 +1,5 @@
 import { t } from '../utils/translations';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 export default function Header({
   activeDashboardTab,
@@ -16,6 +16,30 @@ export default function Header({
   startSpeechRecognition,
   handleVoiceCommand
 }) {
+  useEffect(() => {
+    // Only load if not already loaded
+    if (!document.getElementById('google-translate-script')) {
+      window.googleTranslateElementInit = () => {
+        if (window.google && window.google.translate) {
+          new window.google.translate.TranslateElement(
+            {
+              pageLanguage: 'en',
+              includedLanguages: 'en,hi,mr,pa,gu,ta,te,bn,kn,ml,or,as,ur',
+              layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
+            },
+            'google_translate_element_header'
+          );
+        }
+      };
+
+      const script = document.createElement('script');
+      script.id = 'google-translate-script';
+      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-surface-container-high px-4 py-3 flex items-center justify-between gap-4 shadow-sm">
       
@@ -75,28 +99,10 @@ export default function Header({
       {/* Right Side: Lang Switcher, Voice Helper, Notifications */}
       <div className="flex items-center gap-2 md:gap-3">
         
-        {/* Language Dropdown Selector */}
-        <div className="relative">
-          <select 
-            value={language}
-            onChange={(e) => {
-              const selectedLang = e.target.value;
-              setLanguage(selectedLang);
-              
-              // Trigger Google Translate programmatically
-              const googleSelect = document.querySelector('.goog-te-combo');
-              if (googleSelect) {
-                googleSelect.value = selectedLang;
-                googleSelect.dispatchEvent(new Event('change'));
-              }
-            }}
-            className="notranslate bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 rounded-xl min-h-[48px] px-3 pr-8 text-[13px] md:text-sm font-bold text-on-surface appearance-none cursor-pointer w-full max-w-[100px] md:max-w-none"
-          >
-            {languages.map(l => (
-              <option key={l.id} value={l.id}>{l.native}</option>
-            ))}
-          </select>
-          <span className="material-symbols-outlined notranslate absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-xs text-on-surface-variant">arrow_drop_down</span>
+        {/* Language Dropdown Selector via Google Translate */}
+        <div className="relative group min-w-[100px] h-[48px] bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 rounded-xl px-2 flex items-center justify-between text-[13px] md:text-sm font-bold text-on-surface cursor-pointer overflow-hidden">
+          <div id="google_translate_element_header" className="notranslate w-full flex items-center z-10 relative"></div>
+          <span className="material-symbols-outlined notranslate absolute right-2 pointer-events-none text-xs text-on-surface-variant z-0">arrow_drop_down</span>
         </div>
 
         {/* Notification Button */}
