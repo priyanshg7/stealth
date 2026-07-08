@@ -78,16 +78,23 @@ export default function Header({
         {/* Language Dropdown Selector */}
         <div className="relative">
           <select 
-            value="en"
+            value={language}
             onChange={(e) => {
-              if (e.target.value === 'other') {
-                alert("To view KisanMitra in your regional language (including all 3500+ government schemes), please use the floating Google Translate widget located at the bottom right corner of your screen.");
+              const selectedLang = e.target.value;
+              setLanguage(selectedLang);
+              
+              // Trigger Google Translate programmatically
+              const googleSelect = document.querySelector('.goog-te-combo');
+              if (googleSelect) {
+                googleSelect.value = selectedLang;
+                googleSelect.dispatchEvent(new Event('change'));
               }
             }}
-            className="bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 rounded-xl min-h-[48px] px-3 pr-8 text-[13px] md:text-sm font-bold text-on-surface appearance-none cursor-pointer w-full max-w-[110px] md:max-w-none"
+            className="notranslate bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 rounded-xl min-h-[48px] px-3 pr-8 text-[13px] md:text-sm font-bold text-on-surface appearance-none cursor-pointer w-full max-w-[100px] md:max-w-none"
           >
-            <option value="en">English</option>
-            <option value="other">Other Languages 🌐</option>
+            {languages.map(l => (
+              <option key={l.id} value={l.id}>{l.native}</option>
+            ))}
           </select>
           <span className="material-symbols-outlined notranslate absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-xs text-on-surface-variant">arrow_drop_down</span>
         </div>
