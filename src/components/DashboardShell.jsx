@@ -157,8 +157,8 @@ export default function DashboardShell({
         <main className="p-4 md:p-6 pb-48 md:pb-32 max-w-7xl mx-auto w-full flex-grow space-y-6">
           <ErrorBoundary>
 
-          {activeDashboardTab === 'dashboard' && (
-            (farms.length > 0) ? (
+          <div className={activeDashboardTab === 'dashboard' ? 'block' : 'hidden'}>
+            {(farms.length > 0) ? (
               <FarmingDashboard 
                 farms={farms}
                 selectedFarmIndex={selectedFarmIndex}
@@ -211,10 +211,10 @@ export default function DashboardShell({
                 setSeasonPlanConfirmed={setSeasonPlanConfirmed}
                 crops={crops}
               />
-            )
-          )}
+            )}
+          </div>
 
-           {activeDashboardTab === 'diagnosis' && (
+          <div className={activeDashboardTab === 'diagnosis' ? 'block' : 'hidden'}>
             <DiseaseDiagnosis 
               weatherData={weatherData}
               farms={farms}
@@ -222,9 +222,9 @@ export default function DashboardShell({
               selectedFarmIndex={selectedFarmIndex}
               activeFarm={farms[selectedFarmIndex]}
             />
-          )}
+          </div>
  
-          {activeDashboardTab === 'market' && (
+          <div className={activeDashboardTab === 'market' ? 'block' : 'hidden'}>
             <MarketDetails 
               farms={farms}
               selectedFarmIndex={selectedFarmIndex}
@@ -233,9 +233,9 @@ export default function DashboardShell({
               mandiData={null}
               fetchMandiData={null}
             />
-          )}
+          </div>
  
-          {activeDashboardTab === 'schemes' && (
+          <div className={activeDashboardTab === 'schemes' ? 'block' : 'hidden'}>
             <GovernmentSchemes 
               setSelectedScheme={setSelectedScheme}
               profile={profile}
@@ -247,9 +247,9 @@ export default function DashboardShell({
               setActiveDashboardTab={setActiveDashboardTab}
               allSchemes={allSchemes}
             />
-          )}
+          </div>
  
-          {activeDashboardTab === 'settings' && (
+          <div className={activeDashboardTab === 'settings' ? 'block' : 'hidden'}>
             <SettingsPanel 
               profile={profile}
               setProfile={setProfile}
@@ -262,9 +262,9 @@ export default function DashboardShell({
               setView={setView}
               startNewFarmRegistration={startNewFarmRegistration}
             />
-          )}
+          </div>
 
-          {activeDashboardTab === 'weather' && (
+          <div className={activeDashboardTab === 'weather' ? 'block' : 'hidden'}>
             <WeatherIntelligence 
               profile={profile}
               farms={farms}
@@ -275,9 +275,9 @@ export default function DashboardShell({
               setActiveDashboardTab={setActiveDashboardTab}
               language={language}
             />
-          )}
+          </div>
 
-          {activeDashboardTab === 'season_planner' && (
+          <div className={activeDashboardTab === 'season_planner' ? 'block' : 'hidden'}>
             <SeasonPlanner 
               profile={profile}
               farms={farms}
@@ -290,9 +290,9 @@ export default function DashboardShell({
               setActiveDashboardTab={setActiveDashboardTab}
               weatherData={weatherData}
             />
-          )}
+          </div>
 
-          {activeDashboardTab === 'planner' && (
+          <div className={activeDashboardTab === 'planner' ? 'block' : 'hidden'}>
             <AnnualPlanner
               profile={profile}
               farms={farms}
@@ -305,9 +305,9 @@ export default function DashboardShell({
               seasonPlanConfirmed={seasonPlanConfirmed}
               setSeasonPlanConfirmed={setSeasonPlanConfirmed}
             />
-          )}
+          </div>
 
-          {activeDashboardTab === 'tasks' && (
+          <div className={activeDashboardTab === 'tasks' ? 'block' : 'hidden'}>
             <TodayTasks
               dashboardData={getFarmDashboardData(farms[selectedFarmIndex])}
               completedTasks={completedTasks}
@@ -321,9 +321,9 @@ export default function DashboardShell({
               setFarms={setFarms}
               weatherData={weatherData}
             />
-          )}
+          </div>
 
-          {activeDashboardTab === 'journey' && (
+          <div className={activeDashboardTab === 'journey' ? 'block' : 'hidden'}>
             <FarmJourney
               farms={farms}
               selectedFarmIndex={selectedFarmIndex}
@@ -333,7 +333,7 @@ export default function DashboardShell({
               weatherData={weatherData}
               language={language}
             />
-            )}
+          </div>
           </ErrorBoundary>
         </main>
       </div>
