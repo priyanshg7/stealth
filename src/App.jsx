@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Check, Volume2, Mic, MapPin, Plus, Trash2, Edit3, ArrowLeft, ArrowRight,
@@ -13,97 +13,97 @@ import { useAuth } from './contexts/AuthContext';
 
 // Static Data
 const LANGUAGES = [
-  { id: 'hi', name: 'Hindi', native: 'हिन्दी', letter: 'अ' },
+  { id: 'hi', name: 'Hindi', native: 'à¤¹à¤¿à¤¨à¥à¤¦à¥€', letter: 'à¤…' },
   { id: 'en', name: 'English', native: 'English', letter: 'A' },
-  { id: 'mr', name: 'Marathi', native: 'मराठी', letter: 'म' },
-  { id: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ', letter: 'ਪੰ' },
-  { id: 'te', name: 'Telugu', native: 'తెలుగు', letter: 'తె' },
-  { id: 'kn', name: 'Kannada', native: 'ಕನ್ನಡ', letter: 'ಕ' }
+  { id: 'mr', name: 'Marathi', native: 'à¤®à¤°à¤¾à¤ à¥€', letter: 'à¤®' },
+  { id: 'pa', name: 'Punjabi', native: 'à¨ªà©°à¨œà¨¾à¨¬à©€', letter: 'à¨ªà©°' },
+  { id: 'te', name: 'Telugu', native: 'à°¤à±†à°²à±à°—à±', letter: 'à°¤à±†' },
+  { id: 'kn', name: 'Kannada', native: 'à²•à²¨à³à²¨à²¡', letter: 'à²•' }
 ];
 
 const CROPS = [
-  { id: 'wheat', name: 'Wheat', native: 'गेहूं', icon: '🌾' },
-  { id: 'rice', name: 'Rice', native: 'धान', icon: '🌱' },
-  { id: 'maize', name: 'Maize', native: 'मक्का', icon: '🌽' },
-  { id: 'cotton', name: 'Cotton', native: 'कपास', icon: '☁️' },
-  { id: 'soybean', name: 'Soybean', native: 'सोयाबीन', icon: '🫘' },
-  { id: 'sugarcane', name: 'Sugarcane', native: 'गन्ना', icon: '🎋' },
-  { id: 'tomato', name: 'Tomato', native: 'टमाटर', icon: '🍅' },
-  { id: 'chilli', name: 'Chilli', native: 'मिर्च', icon: '🌶️' }
+  { id: 'wheat', name: 'Wheat', native: 'à¤—à¥‡à¤¹à¥‚à¤‚', icon: 'ðŸŒ¾' },
+  { id: 'rice', name: 'Rice', native: 'à¤§à¤¾à¤¨', icon: 'ðŸŒ±' },
+  { id: 'maize', name: 'Maize', native: 'à¤®à¤•à¥à¤•à¤¾', icon: 'ðŸŒ½' },
+  { id: 'cotton', name: 'Cotton', native: 'à¤•à¤ªà¤¾à¤¸', icon: 'â˜ï¸' },
+  { id: 'soybean', name: 'Soybean', native: 'à¤¸à¥‹à¤¯à¤¾à¤¬à¥€à¤¨', icon: 'ðŸ«˜' },
+  { id: 'sugarcane', name: 'Sugarcane', native: 'à¤—à¤¨à¥à¤¨à¤¾', icon: 'ðŸŽ‹' },
+  { id: 'tomato', name: 'Tomato', native: 'à¤Ÿà¤®à¤¾à¤Ÿà¤°', icon: 'ðŸ…' },
+  { id: 'chilli', name: 'Chilli', native: 'à¤®à¤¿à¤°à¥à¤š', icon: 'ðŸŒ¶ï¸' }
 ];
 
 const WATER_SOURCES = [
-  { id: 'canal', name: 'Canal Irrigation', icon: '🌊' },
-  { id: 'borewell', name: 'Borewell / Tubewell', icon: '🎛️' },
-  { id: 'openwell', name: 'Open Well', icon: '🕳️' },
-  { id: 'river', name: 'River', icon: '🏞️' },
-  { id: 'pond', name: 'Pond', icon: '💧' },
-  { id: 'farmpond', name: 'Farm Pond', icon: '⛲' },
-  { id: 'rain', name: 'Rain-fed Only', icon: '🌧️' },
-  { id: 'checkdam', name: 'Check Dam', icon: '🧱' },
-  { id: 'tank', name: 'Community Water Tank', icon: '🛢️' },
-  { id: 'lake', name: 'Lake / Reservoir', icon: '🏞️' },
-  { id: 'lift', name: 'Lift Irrigation', icon: '⚡' },
-  { id: 'municipal', name: 'Municipal Water Supply', icon: '🚰' }
+  { id: 'canal', name: 'Canal Irrigation', icon: 'ðŸŒŠ' },
+  { id: 'borewell', name: 'Borewell / Tubewell', icon: 'ðŸŽ›ï¸' },
+  { id: 'openwell', name: 'Open Well', icon: 'ðŸ•³ï¸' },
+  { id: 'river', name: 'River', icon: 'ðŸžï¸' },
+  { id: 'pond', name: 'Pond', icon: 'ðŸ’§' },
+  { id: 'farmpond', name: 'Farm Pond', icon: 'â›²' },
+  { id: 'rain', name: 'Rain-fed Only', icon: 'ðŸŒ§ï¸' },
+  { id: 'checkdam', name: 'Check Dam', icon: 'ðŸ§±' },
+  { id: 'tank', name: 'Community Water Tank', icon: 'ðŸ›¢ï¸' },
+  { id: 'lake', name: 'Lake / Reservoir', icon: 'ðŸžï¸' },
+  { id: 'lift', name: 'Lift Irrigation', icon: 'âš¡' },
+  { id: 'municipal', name: 'Municipal Water Supply', icon: 'ðŸš°' }
 ];
 
 const IRRIGATION_METHODS = [
-  { id: 'flood', name: 'Flood Irrigation', icon: '🌊' },
-  { id: 'furrow', name: 'Furrow Irrigation', icon: '🚜' },
-  { id: 'basin', name: 'Basin Irrigation', icon: '⭕' },
-  { id: 'border', name: 'Border Irrigation', icon: '📊' },
-  { id: 'drip', name: 'Drip Irrigation', icon: '💧' },
-  { id: 'minidrip', name: 'Mini Drip', icon: '🍼' },
-  { id: 'sprinkler', name: 'Sprinkler', icon: '🚿' },
-  { id: 'microsprinkler', name: 'Micro Sprinkler', icon: '💦' },
-  { id: 'raingun', name: 'Rain Gun', icon: '🔫' },
-  { id: 'manual', name: 'Manual Watering', icon: '🪣' },
-  { id: 'hose', name: 'Hose Pipe', icon: '🐍' },
-  { id: 'awd', name: 'Alternate Wetting & Drying', icon: '⏱️' },
-  { id: 'pivot', name: 'Center Pivot', icon: '🎡' },
-  { id: 'subsurface', name: 'Subsurface Drip', icon: '⬇️' }
+  { id: 'flood', name: 'Flood Irrigation', icon: 'ðŸŒŠ' },
+  { id: 'furrow', name: 'Furrow Irrigation', icon: 'ðŸšœ' },
+  { id: 'basin', name: 'Basin Irrigation', icon: 'â­•' },
+  { id: 'border', name: 'Border Irrigation', icon: 'ðŸ“Š' },
+  { id: 'drip', name: 'Drip Irrigation', icon: 'ðŸ’§' },
+  { id: 'minidrip', name: 'Mini Drip', icon: 'ðŸ¼' },
+  { id: 'sprinkler', name: 'Sprinkler', icon: 'ðŸš¿' },
+  { id: 'microsprinkler', name: 'Micro Sprinkler', icon: 'ðŸ’¦' },
+  { id: 'raingun', name: 'Rain Gun', icon: 'ðŸ”«' },
+  { id: 'manual', name: 'Manual Watering', icon: 'ðŸª£' },
+  { id: 'hose', name: 'Hose Pipe', icon: 'ðŸ' },
+  { id: 'awd', name: 'Alternate Wetting & Drying', icon: 'â±ï¸' },
+  { id: 'pivot', name: 'Center Pivot', icon: 'ðŸŽ¡' },
+  { id: 'subsurface', name: 'Subsurface Drip', icon: 'â¬‡ï¸' }
 ];
 
 const MACHINERY_ITEMS = [
-  { id: 'tractor', name: 'Tractor', icon: '🚜' },
-  { id: 'tiller', name: 'Power Tiller', icon: '⚙️' },
-  { id: 'cultivator', name: 'Cultivator', icon: '⚙️' },
-  { id: 'rotavator', name: 'Rotavator', icon: '🌀' },
-  { id: 'plough', name: 'MB Plough', icon: '🪵' },
-  { id: 'seeddrill', name: 'Seed Drill', icon: '🌱' },
-  { id: 'happyseeder', name: 'Happy Seeder', icon: '🌾' },
-  { id: 'transplanter', name: 'Paddy Transplanter', icon: '🌾' },
-  { id: 'leveler', name: 'Laser Land Leveler', icon: '📏' },
-  { id: 'harvester', name: 'Combine Harvester', icon: '🌾' },
-  { id: 'reaper', name: 'Reaper', icon: '✂️' },
-  { id: 'thresher', name: 'Thresher', icon: '🌀' },
-  { id: 'weeder', name: 'Power Weeder', icon: '🌱' },
-  { id: 'sprayer', name: 'Sprayer (Manual)', icon: '🧴' },
-  { id: 'boomsprayer', name: 'Boom Sprayer', icon: '🚿' },
-  { id: 'dronespayer', name: 'Drone Sprayer', icon: '🛸' },
-  { id: 'broadcaster', name: 'Fertilizer Broadcaster', icon: '🎒' }
+  { id: 'tractor', name: 'Tractor', icon: 'ðŸšœ' },
+  { id: 'tiller', name: 'Power Tiller', icon: 'âš™ï¸' },
+  { id: 'cultivator', name: 'Cultivator', icon: 'âš™ï¸' },
+  { id: 'rotavator', name: 'Rotavator', icon: 'ðŸŒ€' },
+  { id: 'plough', name: 'MB Plough', icon: 'ðŸªµ' },
+  { id: 'seeddrill', name: 'Seed Drill', icon: 'ðŸŒ±' },
+  { id: 'happyseeder', name: 'Happy Seeder', icon: 'ðŸŒ¾' },
+  { id: 'transplanter', name: 'Paddy Transplanter', icon: 'ðŸŒ¾' },
+  { id: 'leveler', name: 'Laser Land Leveler', icon: 'ðŸ“' },
+  { id: 'harvester', name: 'Combine Harvester', icon: 'ðŸŒ¾' },
+  { id: 'reaper', name: 'Reaper', icon: 'âœ‚ï¸' },
+  { id: 'thresher', name: 'Thresher', icon: 'ðŸŒ€' },
+  { id: 'weeder', name: 'Power Weeder', icon: 'ðŸŒ±' },
+  { id: 'sprayer', name: 'Sprayer (Manual)', icon: 'ðŸ§´' },
+  { id: 'boomsprayer', name: 'Boom Sprayer', icon: 'ðŸš¿' },
+  { id: 'dronespayer', name: 'Drone Sprayer', icon: 'ðŸ›¸' },
+  { id: 'broadcaster', name: 'Fertilizer Broadcaster', icon: 'ðŸŽ’' }
 ];
 
 const LOCALIZED_GUIDES = {
   hi: {
-    welcome: 'किसानमित्र में आपका स्वागत है। आगे बढ़ने के लिए "शुरू करें" पर दबाएं।',
-    otp: 'कृपया अपना १० अंकों का मोबाइल नंबर डालें और ओटीपी दर्ज करें।',
-    lang: 'अपनी पसंदीदा भाषा चुनें और "पुष्टि करें और आगे बढ़ें" दबाएं।',
-    language: 'अपनी पसंदीदा भाषा चुनें और "पुष्टि करें और आगे बढ़ें" दबाएं।',
-    profile: 'कृपया अपना नाम, राज्य, जिला और गाँव की जानकारी भरें।',
-    step1: 'अपने खेत का नाम दर्ज करें और खेत की सीमा का नक्शा बनाएं।',
-    wizard_step1: 'अपने खेत का नाम दर्ज करें और खेत की सीमा का नक्शा बनाएं।',
-    step2: 'अपनी वर्तमान फसल और मिट्टी का विवरण चुनें।',
-    wizard_step2: 'अपनी वर्तमान फसल और मिट्टी का विवरण चुनें।',
-    step3: 'अपने पानी के स्रोत, सिंचाई विधि और उपलब्ध संसाधनों का चयन करें।',
-    wizard_step3: 'अपने पानी के स्रोत, सिंचाई विधि और उपलब्ध संसाधनों का चयन करें।',
-    review: 'खेत के विवरण की समीक्षा करें और इसे सहेजें।',
-    dashboard: 'यह आपका कृषि डैशबोर्ड है। यहाँ आप अपने खेत की सेहत, फसल की वृद्धि और आज के कृषि कार्यों को देख सकते हैं।',
-    market: 'मंडी डिस्कवरी में आपका स्वागत है। यहाँ आप अपनी फसल के मंडी भाव, न्यूनतम समर्थन मूल्य (MSP) और नज़दीकी मंडियों की जानकारी पा सकते हैं।',
-    planner: 'यह फसल योजनाकार है। यहाँ आप पूरे साल का फसल चक्र और बीमारी का पूर्वानुमान देख सकते हैं।',
-    weather: 'यहाँ मौसम का पूर्वानुमान और चेतावनी देख सकते हैं ताकि फसल को नुकसान से बचाया जा सके।',
-    schemes: 'यह सरकारी योजनाएं हैं। यहाँ आप कृषि योजनाओं और अनुदान के लिए पात्रता देख सकते हैं।',
-    soil: 'यह मिट्टी का स्वास्थ्य कार्ड है। यहाँ आप अपनी मिट्टी की जांच और पोषक तत्वों की स्थिति देख सकते हैं।'
+    welcome: 'à¤•à¤¿à¤¸à¤¾à¤¨à¤®à¤¿à¤¤à¥à¤° à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¤¾ à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤¹à¥ˆà¥¤ à¤†à¤—à¥‡ à¤¬à¥à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ "à¤¶à¥à¤°à¥‚ à¤•à¤°à¥‡à¤‚" à¤ªà¤° à¤¦à¤¬à¤¾à¤à¤‚à¥¤',
+    otp: 'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤ªà¤¨à¤¾ à¥§à¥¦ à¤…à¤‚à¤•à¥‹à¤‚ à¤•à¤¾ à¤®à¥‹à¤¬à¤¾à¤‡à¤² à¤¨à¤‚à¤¬à¤° à¤¡à¤¾à¤²à¥‡à¤‚ à¤”à¤° à¤“à¤Ÿà¥€à¤ªà¥€ à¤¦à¤°à¥à¤œ à¤•à¤°à¥‡à¤‚à¥¤',
+    lang: 'à¤…à¤ªà¤¨à¥€ à¤ªà¤¸à¤‚à¤¦à¥€à¤¦à¤¾ à¤­à¤¾à¤·à¤¾ à¤šà¥à¤¨à¥‡à¤‚ à¤”à¤° "à¤ªà¥à¤·à¥à¤Ÿà¤¿ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤†à¤—à¥‡ à¤¬à¤¢à¤¼à¥‡à¤‚" à¤¦à¤¬à¤¾à¤à¤‚à¥¤',
+    language: 'à¤…à¤ªà¤¨à¥€ à¤ªà¤¸à¤‚à¤¦à¥€à¤¦à¤¾ à¤­à¤¾à¤·à¤¾ à¤šà¥à¤¨à¥‡à¤‚ à¤”à¤° "à¤ªà¥à¤·à¥à¤Ÿà¤¿ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤†à¤—à¥‡ à¤¬à¤¢à¤¼à¥‡à¤‚" à¤¦à¤¬à¤¾à¤à¤‚à¥¤',
+    profile: 'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤ªà¤¨à¤¾ à¤¨à¤¾à¤®, à¤°à¤¾à¤œà¥à¤¯, à¤œà¤¿à¤²à¤¾ à¤”à¤° à¤—à¤¾à¤à¤µ à¤•à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤­à¤°à¥‡à¤‚à¥¤',
+    step1: 'à¤…à¤ªà¤¨à¥‡ à¤–à¥‡à¤¤ à¤•à¤¾ à¤¨à¤¾à¤® à¤¦à¤°à¥à¤œ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤–à¥‡à¤¤ à¤•à¥€ à¤¸à¥€à¤®à¤¾ à¤•à¤¾ à¤¨à¤•à¥à¤¶à¤¾ à¤¬à¤¨à¤¾à¤à¤‚à¥¤',
+    wizard_step1: 'à¤…à¤ªà¤¨à¥‡ à¤–à¥‡à¤¤ à¤•à¤¾ à¤¨à¤¾à¤® à¤¦à¤°à¥à¤œ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤–à¥‡à¤¤ à¤•à¥€ à¤¸à¥€à¤®à¤¾ à¤•à¤¾ à¤¨à¤•à¥à¤¶à¤¾ à¤¬à¤¨à¤¾à¤à¤‚à¥¤',
+    step2: 'à¤…à¤ªà¤¨à¥€ à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤«à¤¸à¤² à¤”à¤° à¤®à¤¿à¤Ÿà¥à¤Ÿà¥€ à¤•à¤¾ à¤µà¤¿à¤µà¤°à¤£ à¤šà¥à¤¨à¥‡à¤‚à¥¤',
+    wizard_step2: 'à¤…à¤ªà¤¨à¥€ à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤«à¤¸à¤² à¤”à¤° à¤®à¤¿à¤Ÿà¥à¤Ÿà¥€ à¤•à¤¾ à¤µà¤¿à¤µà¤°à¤£ à¤šà¥à¤¨à¥‡à¤‚à¥¤',
+    step3: 'à¤…à¤ªà¤¨à¥‡ à¤ªà¤¾à¤¨à¥€ à¤•à¥‡ à¤¸à¥à¤°à¥‹à¤¤, à¤¸à¤¿à¤‚à¤šà¤¾à¤ˆ à¤µà¤¿à¤§à¤¿ à¤”à¤° à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¸à¤‚à¤¸à¤¾à¤§à¤¨à¥‹à¤‚ à¤•à¤¾ à¤šà¤¯à¤¨ à¤•à¤°à¥‡à¤‚à¥¤',
+    wizard_step3: 'à¤…à¤ªà¤¨à¥‡ à¤ªà¤¾à¤¨à¥€ à¤•à¥‡ à¤¸à¥à¤°à¥‹à¤¤, à¤¸à¤¿à¤‚à¤šà¤¾à¤ˆ à¤µà¤¿à¤§à¤¿ à¤”à¤° à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¸à¤‚à¤¸à¤¾à¤§à¤¨à¥‹à¤‚ à¤•à¤¾ à¤šà¤¯à¤¨ à¤•à¤°à¥‡à¤‚à¥¤',
+    review: 'à¤–à¥‡à¤¤ à¤•à¥‡ à¤µà¤¿à¤µà¤°à¤£ à¤•à¥€ à¤¸à¤®à¥€à¤•à¥à¤·à¤¾ à¤•à¤°à¥‡à¤‚ à¤”à¤° à¤‡à¤¸à¥‡ à¤¸à¤¹à¥‡à¤œà¥‡à¤‚à¥¤',
+    dashboard: 'à¤¯à¤¹ à¤†à¤ªà¤•à¤¾ à¤•à¥ƒà¤·à¤¿ à¤¡à¥ˆà¤¶à¤¬à¥‹à¤°à¥à¤¡ à¤¹à¥ˆà¥¤ à¤¯à¤¹à¤¾à¤ à¤†à¤ª à¤…à¤ªà¤¨à¥‡ à¤–à¥‡à¤¤ à¤•à¥€ à¤¸à¥‡à¤¹à¤¤, à¤«à¤¸à¤² à¤•à¥€ à¤µà¥ƒà¤¦à¥à¤§à¤¿ à¤”à¤° à¤†à¤œ à¤•à¥‡ à¤•à¥ƒà¤·à¤¿ à¤•à¤¾à¤°à¥à¤¯à¥‹à¤‚ à¤•à¥‹ à¤¦à¥‡à¤– à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤',
+    market: 'à¤®à¤‚à¤¡à¥€ à¤¡à¤¿à¤¸à¥à¤•à¤µà¤°à¥€ à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¤¾ à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤¹à¥ˆà¥¤ à¤¯à¤¹à¤¾à¤ à¤†à¤ª à¤…à¤ªà¤¨à¥€ à¤«à¤¸à¤² à¤•à¥‡ à¤®à¤‚à¤¡à¥€ à¤­à¤¾à¤µ, à¤¨à¥à¤¯à¥‚à¤¨à¤¤à¤® à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤®à¥‚à¤²à¥à¤¯ (MSP) à¤”à¤° à¤¨à¥›à¤¦à¥€à¤•à¥€ à¤®à¤‚à¤¡à¤¿à¤¯à¥‹à¤‚ à¤•à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤ªà¤¾ à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤',
+    planner: 'à¤¯à¤¹ à¤«à¤¸à¤² à¤¯à¥‹à¤œà¤¨à¤¾à¤•à¤¾à¤° à¤¹à¥ˆà¥¤ à¤¯à¤¹à¤¾à¤ à¤†à¤ª à¤ªà¥‚à¤°à¥‡ à¤¸à¤¾à¤² à¤•à¤¾ à¤«à¤¸à¤² à¤šà¤•à¥à¤° à¤”à¤° à¤¬à¥€à¤®à¤¾à¤°à¥€ à¤•à¤¾ à¤ªà¥‚à¤°à¥à¤µà¤¾à¤¨à¥à¤®à¤¾à¤¨ à¤¦à¥‡à¤– à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤',
+    weather: 'à¤¯à¤¹à¤¾à¤ à¤®à¥Œà¤¸à¤® à¤•à¤¾ à¤ªà¥‚à¤°à¥à¤µà¤¾à¤¨à¥à¤®à¤¾à¤¨ à¤”à¤° à¤šà¥‡à¤¤à¤¾à¤µà¤¨à¥€ à¤¦à¥‡à¤– à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚ à¤¤à¤¾à¤•à¤¿ à¤«à¤¸à¤² à¤•à¥‹ à¤¨à¥à¤•à¤¸à¤¾à¤¨ à¤¸à¥‡ à¤¬à¤šà¤¾à¤¯à¤¾ à¤œà¤¾ à¤¸à¤•à¥‡à¥¤',
+    schemes: 'à¤¯à¤¹ à¤¸à¤°à¤•à¤¾à¤°à¥€ à¤¯à¥‹à¤œà¤¨à¤¾à¤à¤‚ à¤¹à¥ˆà¤‚à¥¤ à¤¯à¤¹à¤¾à¤ à¤†à¤ª à¤•à¥ƒà¤·à¤¿ à¤¯à¥‹à¤œà¤¨à¤¾à¤“à¤‚ à¤”à¤° à¤…à¤¨à¥à¤¦à¤¾à¤¨ à¤•à¥‡ à¤²à¤¿à¤ à¤ªà¤¾à¤¤à¥à¤°à¤¤à¤¾ à¤¦à¥‡à¤– à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤',
+    soil: 'à¤¯à¤¹ à¤®à¤¿à¤Ÿà¥à¤Ÿà¥€ à¤•à¤¾ à¤¸à¥à¤µà¤¾à¤¸à¥à¤¥à¥à¤¯ à¤•à¤¾à¤°à¥à¤¡ à¤¹à¥ˆà¥¤ à¤¯à¤¹à¤¾à¤ à¤†à¤ª à¤…à¤ªà¤¨à¥€ à¤®à¤¿à¤Ÿà¥à¤Ÿà¥€ à¤•à¥€ à¤œà¤¾à¤‚à¤š à¤”à¤° à¤ªà¥‹à¤·à¤• à¤¤à¤¤à¥à¤µà¥‹à¤‚ à¤•à¥€ à¤¸à¥à¤¥à¤¿à¤¤à¤¿ à¤¦à¥‡à¤– à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤'
   },
   en: {
     welcome: 'Welcome to KisanMitra. Tap "Get Started" to personalize your digital companion.',
@@ -174,7 +174,7 @@ const DEFAULT_FARM = {
   machineryOwnership: { tractor: 'Own' },
   storage: ['Warehouse'],
   livestock: ['Cow'],
-  labor: { type: 'Both', count: '3–5' },
+  labor: { type: 'Both', count: '3â€“5' },
   transportation: ['Tractor'],
   internet: 'Average',
   smartphone: 'Farmer Uses App',
@@ -535,7 +535,7 @@ export default function App() {
   const [playingAudio, setPlayingAudio] = useState(null);
   const [showDemoBanner, setShowDemoBanner] = useState(true);
   
-  // Auth state (showGoogleDialog removed — now separate /demo route)
+  // Auth state (showGoogleDialog removed â€” now separate /demo route)
   const [mobileNumber, setMobileNumber] = useState('');
   const [showJwtInspector, setShowJwtInspector] = useState(false);
   const [authError, setAuthError] = useState(null);
@@ -1016,7 +1016,7 @@ export default function App() {
       };
     }
     const cropId = (farm.crop?.name || 'wheat').toLowerCase();
-    const cropDetails = CROPS.find(c => c.id === cropId) || { name: 'Wheat', icon: '🌾' };
+    const cropDetails = CROPS.find(c => c.id === cropId) || { name: 'Wheat', icon: 'ðŸŒ¾' };
     const cropStage = farm.crop?.stage || 'Vegetative / Growth';
     
     // Default structure
@@ -1045,9 +1045,9 @@ export default function App() {
       },
       market: {
         recommendation: "Hold",
-        expectedProfitIncrease: "₹12,500",
+        expectedProfitIncrease: "â‚¹12,500",
         recommendedMandi: "Nashik APMC",
-        adjustedEarnings: "₹2,250/Quintal",
+        adjustedEarnings: "â‚¹2,250/Quintal",
         confidence: 88,
         trend: "up",
         reasoning: "Prices are expected to rise due to supply delays. Selling in 5-7 days will maximize profits."
@@ -1119,9 +1119,9 @@ export default function App() {
           type: 'disease',
           title: 'Stem Rust Warning Nearby',
           problem: 'Increasing reports of Stem Rust in neighboring village (Pimpalgaon, 3km away).',
-          reason: 'High morning humidity and moderate temperatures (24-28°C) are ideal for fungal spread.',
+          reason: 'High morning humidity and moderate temperatures (24-28Â°C) are ideal for fungal spread.',
           action: 'Inspect your fields and upload leaf photos immediately if you notice yellow/orange pustules.',
-          benefit: 'Early application of propiconazole fungicide can save up to ₹25,000 in damages.',
+          benefit: 'Early application of propiconazole fungicide can save up to â‚¹25,000 in damages.',
           actionText: 'Open Leaf Scanner'
         },
         {
@@ -1131,7 +1131,7 @@ export default function App() {
           problem: 'Local weather station predicts 15mm rainfall in 48 hours.',
           reason: 'Western disturbance approaching the district.',
           action: 'Postpone your next scheduled drip irrigation cycle to save electricity and prevent root waterlogging.',
-          benefit: 'Saves around ₹450 in power bills and avoids nutrient leaching.',
+          benefit: 'Saves around â‚¹450 in power bills and avoids nutrient leaching.',
           actionText: 'Postpone Irrigation'
         }
       ];
@@ -1140,7 +1140,7 @@ export default function App() {
           id: 's1',
           name: 'PM-Kisan Samman Nidhi',
           status: 'Eligible',
-          benefits: '₹6,000/year (Direct Benefit Transfer)',
+          benefits: 'â‚¹6,000/year (Direct Benefit Transfer)',
           deadline: '2026-07-15',
           progress: 80,
           documents: 'Aadhaar Card, Land Registry (Khatauni), Bank Passbook',
@@ -1231,7 +1231,7 @@ export default function App() {
           problem: 'Basmati Paddy prices rose by 14% at Nashik Mandi.',
           reason: 'Export demand surge and lower arrivals in northern states.',
           action: 'If you have stored rice from the previous season, consider selling now.',
-          benefit: 'Earn an additional ₹350 per quintal over the standard support price.',
+          benefit: 'Earn an additional â‚¹350 per quintal over the standard support price.',
           actionText: 'View Mandi Prices'
         }
       ];
@@ -1321,7 +1321,7 @@ export default function App() {
           id: 's4',
           name: 'State Sugarcane Drip Subsidy Scheme',
           status: 'Eligible',
-          benefits: '₹40,000 per hectare direct subsidy for drip line setups',
+          benefits: 'â‚¹40,000 per hectare direct subsidy for drip line setups',
           deadline: '2026-07-10',
           progress: 90,
           documents: 'Soil Card, CHC registration, Farm Area certificate',
@@ -1356,7 +1356,7 @@ export default function App() {
             id: 'pm-kisan',
             name: 'PM-Kisan Samman Nidhi',
             status: 'Eligible',
-            benefits: '₹6,000/year (Direct Benefit Transfer)',
+            benefits: 'â‚¹6,000/year (Direct Benefit Transfer)',
             deadline: '2026-07-15',
             progress: 80,
             documents: 'Aadhaar Card, Land Registry (Khatauni), Bank Passbook',
@@ -1606,7 +1606,7 @@ Instructions:
           }));
           setLocationStatus('success');
         } catch {
-          // Geolocation succeeded but reverse geocode failed – still store coords
+          // Geolocation succeeded but reverse geocode failed â€“ still store coords
           setCurrentFarm(f => ({
             ...f,
             lat: latitude.toFixed(6),
@@ -1685,8 +1685,8 @@ Instructions:
       {isDemo && showDemoBanner && (
         <div className="demo-banner flex items-center justify-between">
           <div className="flex-1 flex items-center justify-center gap-2 pl-6">
-            <span>🔬</span>
-            <span>Demo Environment — All data is simulated</span>
+            <span>ðŸ”¬</span>
+            <span>Demo Environment â€” All data is simulated</span>
             <button
               onClick={handleSignOut}
               className="ml-3 px-3 py-1 rounded-lg bg-amber-800/10 hover:bg-amber-800/20 text-amber-900 text-xs font-bold transition-colors"
@@ -1762,7 +1762,7 @@ Instructions:
                <span className="hidden sm:inline">{voiceGuide ? 'Voice Helper On' : 'Voice Helper Off'}</span>
              </button>
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-md">
-              <span className="material-symbols-outlined font-bold text-2xl">agriculture</span>
+              <span className="material-symbols-outlined notranslate font-bold text-2xl">agriculture</span>
             </div>
             <span className="font-display text-2xl font-bold text-primary tracking-tight">KisanMitra</span>
           </div>
@@ -1775,7 +1775,7 @@ Instructions:
         {/* View Routing */}
         <div className={`flex-1 flex ${view === 'DASHBOARD' ? 'flex-col w-full h-full' : 'justify-center items-center py-6 px-4 md:px-8'}`}>
           
-          {/* Welcome screen removed — now served by /login route */}
+          {/* Welcome screen removed â€” now served by /login route */}
 
           {/* OTP Screen */}
           {view === 'OTP' && (
@@ -1800,7 +1800,7 @@ Instructions:
                 {/* Simulated SMS Alert Banner */}
                 {otpStep && smsNotification && (
                   <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold flex items-center gap-2 animate-pulse">
-                    <span className="material-symbols-outlined text-amber-700">sms</span>
+                    <span className="material-symbols-outlined notranslate text-amber-700">sms</span>
                     <span>{smsNotification}</span>
                   </div>
                 )}
@@ -1877,7 +1877,7 @@ Instructions:
                     onClick={backspaceKey}
                     className="h-14 rounded-xl bg-surface-container-low hover:bg-surface-container text-xl font-bold text-on-surface transition-colors active:scale-95 flex items-center justify-center"
                   >
-                    ⌫
+                    âŒ«
                   </button>
                 </div>
 
@@ -1938,7 +1938,7 @@ Instructions:
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-6">
                   <div>
-                    <h2 className="text-white text-2xl font-bold">Select Language / भाषा चुनें</h2>
+                    <h2 className="text-white text-2xl font-bold">Select Language / à¤­à¤¾à¤·à¤¾ à¤šà¥à¤¨à¥‡à¤‚</h2>
                     <p className="text-white/80 text-sm mt-1">This will configure voice commands and AI responses.</p>
                   </div>
                 </div>
@@ -1958,7 +1958,7 @@ Instructions:
                       placeholder="Search languages..."
                       className="w-full h-10 pl-10 pr-4 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary/20 text-sm"
                     />
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+                    <span className="material-symbols-outlined notranslate absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
                   </div>
                 </div>
 
@@ -2056,7 +2056,7 @@ Instructions:
                     {profile.photo ? (
                       <img src={profile.photo} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
-                      <span className="material-symbols-outlined text-outline group-hover:text-primary text-3xl">add_a_photo</span>
+                      <span className="material-symbols-outlined notranslate text-outline group-hover:text-primary text-3xl">add_a_photo</span>
                     )}
                     <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => { const file = e.target.files[0]; if(file){ const url = URL.createObjectURL(file); setProfile(p=>({...p, photo: url})); }}} />
                   </div>
@@ -2094,7 +2094,7 @@ Instructions:
                   <div className="flex flex-col gap-2">
                     <label className="font-bold text-sm text-on-surface flex items-center gap-1.5">
                       Email
-                      {profile.email && <span className="text-xs font-normal text-green-600 bg-green-50 px-2 py-0.5 rounded-full">✓ From Google</span>}
+                      {profile.email && <span className="text-xs font-normal text-green-600 bg-green-50 px-2 py-0.5 rounded-full">âœ“ From Google</span>}
                     </label>
                     <input 
                       type="email" 
@@ -2413,20 +2413,20 @@ Instructions:
                   {/* Status messages */}
                   {locationStatus === 'denied' && (
                     <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700">
-                      <span className="material-symbols-outlined text-base">location_off</span>
-                      <span><strong>Permission Denied.</strong> Please allow location access in your browser (click the lock icon in the address bar → Permissions → Location → Allow) and try again.</span>
+                      <span className="material-symbols-outlined notranslate text-base">location_off</span>
+                      <span><strong>Permission Denied.</strong> Please allow location access in your browser (click the lock icon in the address bar â†’ Permissions â†’ Location â†’ Allow) and try again.</span>
                     </div>
                   )}
                   {locationStatus === 'error' && (
                     <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700">
-                      <span className="material-symbols-outlined text-base">warning</span>
+                      <span className="material-symbols-outlined notranslate text-base">warning</span>
                       <span><strong>Could not detect location.</strong> Make sure GPS is enabled on your device or try moving to an open area.</span>
                     </div>
                   )}
                   {locationStatus === 'success' && (
                     <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl p-2 text-xs text-green-700 font-semibold">
-                      <span className="material-symbols-outlined text-base">check_circle</span>
-                      Location detected successfully{currentFarm.accuracy ? ` (±${currentFarm.accuracy}m accuracy)` : ''}!
+                      <span className="material-symbols-outlined notranslate text-base">check_circle</span>
+                      Location detected successfully{currentFarm.accuracy ? ` (Â±${currentFarm.accuracy}m accuracy)` : ''}!
                     </div>
                   )}
 
@@ -2434,8 +2434,8 @@ Instructions:
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white p-3 rounded-xl border border-outline-variant text-xs font-semibold">
                       <div><span className="text-on-surface-variant block">Latitude:</span> {currentFarm.lat}</div>
                       <div><span className="text-on-surface-variant block">Longitude:</span> {currentFarm.lng}</div>
-                      <div><span className="text-on-surface-variant block">Village:</span> {currentFarm.village || '—'}</div>
-                      <div><span className="text-on-surface-variant block">District:</span> {currentFarm.district || '—'}</div>
+                      <div><span className="text-on-surface-variant block">Village:</span> {currentFarm.village || 'â€”'}</div>
+                      <div><span className="text-on-surface-variant block">District:</span> {currentFarm.district || 'â€”'}</div>
                     </div>
                   )}
 
@@ -2561,7 +2561,7 @@ Instructions:
                 {/* Crops Info Card */}
                 <div className="bg-white rounded-card p-6 border border-outline-variant shadow-xl space-y-6">
                   <h2 className="font-display text-xl font-bold text-on-surface border-b border-surface-container-high pb-3 flex items-center gap-2">
-                    <span>🌾</span> Crop Lifecycle Information
+                    <span>ðŸŒ¾</span> Crop Lifecycle Information
                   </h2>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -2694,7 +2694,7 @@ Instructions:
                 {/* Soil Health Card Section */}
                 <div className="bg-white rounded-card p-6 border border-outline-variant shadow-xl space-y-6">
                   <h2 className="font-display text-xl font-bold text-on-surface border-b border-surface-container-high pb-3 flex items-center gap-2">
-                    <span>🧪</span> Soil Information & Soil Health Card
+                    <span>ðŸ§ª</span> Soil Information & Soil Health Card
                   </h2>
 
                   {/* Mode Selector */}
@@ -2742,7 +2742,7 @@ Instructions:
                         </div>
                       ) : (
                         <div className="space-y-4">
-                          <span className="material-symbols-outlined text-outline-variant text-5xl">description</span>
+                          <span className="material-symbols-outlined notranslate text-outline-variant text-5xl">description</span>
                           <div>
                             <h4 className="font-bold text-on-surface">Upload Soil Health Card photo or PDF</h4>
                             <p className="text-xs text-on-surface-variant mt-1">Accepts PNG, JPG, or PDF (Max 10MB)</p>
@@ -3038,7 +3038,7 @@ Instructions:
                 {/* 2. Irrigation Methods */}
                 <div className="bg-white rounded-card p-6 border border-outline-variant shadow-xl space-y-4">
                   <h2 className="font-display text-xl font-bold text-on-surface flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-2xl font-bold">sprinkler</span> Irrigation Methods (Select Multiple)
+                    <span className="material-symbols-outlined notranslate text-primary text-2xl font-bold">sprinkler</span> Irrigation Methods (Select Multiple)
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {IRRIGATION_METHODS.map(m => {
@@ -3150,7 +3150,7 @@ Instructions:
                   {(currentFarm.water.sources.includes('borewell')) && (
                     <div className="p-6 rounded-2xl bg-primary-container/10 border border-primary/20 space-y-4">
                       <h3 className="font-bold text-primary text-base flex items-center gap-2">
-                        <span className="material-symbols-outlined text-primary font-bold">bolt</span> Conditional Pump Details
+                        <span className="material-symbols-outlined notranslate text-primary font-bold">bolt</span> Conditional Pump Details
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="flex flex-col gap-2">
@@ -3193,7 +3193,7 @@ Instructions:
                 {/* 5. Farm Machinery (Ownership toggle cards) */}
                 <div className="bg-white rounded-card p-6 border border-outline-variant shadow-xl space-y-4">
                   <h2 className="font-display text-xl font-bold text-on-surface flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-2xl font-bold">agriculture</span> Farm Machinery (Multi-select)
+                    <span className="material-symbols-outlined notranslate text-primary text-2xl font-bold">agriculture</span> Farm Machinery (Multi-select)
                   </h2>
                   <p className="text-xs text-on-surface-variant">Select machinery and select whether you own it, rent it, or use a custom hiring center.</p>
 
@@ -3357,9 +3357,9 @@ Instructions:
                           })}
                           className="bg-surface-container-lowest border border-outline-variant rounded-xl h-10 px-3 text-xs"
                         >
-                          <option>1–2</option>
-                          <option>3–5</option>
-                          <option>5–10</option>
+                          <option>1â€“2</option>
+                          <option>3â€“5</option>
+                          <option>5â€“10</option>
                           <option>10+</option>
                         </select>
                       </div>
@@ -3546,7 +3546,7 @@ Instructions:
                     <Edit3 className="w-3.5 h-3.5" /> Edit
                   </button>
                   <h3 className="font-display text-lg font-bold text-on-surface mb-3 pb-2 border-b border-surface-container-high flex items-center gap-2">
-                    <span>🌾</span> Crop Cycle
+                    <span>ðŸŒ¾</span> Crop Cycle
                   </h3>
                   <ul className="space-y-2 text-sm">
                     <li><span className="font-semibold text-on-surface-variant">Current Crop:</span> {currentFarm.crop.name.toUpperCase()} (Variety: {currentFarm.crop.variety})</li>
@@ -3567,7 +3567,7 @@ Instructions:
                     <Edit3 className="w-3.5 h-3.5" /> Edit
                   </button>
                   <h3 className="font-display text-lg font-bold text-on-surface mb-3 pb-2 border-b border-surface-container-high flex items-center gap-2">
-                    <span>🧪</span> Soil Quality
+                    <span>ðŸ§ª</span> Soil Quality
                   </h3>
                   <ul className="space-y-2 text-sm">
                     <li><span className="font-semibold text-on-surface-variant">Soil Type:</span> {currentFarm.soil.type.toUpperCase()}</li>
@@ -3643,7 +3643,7 @@ Instructions:
             <div className="w-full max-w-[500px]">
               <div className="bg-white rounded-card p-6 md:p-8 border border-outline-variant shadow-2xl relative text-center space-y-6">
                 <div className="w-16 h-16 bg-[#f0fdf4] text-primary rounded-full flex items-center justify-center mx-auto">
-                  <span className="material-symbols-outlined text-4xl fill">check_circle</span>
+                  <span className="material-symbols-outlined notranslate text-4xl fill">check_circle</span>
                 </div>
 
                 <div>
@@ -3768,7 +3768,7 @@ Instructions:
 
         </div>
 
-        {/* Google Account Selector Dialog removed — now served by /demo route */}
+        {/* Google Account Selector Dialog removed â€” now served by /demo route */}
 
         {/* JWT Inspector Modal */}
         {showJwtInspector && jwtToken && (
@@ -3782,7 +3782,7 @@ Instructions:
                   onClick={() => setShowJwtInspector(false)}
                   className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1 rounded-full hover:bg-surface-container"
                 >
-                  <span className="material-symbols-outlined text-lg">close</span>
+                  <span className="material-symbols-outlined notranslate text-lg">close</span>
                 </button>
               </div>
 
@@ -3828,7 +3828,7 @@ Instructions:
         {view !== 'DASHBOARD' && (
         <footer className="bg-white border-t border-surface-container-high py-4 text-center text-xs text-on-surface-variant">
           <div className="max-w-[1440px] mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <span>© 2026 KisanMitra Inc. Designed for Indian Farmers.</span>
+            <span>Â© 2026 KisanMitra Inc. Designed for Indian Farmers.</span>
             <div className="flex gap-4">
               <a href="#" className="hover:underline">Terms of Service</a>
               <a href="#" className="hover:underline">Privacy Policy</a>
@@ -3842,3 +3842,4 @@ Instructions:
     </div>
   );
 }
+

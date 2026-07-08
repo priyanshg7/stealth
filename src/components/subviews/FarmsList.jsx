@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 export default function FarmsList({
   farms,
@@ -19,7 +19,7 @@ export default function FarmsList({
           onClick={startNewFarmRegistration}
           className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center gap-1.5 shadow-sm"
         >
-          <span className="material-symbols-outlined text-sm font-bold">add</span>
+          <span className="material-symbols-outlined notranslate text-sm font-bold">add</span>
           <span>Add New Farm</span>
         </button>
       </div>
@@ -37,7 +37,7 @@ export default function FarmsList({
               className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-surface-container-high text-primary"
               title="Edit Farm"
             >
-              <span className="material-symbols-outlined text-sm font-bold">edit</span>
+              <span className="material-symbols-outlined notranslate text-sm font-bold">edit</span>
             </button>
 
             <div>
@@ -57,3 +57,4 @@ export default function FarmsList({
     </div>
   );
 }
+

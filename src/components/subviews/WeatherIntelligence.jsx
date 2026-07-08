@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { 
   Sun, Cloud, CloudRain, Wind, Droplet, Compass, Sunrise, Sunset, 
   RefreshCw, AlertCircle, CheckCircle2, HelpCircle, Activity, Info, Calendar, ArrowRight
@@ -63,7 +63,7 @@ export default function WeatherIntelligence({
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-primary font-bold uppercase tracking-wider bg-primary/10 px-2.5 py-0.5 rounded-full">
-              🏛️ Official IMD API Integration
+              ðŸ›ï¸ Official IMD API Integration
             </span>
             <span className="text-[10px] text-on-surface-variant font-bold">
               Station: {stationName} ({region})
@@ -73,7 +73,7 @@ export default function WeatherIntelligence({
             {t("Weather Intelligence Dashboard", language)}
           </h2>
           <p className="text-xs text-on-surface-variant font-medium mt-0.5">
-            Active Farm: <strong className="text-on-surface">{activeFarm?.name || 'Unnamed Farm'}</strong> ({activeFarm?.district}, {activeFarm?.state}) | Coordinates: {activeFarm?.lat || 20.00}°N, {activeFarm?.lng || 73.78}°E
+            Active Farm: <strong className="text-on-surface">{activeFarm?.name || 'Unnamed Farm'}</strong> ({activeFarm?.district}, {activeFarm?.state}) | Coordinates: {activeFarm?.lat || 20.00}Â°N, {activeFarm?.lng || 73.78}Â°E
           </p>
         </div>
 
@@ -129,15 +129,15 @@ export default function WeatherIntelligence({
             <span className="text-xs text-primary font-bold uppercase tracking-widest block">Current Weather</span>
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-5xl font-black tracking-tight text-on-surface">{current.temp}°C</div>
-                <span className="text-xs font-bold text-on-surface-variant mt-1 block">Feels like: {current.feelsLike}°C</span>
+                <div className="text-5xl font-black tracking-tight text-on-surface">{current.temp}Â°C</div>
+                <span className="text-xs font-bold text-on-surface-variant mt-1 block">Feels like: {current.feelsLike}Â°C</span>
               </div>
               {getWeatherIcon(current.condition)}
             </div>
             
             <div className="text-sm font-black text-primary uppercase">{current.condition}</div>
             <p className="text-xs text-on-surface-variant font-medium">
-              Daily limits: H: {current.tempMax}°C | L: {current.tempMin}°C
+              Daily limits: H: {current.tempMax}Â°C | L: {current.tempMin}Â°C
             </p>
           </div>
 
@@ -273,7 +273,7 @@ export default function WeatherIntelligence({
         {/* Departure Card */}
         <div className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4 flex flex-col justify-between">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-xl font-bold">query_stats</span>
+            <span className="material-symbols-outlined notranslate text-primary text-xl font-bold">query_stats</span>
             Rainfall Departure
           </h3>
 
@@ -325,7 +325,7 @@ export default function WeatherIntelligence({
           </div>
 
           <div className="p-4 bg-[#f0fdf4] border border-primary/20 rounded-xl flex gap-3 items-start mt-4">
-            <span className="material-symbols-outlined text-primary text-xl font-bold mt-0.5">tips_and_updates</span>
+            <span className="material-symbols-outlined notranslate text-primary text-xl font-bold mt-0.5">tips_and_updates</span>
             <div>
               <span className="block text-xs font-black text-primary mb-0.5">IMD Rainfall Advisory:</span>
               <p className="text-xs text-green-950 font-semibold leading-relaxed">
@@ -340,7 +340,7 @@ export default function WeatherIntelligence({
       {/* 5. AI Irrigation Advisor */}
       <div className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
         <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-          <span className="material-symbols-outlined text-blue-600 text-xl font-bold animate-pulse">water_drop</span>
+          <span className="material-symbols-outlined notranslate text-blue-600 text-xl font-bold animate-pulse">water_drop</span>
           AI Irrigation Advisor
         </h3>
 
@@ -351,7 +351,7 @@ export default function WeatherIntelligence({
             
             {irrigation.estimatedWater > 0 && (
               <div className="text-xs font-bold bg-white text-blue-900 border border-blue-200 px-3 py-1 rounded-full mt-2">
-                🚰 {irrigation.estimatedWater.toLocaleString('en-IN')} Litres/Acre
+                ðŸš° {irrigation.estimatedWater.toLocaleString('en-IN')} Litres/Acre
               </div>
             )}
           </div>
@@ -377,7 +377,7 @@ export default function WeatherIntelligence({
       <section className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
         <div>
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-xl font-bold">calendar_month</span>
+            <span className="material-symbols-outlined notranslate text-primary text-xl font-bold">calendar_month</span>
             7-Day Weather Timeline & Suitability Advisor
           </h3>
           <p className="text-[10px] text-on-surface-variant font-semibold mt-0.5">Click any day to view farm action ratings and AI weather advice</p>
@@ -401,7 +401,7 @@ export default function WeatherIntelligence({
               <div className="flex gap-6 w-full md:w-1/4 text-xs font-bold text-on-surface">
                 <div>
                   <span className="text-[9px] text-on-surface-variant block uppercase font-bold">Max / Min Temp:</span>
-                  <span>{dayObj.tempMax}°C / {dayObj.tempMin}°C</span>
+                  <span>{dayObj.tempMax}Â°C / {dayObj.tempMin}Â°C</span>
                 </div>
                 <div>
                   <span className="text-[9px] text-on-surface-variant block uppercase font-bold">Rain Chance:</span>
@@ -446,3 +446,4 @@ export default function WeatherIntelligence({
     </div>
   );
 }
+

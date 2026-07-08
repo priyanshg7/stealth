@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ChevronDown, ArrowRight, Cpu, Shield, Globe, Mic, Sparkles, Zap, Sun, Droplet, Activity, CheckCircle2, Users, Layers, BarChart3, Calendar, Camera, BookOpen } from 'lucide-react';
@@ -34,9 +34,9 @@ function RevealDiv({ className = '', children, stagger = false, ...props }) {
   );
 }
 
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // NAVBAR
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Navbar() {
   const navigate = useNavigate();
   const { isAuthenticated, demoLogin } = useAuth();
@@ -69,7 +69,7 @@ function Navbar() {
           {/* Logo */}
           <a href="#" className="flex items-center gap-2.5 group" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-              <span className="material-symbols-outlined text-white text-lg fill">eco</span>
+              <span className="material-symbols-outlined notranslate text-white text-lg fill">eco</span>
             </div>
             <span className="font-display font-bold text-xl text-on-surface">Kisan<span className="text-primary">Mitra</span></span>
           </a>
@@ -109,7 +109,7 @@ function Navbar() {
             className="md:hidden p-2 rounded-lg text-on-surface-variant hover:bg-surface-container"
             aria-label="Toggle menu"
           >
-            <span className="material-symbols-outlined">{mobileMenuOpen ? 'close' : 'menu'}</span>
+            <span className="material-symbols-outlined notranslate">{mobileMenuOpen ? 'close' : 'menu'}</span>
           </button>
         </div>
 
@@ -147,9 +147,9 @@ function Navbar() {
   );
 }
 
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // HERO SECTION
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function HeroSection() {
   const navigate = useNavigate();
   const { demoLogin } = useAuth();
@@ -185,7 +185,7 @@ function HeroSection() {
             </h1>
 
             <p className="text-lg sm:text-xl text-on-surface-variant max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              From sowing to selling — KisanMitra guides Indian farmers with AI crop recommendations, real-time weather intelligence, government scheme matching, and market insights. All in your local language.
+              From sowing to selling â€” KisanMitra guides Indian farmers with AI crop recommendations, real-time weather intelligence, government scheme matching, and market insights. All in your local language.
             </p>
 
             {/* CTA buttons */}
@@ -201,7 +201,7 @@ function HeroSection() {
                 onClick={handleDemoClick}
                 className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-primary bg-white border-2 border-primary/20 hover:border-primary/40 hover:bg-primary-container/10 transition-all flex items-center justify-center gap-2"
               >
-                <span className="material-symbols-outlined text-lg">play_circle</span>
+                <span className="material-symbols-outlined notranslate text-lg">play_circle</span>
                 Explore Demo
               </button>
             </div>
@@ -245,8 +245,8 @@ function HeroSection() {
                   </div>
                   <div className="hidden sm:block flex-1 bg-white rounded-xl p-3 border border-outline-variant/40">
                     <div className="text-[10px] font-medium text-on-surface-variant mb-1">Weather</div>
-                    <div className="text-xl font-bold text-on-surface">32°C</div>
-                    <div className="text-[10px] text-on-surface-variant mt-1">☀️ Sunny, Low Rain</div>
+                    <div className="text-xl font-bold text-on-surface">32Â°C</div>
+                    <div className="text-[10px] text-on-surface-variant mt-1">â˜€ï¸ Sunny, Low Rain</div>
                   </div>
                 </div>
                 <div className="bg-white rounded-xl p-3 border border-outline-variant/40">
@@ -259,8 +259,8 @@ function HeroSection() {
                 <div className="flex gap-3">
                   <div className="flex-1 bg-white rounded-xl p-3 border border-outline-variant/40">
                     <div className="text-[10px] font-medium text-on-surface-variant mb-1">Wheat Price</div>
-                    <div className="text-base font-bold text-on-surface">₹2,275/q</div>
-                    <div className="text-[10px] text-primary font-semibold">↑ ₹50 MSP</div>
+                    <div className="text-base font-bold text-on-surface">â‚¹2,275/q</div>
+                    <div className="text-[10px] text-primary font-semibold">â†‘ â‚¹50 MSP</div>
                   </div>
                   <div className="flex-1 bg-white rounded-xl p-3 border border-outline-variant/40">
                     <div className="text-[10px] font-medium text-on-surface-variant mb-1">Crop Stage</div>
@@ -277,9 +277,9 @@ function HeroSection() {
   );
 }
 
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // FEATURES SECTION
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function FeaturesSection() {
   const features = [
     {
@@ -325,7 +325,7 @@ function FeaturesSection() {
             Everything a Farmer Needs, In One App
           </h2>
           <p className="text-on-surface-variant text-lg">
-            KisanMitra covers the entire farming lifecycle — from planning your season to selling your harvest.
+            KisanMitra covers the entire farming lifecycle â€” from planning your season to selling your harvest.
           </p>
         </RevealDiv>
 
@@ -345,9 +345,9 @@ function FeaturesSection() {
   );
 }
 
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // HOW IT WORKS
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function HowItWorksSection() {
   const steps = [
     { num: '01', title: 'Setup Your Farm', desc: 'Register your farm with GPS boundaries, soil type, water sources, and crop details.', icon: 'add_location_alt' },
@@ -375,7 +375,7 @@ function HowItWorksSection() {
           {steps.map((step, i) => (
             <div key={i} className={`landing-step-card ${i < steps.length - 1 ? 'step-connector' : ''}`}>
               <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
-                <span className="material-symbols-outlined text-2xl fill">{step.icon}</span>
+                <span className="material-symbols-outlined notranslate text-2xl fill">{step.icon}</span>
               </div>
               <div className="text-xs font-bold text-primary/60 mb-2 tracking-widest">{step.num}</div>
               <h3 className="font-display text-base font-bold text-on-surface mb-2">{step.title}</h3>
@@ -388,9 +388,9 @@ function HowItWorksSection() {
   );
 }
 
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // AI DECISION SUPPORT
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function AISection() {
   const capabilities = [
     { icon: 'psychology', title: 'Crop Stage Analysis', desc: 'Knows exactly what your crop needs at each growth stage.' },
@@ -413,14 +413,14 @@ function AISection() {
               Your Personal Agronomist, Available 24/7
             </h2>
             <p className="text-on-surface-variant text-lg mb-8 max-w-lg">
-              KisanMitra's AI engine processes your farm's unique data — soil, crop, weather, and market conditions — to deliver hyper-personalized recommendations every single day.
+              KisanMitra's AI engine processes your farm's unique data â€” soil, crop, weather, and market conditions â€” to deliver hyper-personalized recommendations every single day.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {capabilities.map((cap, i) => (
                 <div key={i} className="flex items-start gap-3 p-3 rounded-xl hover:bg-surface-container/60 transition-colors">
                   <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
-                    <span className="material-symbols-outlined text-lg fill">{cap.icon}</span>
+                    <span className="material-symbols-outlined notranslate text-lg fill">{cap.icon}</span>
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-on-surface">{cap.title}</h4>
@@ -436,23 +436,23 @@ function AISection() {
             <div className="bg-background rounded-2xl border border-outline-variant/50 p-6 shadow-lg">
               <div className="flex items-center gap-2 mb-5">
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                  <span className="material-symbols-outlined text-white text-sm fill">smart_toy</span>
+                  <span className="material-symbols-outlined notranslate text-white text-sm fill">smart_toy</span>
                 </div>
                 <span className="text-sm font-bold text-on-surface">KisanMitra AI</span>
                 <span className="text-[10px] bg-primary-container/20 text-primary px-2 py-0.5 rounded-full font-bold ml-auto">LIVE</span>
               </div>
               <div className="space-y-4">
                 <div className="bg-white rounded-xl p-3 border border-outline-variant/30 text-sm text-on-surface-variant">
-                  <p className="font-medium text-on-surface mb-1">🌾 Wheat — Tillering Stage (Day 48)</p>
+                  <p className="font-medium text-on-surface mb-1">ðŸŒ¾ Wheat â€” Tillering Stage (Day 48)</p>
                   <p className="text-xs leading-relaxed">Your soil report shows Zinc deficiency at 0.42 ppm. Apply Zinc Sulphate Monohydrate at 25 kg/acre before next irrigation for optimal tillering.</p>
                 </div>
                 <div className="bg-primary/5 rounded-xl p-3 border border-primary/20 text-sm">
-                  <p className="font-medium text-primary mb-1">⚡ Action Required</p>
+                  <p className="font-medium text-primary mb-1">âš¡ Action Required</p>
                   <p className="text-xs text-on-surface-variant leading-relaxed">Western disturbance approaching. Irrigate tomorrow morning (6-8 AM) and postpone fertilizer application by 2 days.</p>
                 </div>
                 <div className="bg-white rounded-xl p-3 border border-outline-variant/30 text-sm">
-                  <p className="font-medium text-on-surface mb-1">💰 Market Alert</p>
-                  <p className="text-xs text-on-surface-variant leading-relaxed">Wheat MSP ₹2,275/q. Nashik Mandi offering ₹2,340/q — ₹65 above MSP. Consider selling within 3 days.</p>
+                  <p className="font-medium text-on-surface mb-1">ðŸ’° Market Alert</p>
+                  <p className="text-xs text-on-surface-variant leading-relaxed">Wheat MSP â‚¹2,275/q. Nashik Mandi offering â‚¹2,340/q â€” â‚¹65 above MSP. Consider selling within 3 days.</p>
                 </div>
               </div>
             </div>
@@ -463,9 +463,9 @@ function AISection() {
   );
 }
 
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // GOVERNMENT SCHEMES SECTION
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function GovtSection() {
   return (
     <section className="landing-section bg-background">
@@ -478,7 +478,7 @@ function GovtSection() {
                 <Shield className="w-4 h-4 text-primary" /> Eligible Government Schemes
               </h3>
               {[
-                { name: 'PM-KISAN', match: '95%', benefit: '₹6,000/year', tag: 'Central' },
+                { name: 'PM-KISAN', match: '95%', benefit: 'â‚¹6,000/year', tag: 'Central' },
                 { name: 'PMFBY', match: '88%', benefit: 'Crop Insurance', tag: 'Central' },
                 { name: 'PM Kusum', match: '92%', benefit: 'Solar Pump Subsidy', tag: 'Central' },
               ].map((scheme, i) => (
@@ -534,9 +534,9 @@ function GovtSection() {
   );
 }
 
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // BENEFITS SECTION
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function BenefitsSection() {
   const benefits = [
     { icon: <Zap className="w-5 h-5" />, title: 'Save Time', desc: 'No more guesswork. Get precise daily task lists and recommendations.' },
@@ -580,16 +580,16 @@ function BenefitsSection() {
   );
 }
 
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // FAQ SECTION
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function FAQSection() {
   const [openIndex, setOpenIndex] = useState(null);
 
   const faqs = [
     { q: 'Is KisanMitra free to use?', a: 'Yes! KisanMitra is completely free for all Indian farmers. We believe every farmer deserves access to AI-powered farming intelligence regardless of farm size or budget.' },
     { q: 'Which languages are supported?', a: 'KisanMitra supports Hindi, English, Marathi, Punjabi, Telugu, and Kannada. Both text and voice interactions are available in all supported languages.' },
-    { q: 'How does the AI recommendation work?', a: 'Our AI engine analyzes your farm\'s specific conditions — soil type, crop stage, local weather, water availability — and generates personalized daily recommendations for fertilizer, irrigation, pest management, and more.' },
+    { q: 'How does the AI recommendation work?', a: 'Our AI engine analyzes your farm\'s specific conditions â€” soil type, crop stage, local weather, water availability â€” and generates personalized daily recommendations for fertilizer, irrigation, pest management, and more.' },
     { q: 'Do I need internet to use KisanMitra?', a: 'An internet connection is required for real-time features like weather updates and market prices. However, your farm data and crop plans are cached locally so you can view them offline.' },
     { q: 'How are government schemes matched?', a: 'KisanMitra indexes 500+ central and state government agricultural schemes. Our AI compares your profile (location, crops, land size, gender, irrigation type) against each scheme\'s eligibility criteria to calculate a match score.' },
     { q: 'Is my farm data secure?', a: 'Absolutely. Your data is encrypted and stored securely. We never share individual farm data with third parties. KisanMitra uses Google Firebase for authentication and data storage with enterprise-grade security.' },
@@ -632,9 +632,9 @@ function FAQSection() {
   );
 }
 
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // CTA SECTION
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function CTASection() {
   const navigate = useNavigate();
   const { demoLogin } = useAuth();
@@ -665,7 +665,7 @@ function CTASection() {
             onClick={handleDemoClick}
             className="w-full sm:w-auto px-10 py-4 rounded-2xl text-base font-bold text-white border-2 border-white/30 hover:border-white/60 hover:bg-white/10 transition-all flex items-center justify-center gap-2"
           >
-            <span className="material-symbols-outlined text-lg">play_circle</span>
+            <span className="material-symbols-outlined notranslate text-lg">play_circle</span>
             Try Demo First
           </button>
         </div>
@@ -674,9 +674,9 @@ function CTASection() {
   );
 }
 
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // FOOTER
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Footer() {
   return (
     <footer className="bg-white border-t border-outline-variant/40 py-12 px-4 sm:px-6 lg:px-8">
@@ -684,7 +684,7 @@ function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
-              <span className="material-symbols-outlined text-white text-sm fill">eco</span>
+              <span className="material-symbols-outlined notranslate text-white text-sm fill">eco</span>
             </div>
             <span className="font-display font-bold text-lg text-on-surface">Kisan<span className="text-primary">Mitra</span></span>
           </div>
@@ -694,16 +694,16 @@ function Footer() {
             <a href="#benefits" className="hover:text-primary transition-colors">Benefits</a>
             <a href="#faq" className="hover:text-primary transition-colors">FAQ</a>
           </div>
-          <p className="text-xs text-on-surface-variant">© 2026 KisanMitra. Designed for Indian Farmers.</p>
+          <p className="text-xs text-on-surface-variant">Â© 2026 KisanMitra. Designed for Indian Farmers.</p>
         </div>
       </div>
     </footer>
   );
 }
 
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // STATS SECTION
-// ────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function StatsSection() {
   const stats = [
     { value: '500+', label: 'Govt Schemes Indexed' },
@@ -726,9 +726,9 @@ function StatsSection() {
   );
 }
 
-// ════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MAIN LANDING PAGE COMPONENT
-// ════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 export default function LandingPage() {
   return (
     <div className="landing-page min-h-screen bg-background text-on-surface font-sans">
@@ -746,3 +746,4 @@ export default function LandingPage() {
     </div>
   );
 }
+
