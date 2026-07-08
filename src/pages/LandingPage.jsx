@@ -207,8 +207,8 @@ function HeroSection() {
                 onClick={handleDemoClick}
                 className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-primary border-2 border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all active:scale-[0.97] flex items-center justify-center gap-2"
               >
-                <span className="material-symbols-outlined notranslate text-lg">science</span>
-                Try Demo
+                <span className="material-symbols-outlined notranslate text-lg">play_circle</span>
+                Interactive Demo
               </button>
             </div>
 
