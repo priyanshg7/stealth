@@ -67,7 +67,7 @@ export default function FarmingDashboard({
     <div className="space-y-5 animate-fade-in-up font-sans pb-10">
       {translating && (
         <div className="bg-primary/10 text-primary border border-primary/20 rounded-xl p-3 text-xs font-bold flex items-center gap-2 animate-pulse">
-          <span className="material-symbols-outlined text-sm font-bold animate-spin">sync</span>
+          <span className="material-symbols-outlined notranslate text-sm font-bold animate-spin">sync</span>
           <span>{t("AI is translating your dashboard into the selected language...", language)}</span>
         </div>
       )}
@@ -231,7 +231,7 @@ export default function FarmingDashboard({
         <div className="flex justify-between items-center border-b border-surface-container-high pb-3">
           <div>
             <h3 className="font-display font-extrabold text-lg text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary font-bold">calendar_today</span>
+              <span className="material-symbols-outlined notranslate text-primary font-bold">calendar_today</span>
               {t("Today's Work Schedule", language)}
             </h3>
             <p className="text-xs text-on-surface-variant mt-0.5">{t("AI-generated schedule based on active crop stage & weather warnings", language)}</p>
@@ -257,7 +257,7 @@ export default function FarmingDashboard({
             if (pending.length === 0) {
               return (
                 <div className="p-6 bg-primary/5 rounded-2xl border border-primary/20 text-center space-y-3 animate-fade-in-up">
-                  <span className="material-symbols-outlined text-primary text-4xl fill">check_circle</span>
+                  <span className="material-symbols-outlined notranslate text-primary text-4xl fill">check_circle</span>
                   <div>
                     <h4 className="font-bold text-on-surface text-base">{t("All done for today!", language)}</h4>
                     <p className="text-xs text-on-surface-variant mt-1">{t("Your farm is fully optimized and in excellent health.", language)} 🌾</p>
@@ -345,7 +345,7 @@ export default function FarmingDashboard({
       {dashboardData && (
         <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-4">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-xl font-bold">analytics</span>
+            <span className="material-symbols-outlined notranslate text-primary text-xl font-bold">analytics</span>
             {t("Active Farm Snapshot", language)}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -401,7 +401,7 @@ export default function FarmingDashboard({
       {dashboardData && (
         <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-4">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-xl">route</span>
+            <span className="material-symbols-outlined notranslate text-primary text-xl">route</span>
             {t("Farm Journey Progress", language)}
           </h3>
 
@@ -444,7 +444,7 @@ export default function FarmingDashboard({
         <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
           <div className="flex justify-between items-center border-b border-outline-variant/30 pb-2">
             <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-xl font-bold">store</span>
+              <span className="material-symbols-outlined notranslate text-primary text-xl font-bold">store</span>
               {t("Market Snapshot", language)}
             </h3>
             <button 
@@ -482,7 +482,7 @@ export default function FarmingDashboard({
         <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
           <div className="flex justify-between items-center border-b border-outline-variant/30 pb-2">
             <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-yellow-600 text-xl font-bold">wb_sunny</span>
+              <span className="material-symbols-outlined notranslate text-yellow-600 text-xl font-bold">wb_sunny</span>
               {t("Weather Impact Advisory", language)}
             </h3>
             <button 
@@ -562,7 +562,7 @@ export default function FarmingDashboard({
       <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
         <div className="flex justify-between items-center border-b border-outline-variant/30 pb-2">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-xl font-bold">auto_awesome</span>
+            <span className="material-symbols-outlined notranslate text-primary text-xl font-bold">auto_awesome</span>
             {t("Eligible Benefits", language)} ({activeFarm?.state ? t(activeFarm.state, language) : t('Maharashtra', language)})
           </h3>
           <button 
@@ -600,7 +600,7 @@ export default function FarmingDashboard({
       {/* 11. Insights & Reminders */}
       <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
         <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-          <span className="material-symbols-outlined text-primary text-xl">notifications_active</span>
+          <span className="material-symbols-outlined notranslate text-primary text-xl">notifications_active</span>
           {t("Insights & Upcoming Reminders", language)}
         </h3>
         <div className="space-y-2.5">
@@ -610,7 +610,7 @@ export default function FarmingDashboard({
             { msg: 'Government schemes registry deadline approaching soon.', icon: 'campaign', color: 'text-amber-600' }
           ].map((rem, i) => (
             <div key={i} className="flex gap-2.5 items-start text-xs font-semibold text-on-surface-variant p-2.5 rounded-xl bg-slate-50/50 border border-outline-variant/30">
-              <span className={`material-symbols-outlined text-sm mt-0.5 ${rem.color}`}>{rem.icon}</span>
+              <span className={`material-symbols-outlined notranslate text-sm mt-0.5 ${rem.color}`}>{rem.icon}</span>
               <span className="leading-normal">{t(rem.msg, language)}</span>
             </div>
           ))}
@@ -620,7 +620,7 @@ export default function FarmingDashboard({
       {/* 12. Quick Actions */}
       <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
         <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-          <span className="material-symbols-outlined text-primary text-xl font-bold">bolt</span>
+          <span className="material-symbols-outlined notranslate text-primary text-xl font-bold">bolt</span>
           {t("Quick Actions Control Grid", language)}
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -642,7 +642,7 @@ export default function FarmingDashboard({
               }}
               className="p-3.5 rounded-2xl border border-outline-variant/60 bg-white hover:border-primary/50 flex flex-col justify-center items-center text-center gap-2 transition-all shadow-xs hover:shadow-sm group min-h-[96px]"
             >
-              <span className="material-symbols-outlined text-primary text-2xl group-hover:scale-110 transition-transform">{act.icon}</span>
+              <span className="material-symbols-outlined notranslate text-primary text-2xl group-hover:scale-110 transition-transform">{act.icon}</span>
               <span className="text-xs font-black text-on-surface-variant leading-none">{t(act.label, language)}</span>
             </button>
           ))}
@@ -655,11 +655,11 @@ export default function FarmingDashboard({
           <div className="bg-white rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto border border-outline-variant shadow-2xl flex flex-col p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-sm font-bold text-primary flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-primary text-lg">calendar_today</span>
+                <span className="material-symbols-outlined notranslate text-primary text-lg">calendar_today</span>
                 Reschedule task
               </h3>
               <button onClick={() => setActiveDialogTask(null)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1">
-                <span className="material-symbols-outlined text-lg">close</span>
+                <span className="material-symbols-outlined notranslate text-lg">close</span>
               </button>
             </div>
             <div className="py-4 space-y-4 text-xs leading-relaxed">
@@ -695,10 +695,10 @@ export default function FarmingDashboard({
           <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-outline-variant shadow-2xl flex flex-col p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-sm font-bold text-primary flex items-center gap-1">
-                <span className="material-symbols-outlined text-primary text-lg">trending_up</span> Mandi Price Trends Analysis
+                <span className="material-symbols-outlined notranslate text-primary text-lg">trending_up</span> Mandi Price Trends Analysis
               </h3>
               <button onClick={() => setSelectedMandiDetails(null)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1">
-                <span className="material-symbols-outlined text-lg">close</span>
+                <span className="material-symbols-outlined notranslate text-lg">close</span>
               </button>
             </div>
             <div className="py-4 space-y-3 text-xs leading-relaxed">
@@ -739,7 +739,7 @@ export default function FarmingDashboard({
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-sm font-bold text-primary">{selectedScheme.name}</h3>
               <button onClick={() => setSelectedScheme(null)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1">
-                <span className="material-symbols-outlined text-lg">close</span>
+                <span className="material-symbols-outlined notranslate text-lg">close</span>
               </button>
             </div>
             <div className="py-4 space-y-3 text-xs leading-relaxed">
@@ -783,7 +783,7 @@ export default function FarmingDashboard({
                 <h3 className="font-display font-extrabold text-sm text-on-surface leading-tight mt-0.5">{selectedCommunityPost.title}</h3>
               </div>
               <button onClick={() => setSelectedCommunityPost(null)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1">
-                <span className="material-symbols-outlined text-lg">close</span>
+                <span className="material-symbols-outlined notranslate text-lg">close</span>
               </button>
             </div>
             <div className="py-4 space-y-4 text-xs leading-relaxed">
@@ -820,7 +820,7 @@ export default function FarmingDashboard({
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-base font-bold text-primary">Next 7 Days Farming Calendar</h3>
               <button onClick={() => setShowAllTasksModal(false)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1">
-                <span className="material-symbols-outlined text-lg">close</span>
+                <span className="material-symbols-outlined notranslate text-lg">close</span>
               </button>
             </div>
             <div className="py-4 space-y-3 text-xs leading-relaxed max-h-96 overflow-y-auto pr-1">

@@ -21,7 +21,7 @@ export default function QuickActionFAB({
             onClick={act.action}
             className="flex items-center gap-2 self-end bg-white hover:bg-surface-container border border-outline-variant/60 text-on-surface-variant py-2 px-3.5 rounded-xl text-xs font-bold shadow-md transition-all whitespace-nowrap min-h-[48px]"
           >
-            <span className="material-symbols-outlined text-sm font-bold text-primary">{act.icon}</span>
+            <span className="material-symbols-outlined notranslate text-sm font-bold text-primary">{act.icon}</span>
             <span>{act.label}</span>
           </button>
         ))}
@@ -31,7 +31,7 @@ export default function QuickActionFAB({
         className="bg-primary hover:bg-secondary text-white h-14 w-14 rounded-full flex items-center justify-center shadow-2xl border-2 border-white transition-transform active:scale-95"
         title="Quick Actions"
       >
-        <span className="material-symbols-outlined text-2xl font-bold transition-transform group-hover:rotate-45">add</span>
+        <span className="material-symbols-outlined notranslate text-2xl font-bold transition-transform group-hover:rotate-45">add</span>
       </button>
     </div>
   );

@@ -1256,7 +1256,7 @@ export default function SeasonPlanner({
             <details className="group border-t border-outline-variant/40 pt-4 text-xs font-semibold text-on-surface-variant">
               <summary className="list-none flex justify-between items-center cursor-pointer select-none text-primary font-extrabold focus:outline-none">
                 <span>Advanced Planning Parameters (NPK, Resources, Budget)</span>
-                <span className="material-symbols-outlined transition-transform duration-200 group-open:rotate-180">expand_more</span>
+                <span className="material-symbols-outlined notranslate transition-transform duration-200 group-open:rotate-180">expand_more</span>
               </summary>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
                 <div>

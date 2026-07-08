@@ -28,7 +28,7 @@ export default function Header({
             className="p-3 rounded-xl border border-outline-variant hover:bg-surface-container lg:hidden text-on-surface-variant flex items-center justify-center min-h-[48px] min-w-[48px]"
             title="Go Back"
           >
-            <span className="material-symbols-outlined text-xl">arrow_back</span>
+            <span className="material-symbols-outlined notranslate text-xl">arrow_back</span>
           </button>
         ) : (
           <button 
@@ -36,7 +36,7 @@ export default function Header({
             className="p-3 rounded-xl border border-outline-variant hover:bg-surface-container lg:hidden text-on-surface-variant flex items-center justify-center min-h-[48px] min-w-[48px]"
             title="Open navigation"
           >
-            <span className="material-symbols-outlined text-xl">menu</span>
+            <span className="material-symbols-outlined notranslate text-xl">menu</span>
           </button>
         )}
 
@@ -46,7 +46,7 @@ export default function Header({
           className="hidden lg:flex p-3 rounded-xl border border-outline-variant hover:bg-surface-container text-on-surface-variant transition-colors min-h-[48px] min-w-[48px] items-center justify-center"
           title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          <span className="material-symbols-outlined text-xl">
+          <span className="material-symbols-outlined notranslate text-xl">
             {sidebarCollapsed ? 'menu_open' : 'menu'}
           </span>
         </button>
@@ -86,7 +86,7 @@ export default function Header({
               <option key={l.id} value={l.id}>{l.native}</option>
             ))}
           </select>
-          <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-xs text-on-surface-variant">arrow_drop_down</span>
+          <span className="material-symbols-outlined notranslate absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-xs text-on-surface-variant">arrow_drop_down</span>
         </div>
 
         {/* Notification Button */}
@@ -94,7 +94,7 @@ export default function Header({
           onClick={() => setActiveDashboardTab('notifications')}
           className="p-3 rounded-xl border border-outline-variant/60 hover:bg-surface-container text-on-surface-variant relative min-h-[48px] min-w-[48px] flex items-center justify-center"
         >
-          <span className="material-symbols-outlined text-lg">notifications</span>
+          <span className="material-symbols-outlined notranslate text-lg">notifications</span>
           <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-red-600 rounded-full animate-ping" />
           <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-red-600 rounded-full" />
         </button>
@@ -112,7 +112,7 @@ export default function Header({
           }}
           className={`bg-primary hover:bg-secondary text-white p-3 rounded-xl flex items-center justify-center shadow-md min-h-[48px] min-w-[48px] ${isListening ? 'bg-red-600 animate-pulse' : 'animate-pulse-ring'}`}
         >
-          <span className="material-symbols-outlined text-lg font-bold">{isListening ? 'settings_voice' : 'mic'}</span>
+          <span className="material-symbols-outlined notranslate text-lg font-bold">{isListening ? 'settings_voice' : 'mic'}</span>
         </button>
 
       </div>

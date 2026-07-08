@@ -1762,7 +1762,7 @@ Instructions:
                <span className="hidden sm:inline">{voiceGuide ? 'Voice Helper On' : 'Voice Helper Off'}</span>
              </button>
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-md">
-              <span className="material-symbols-outlined font-bold text-2xl">agriculture</span>
+              <span className="material-symbols-outlined notranslate font-bold text-2xl">agriculture</span>
             </div>
             <span className="font-display text-2xl font-bold text-primary tracking-tight">KisanMitra</span>
           </div>
@@ -1800,7 +1800,7 @@ Instructions:
                 {/* Simulated SMS Alert Banner */}
                 {otpStep && smsNotification && (
                   <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold flex items-center gap-2 animate-pulse">
-                    <span className="material-symbols-outlined text-amber-700">sms</span>
+                    <span className="material-symbols-outlined notranslate text-amber-700">sms</span>
                     <span>{smsNotification}</span>
                   </div>
                 )}
@@ -1958,7 +1958,7 @@ Instructions:
                       placeholder="Search languages..."
                       className="w-full h-10 pl-10 pr-4 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary/20 text-sm"
                     />
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+                    <span className="material-symbols-outlined notranslate absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
                   </div>
                 </div>
 
@@ -2056,7 +2056,7 @@ Instructions:
                     {profile.photo ? (
                       <img src={profile.photo} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
-                      <span className="material-symbols-outlined text-outline group-hover:text-primary text-3xl">add_a_photo</span>
+                      <span className="material-symbols-outlined notranslate text-outline group-hover:text-primary text-3xl">add_a_photo</span>
                     )}
                     <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => { const file = e.target.files[0]; if(file){ const url = URL.createObjectURL(file); setProfile(p=>({...p, photo: url})); }}} />
                   </div>
@@ -2413,19 +2413,19 @@ Instructions:
                   {/* Status messages */}
                   {locationStatus === 'denied' && (
                     <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700">
-                      <span className="material-symbols-outlined text-base">location_off</span>
+                      <span className="material-symbols-outlined notranslate text-base">location_off</span>
                       <span><strong>Permission Denied.</strong> Please allow location access in your browser (click the lock icon in the address bar → Permissions → Location → Allow) and try again.</span>
                     </div>
                   )}
                   {locationStatus === 'error' && (
                     <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700">
-                      <span className="material-symbols-outlined text-base">warning</span>
+                      <span className="material-symbols-outlined notranslate text-base">warning</span>
                       <span><strong>Could not detect location.</strong> Make sure GPS is enabled on your device or try moving to an open area.</span>
                     </div>
                   )}
                   {locationStatus === 'success' && (
                     <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl p-2 text-xs text-green-700 font-semibold">
-                      <span className="material-symbols-outlined text-base">check_circle</span>
+                      <span className="material-symbols-outlined notranslate text-base">check_circle</span>
                       Location detected successfully{currentFarm.accuracy ? ` (±${currentFarm.accuracy}m accuracy)` : ''}!
                     </div>
                   )}
@@ -2742,7 +2742,7 @@ Instructions:
                         </div>
                       ) : (
                         <div className="space-y-4">
-                          <span className="material-symbols-outlined text-outline-variant text-5xl">description</span>
+                          <span className="material-symbols-outlined notranslate text-outline-variant text-5xl">description</span>
                           <div>
                             <h4 className="font-bold text-on-surface">Upload Soil Health Card photo or PDF</h4>
                             <p className="text-xs text-on-surface-variant mt-1">Accepts PNG, JPG, or PDF (Max 10MB)</p>
@@ -3038,7 +3038,7 @@ Instructions:
                 {/* 2. Irrigation Methods */}
                 <div className="bg-white rounded-card p-6 border border-outline-variant shadow-xl space-y-4">
                   <h2 className="font-display text-xl font-bold text-on-surface flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-2xl font-bold">sprinkler</span> Irrigation Methods (Select Multiple)
+                    <span className="material-symbols-outlined notranslate text-primary text-2xl font-bold">sprinkler</span> Irrigation Methods (Select Multiple)
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {IRRIGATION_METHODS.map(m => {
@@ -3150,7 +3150,7 @@ Instructions:
                   {(currentFarm.water.sources.includes('borewell')) && (
                     <div className="p-6 rounded-2xl bg-primary-container/10 border border-primary/20 space-y-4">
                       <h3 className="font-bold text-primary text-base flex items-center gap-2">
-                        <span className="material-symbols-outlined text-primary font-bold">bolt</span> Conditional Pump Details
+                        <span className="material-symbols-outlined notranslate text-primary font-bold">bolt</span> Conditional Pump Details
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="flex flex-col gap-2">
@@ -3193,7 +3193,7 @@ Instructions:
                 {/* 5. Farm Machinery (Ownership toggle cards) */}
                 <div className="bg-white rounded-card p-6 border border-outline-variant shadow-xl space-y-4">
                   <h2 className="font-display text-xl font-bold text-on-surface flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-2xl font-bold">agriculture</span> Farm Machinery (Multi-select)
+                    <span className="material-symbols-outlined notranslate text-primary text-2xl font-bold">agriculture</span> Farm Machinery (Multi-select)
                   </h2>
                   <p className="text-xs text-on-surface-variant">Select machinery and select whether you own it, rent it, or use a custom hiring center.</p>
 
@@ -3643,7 +3643,7 @@ Instructions:
             <div className="w-full max-w-[500px]">
               <div className="bg-white rounded-card p-6 md:p-8 border border-outline-variant shadow-2xl relative text-center space-y-6">
                 <div className="w-16 h-16 bg-[#f0fdf4] text-primary rounded-full flex items-center justify-center mx-auto">
-                  <span className="material-symbols-outlined text-4xl fill">check_circle</span>
+                  <span className="material-symbols-outlined notranslate text-4xl fill">check_circle</span>
                 </div>
 
                 <div>
@@ -3782,7 +3782,7 @@ Instructions:
                   onClick={() => setShowJwtInspector(false)}
                   className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1 rounded-full hover:bg-surface-container"
                 >
-                  <span className="material-symbols-outlined text-lg">close</span>
+                  <span className="material-symbols-outlined notranslate text-lg">close</span>
                 </button>
               </div>
 

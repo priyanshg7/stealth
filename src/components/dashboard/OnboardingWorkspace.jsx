@@ -44,7 +44,7 @@ export default function OnboardingWorkspace({
         {/* Setup Progress Stepper */}
         <div className="bg-white rounded-card p-6 border border-outline-variant/60 shadow-sm space-y-4">
           <h3 className="font-display font-bold text-lg text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-xl">task_alt</span> Setup Progress
+            <span className="material-symbols-outlined notranslate text-primary text-xl">task_alt</span> Setup Progress
           </h3>
           <div className="space-y-3">
             {[
@@ -79,7 +79,7 @@ export default function OnboardingWorkspace({
             </button>
             <div className="space-y-2">
               <h4 className="font-bold text-primary text-base flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-lg">science</span> Upload Soil Health Card
+                <span className="material-symbols-outlined notranslate text-primary text-lg">science</span> Upload Soil Health Card
               </h4>
               <p className="text-xs text-on-surface-variant leading-relaxed">
                 Provide your soil testing values to unlock hyper-accurate fertilizer recommendations. Otherwise, KisanMitra uses district averages.
@@ -88,7 +88,7 @@ export default function OnboardingWorkspace({
 
             <div className="flex gap-3">
               <label className="flex-1 bg-primary hover:bg-secondary text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm cursor-pointer transition-all">
-                <span className="material-symbols-outlined text-sm">upload</span> Upload Now
+                <span className="material-symbols-outlined notranslate text-sm">upload</span> Upload Now
                 <input type="file" onChange={handleSoilHealthCardUpload} className="hidden" />
               </label>
             </div>
@@ -99,7 +99,7 @@ export default function OnboardingWorkspace({
           <div className="bg-primary/5 border border-primary/20 rounded-card p-6 shadow-sm flex flex-col justify-between space-y-3">
             <div className="space-y-1">
               <h4 className="font-bold text-primary text-base flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-green-700 text-lg">check_circle</span> Soil Card Parsed!
+                <span className="material-symbols-outlined notranslate text-green-700 text-lg">check_circle</span> Soil Card Parsed!
               </h4>
               <p className="text-xs text-on-surface-variant">
                 AI has extracted metrics successfully. Nitrogen: Medium, Phosphorus: Medium, Potassium: High.
@@ -118,7 +118,7 @@ export default function OnboardingWorkspace({
       {/* 3. Primary CTA: Generate Annual Planner */}
       <div className="bg-white border-2 border-primary rounded-card p-6 md:p-8 shadow-md text-center space-y-4">
         <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-2">
-          <span className="material-symbols-outlined text-3xl">psychology</span>
+          <span className="material-symbols-outlined notranslate text-3xl">psychology</span>
         </div>
         <h3 className="font-display font-extrabold text-xl text-on-surface leading-tight">
           Generate Your First Annual Farm & Season Plan
@@ -131,7 +131,7 @@ export default function OnboardingWorkspace({
           className="bg-primary hover:bg-secondary text-white font-extrabold px-8 py-3 rounded-xl text-sm shadow-md transition-all active:scale-[0.97] inline-flex items-center gap-2"
         >
           <span>Generate Crop Plan</span>
-          <span className="material-symbols-outlined text-sm font-bold">arrow_forward</span>
+          <span className="material-symbols-outlined notranslate text-sm font-bold">arrow_forward</span>
         </button>
       </div>
 
@@ -145,14 +145,14 @@ export default function OnboardingWorkspace({
               className="p-1 rounded-lg border border-outline-variant hover:bg-surface-container disabled:opacity-30"
               disabled={onboardingCarouselIndex === 0}
             >
-              <span className="material-symbols-outlined text-xs">chevron_left</span>
+              <span className="material-symbols-outlined notranslate text-xs">chevron_left</span>
             </button>
             <button 
               onClick={() => setOnboardingCarouselIndex(prev => Math.min(onboardingSlides.length - 1, prev + 1))}
               className="p-1 rounded-lg border border-outline-variant hover:bg-surface-container disabled:opacity-30"
               disabled={onboardingCarouselIndex === onboardingSlides.length - 1}
             >
-              <span className="material-symbols-outlined text-xs">chevron_right</span>
+              <span className="material-symbols-outlined notranslate text-xs">chevron_right</span>
             </button>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function OnboardingWorkspace({
             {onboardingSlides.map((slide, idx) => (
               <div key={idx} className="w-full flex-shrink-0 flex flex-col md:flex-row h-full">
                 <div className={`w-full md:w-2/5 bg-gradient-to-br ${slide.color} p-6 flex flex-col justify-between text-white`}>
-                  <span className="material-symbols-outlined text-3xl">{slide.icon}</span>
+                  <span className="material-symbols-outlined notranslate text-3xl">{slide.icon}</span>
                   <h4 className="font-display font-bold text-lg leading-tight">{slide.title}</h4>
                 </div>
                 <div className="flex-1 p-6 flex items-center text-sm font-semibold text-on-surface-variant leading-relaxed bg-white">
@@ -197,13 +197,13 @@ export default function OnboardingWorkspace({
             
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-lg font-bold text-primary flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-primary text-lg">science</span> AI Annual Crop Plan Recommendations
+                <span className="material-symbols-outlined notranslate text-primary text-lg">science</span> AI Annual Crop Plan Recommendations
               </h3>
               <button 
                 onClick={() => setShowAnnualPlanWizard(false)}
                 className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1 rounded-full hover:bg-surface-container"
               >
-                <span className="material-symbols-outlined text-lg">close</span>
+                <span className="material-symbols-outlined notranslate text-lg">close</span>
               </button>
             </div>
 

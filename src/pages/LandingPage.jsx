@@ -69,7 +69,7 @@ function Navbar() {
           {/* Logo */}
           <a href="#" className="flex items-center gap-2.5 group" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-              <span className="material-symbols-outlined text-white text-lg fill">eco</span>
+              <span className="material-symbols-outlined notranslate text-white text-lg fill">eco</span>
             </div>
             <span className="font-display font-bold text-xl text-on-surface">Kisan<span className="text-primary">Mitra</span></span>
           </a>
@@ -109,7 +109,7 @@ function Navbar() {
             className="md:hidden p-2 rounded-lg text-on-surface-variant hover:bg-surface-container"
             aria-label="Toggle menu"
           >
-            <span className="material-symbols-outlined">{mobileMenuOpen ? 'close' : 'menu'}</span>
+            <span className="material-symbols-outlined notranslate">{mobileMenuOpen ? 'close' : 'menu'}</span>
           </button>
         </div>
 
@@ -201,7 +201,7 @@ function HeroSection() {
                 onClick={handleDemoClick}
                 className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-primary bg-white border-2 border-primary/20 hover:border-primary/40 hover:bg-primary-container/10 transition-all flex items-center justify-center gap-2"
               >
-                <span className="material-symbols-outlined text-lg">play_circle</span>
+                <span className="material-symbols-outlined notranslate text-lg">play_circle</span>
                 Explore Demo
               </button>
             </div>
@@ -375,7 +375,7 @@ function HowItWorksSection() {
           {steps.map((step, i) => (
             <div key={i} className={`landing-step-card ${i < steps.length - 1 ? 'step-connector' : ''}`}>
               <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
-                <span className="material-symbols-outlined text-2xl fill">{step.icon}</span>
+                <span className="material-symbols-outlined notranslate text-2xl fill">{step.icon}</span>
               </div>
               <div className="text-xs font-bold text-primary/60 mb-2 tracking-widest">{step.num}</div>
               <h3 className="font-display text-base font-bold text-on-surface mb-2">{step.title}</h3>
@@ -420,7 +420,7 @@ function AISection() {
               {capabilities.map((cap, i) => (
                 <div key={i} className="flex items-start gap-3 p-3 rounded-xl hover:bg-surface-container/60 transition-colors">
                   <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
-                    <span className="material-symbols-outlined text-lg fill">{cap.icon}</span>
+                    <span className="material-symbols-outlined notranslate text-lg fill">{cap.icon}</span>
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-on-surface">{cap.title}</h4>
@@ -436,7 +436,7 @@ function AISection() {
             <div className="bg-background rounded-2xl border border-outline-variant/50 p-6 shadow-lg">
               <div className="flex items-center gap-2 mb-5">
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                  <span className="material-symbols-outlined text-white text-sm fill">smart_toy</span>
+                  <span className="material-symbols-outlined notranslate text-white text-sm fill">smart_toy</span>
                 </div>
                 <span className="text-sm font-bold text-on-surface">KisanMitra AI</span>
                 <span className="text-[10px] bg-primary-container/20 text-primary px-2 py-0.5 rounded-full font-bold ml-auto">LIVE</span>
@@ -665,7 +665,7 @@ function CTASection() {
             onClick={handleDemoClick}
             className="w-full sm:w-auto px-10 py-4 rounded-2xl text-base font-bold text-white border-2 border-white/30 hover:border-white/60 hover:bg-white/10 transition-all flex items-center justify-center gap-2"
           >
-            <span className="material-symbols-outlined text-lg">play_circle</span>
+            <span className="material-symbols-outlined notranslate text-lg">play_circle</span>
             Try Demo First
           </button>
         </div>
@@ -684,7 +684,7 @@ function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
-              <span className="material-symbols-outlined text-white text-sm fill">eco</span>
+              <span className="material-symbols-outlined notranslate text-white text-sm fill">eco</span>
             </div>
             <span className="font-display font-bold text-lg text-on-surface">Kisan<span className="text-primary">Mitra</span></span>
           </div>

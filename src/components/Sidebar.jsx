@@ -121,7 +121,7 @@ export default function Sidebar({
               {profile.name || 'Ramesh Ji'}
             </h4>
             <p className="text-xs text-on-surface-variant flex items-center gap-1 mt-0.5">
-              <span className="material-symbols-outlined text-xs">location_on</span>
+              <span className="material-symbols-outlined notranslate text-xs">location_on</span>
               <span className="truncate">{profile.village || 'Pimpalgaon'}</span>
             </p>
             {/* Farm health bar */}
@@ -168,7 +168,7 @@ export default function Sidebar({
 
                 {/* Fixed width icon wrapper to ensure perfect centering */}
                 <div className="w-14 lg:w-[80px] h-12 flex-shrink-0 flex items-center justify-center">
-                  <span className={`material-symbols-outlined text-xl transition-all duration-300 ${isActive ? 'fill' : ''}`}>
+                  <span className={`material-symbols-outlined notranslate text-xl transition-all duration-300 ${isActive ? 'fill' : ''}`}>
                     {item.icon}
                   </span>
                 </div>
@@ -235,7 +235,7 @@ export default function Sidebar({
                 ${sidebarCollapsed ? 'lg:rounded-none lg:bg-transparent lg:hover:bg-amber-50' : 'border border-amber-200'}`}
             >
               <div className="w-12 lg:w-[80px] h-12 flex-shrink-0 flex items-center justify-center">
-                <span className="material-symbols-outlined text-lg">science</span>
+                <span className="material-symbols-outlined notranslate text-lg">science</span>
               </div>
               <span className={`text-left truncate transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'flex-1 opacity-100 pr-3'}`}>
                 Exit Demo
@@ -262,7 +262,7 @@ export default function Sidebar({
               ${sidebarCollapsed ? 'hover:bg-red-50 lg:rounded-none lg:hover:bg-red-50' : 'hover:bg-red-50 hover:text-red-700'}`}
           >
             <div className="w-12 lg:w-[80px] h-12 flex-shrink-0 flex items-center justify-center">
-              <span className="material-symbols-outlined text-lg">logout</span>
+              <span className="material-symbols-outlined notranslate text-lg">logout</span>
             </div>
             <span className={`text-left truncate transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'flex-1 opacity-100 pr-3'}`}>
               {tr("Sign Out / Reset", language)}

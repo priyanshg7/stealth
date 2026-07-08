@@ -392,7 +392,7 @@ const SchemeCard = ({
           {/* Benefits Block (Green Left Border) */}
           <div className="border-l-4 border-l-green-600 bg-green-50/50 p-3.5 rounded-r-xl space-y-1">
             <h4 className="font-bold text-xs text-green-900 flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-green-700 text-sm font-bold">payments</span>
+              <span className="material-symbols-outlined notranslate text-green-700 text-sm font-bold">payments</span>
               Benefits
             </h4>
             <p className="text-[11px] text-green-950 leading-relaxed font-semibold">
@@ -403,7 +403,7 @@ const SchemeCard = ({
           {/* Eligibility Block (Blue Left Border) */}
           <div className="border-l-4 border-l-blue-600 bg-blue-50/50 p-3.5 rounded-r-xl space-y-1">
             <h4 className="font-bold text-xs text-blue-900 flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-blue-700 text-sm font-bold">fact_check</span>
+              <span className="material-symbols-outlined notranslate text-blue-700 text-sm font-bold">fact_check</span>
               Eligibility
             </h4>
             <p className="text-[11px] text-blue-950 leading-relaxed font-semibold">
@@ -415,7 +415,7 @@ const SchemeCard = ({
           {sch.application && (
             <div className="border-l-4 border-l-purple-600 bg-purple-50/50 p-3.5 rounded-r-xl space-y-1">
               <h4 className="font-bold text-xs text-purple-900 flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-purple-700 text-sm font-bold">route</span>
+                <span className="material-symbols-outlined notranslate text-purple-700 text-sm font-bold">route</span>
                 How To Apply
               </h4>
               <p className="text-[11px] text-purple-950 leading-relaxed font-semibold">
@@ -429,7 +429,7 @@ const SchemeCard = ({
             <div className="border-l-4 border-l-amber-600 bg-amber-50/50 p-3.5 rounded-r-xl space-y-2">
               <div className="flex justify-between items-center">
                 <h4 className="font-bold text-xs text-amber-900 flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-amber-700 text-sm font-bold">assignment</span>
+                  <span className="material-symbols-outlined notranslate text-amber-700 text-sm font-bold">assignment</span>
                   Required Documents
                 </h4>
                 <span className="text-[9px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">
@@ -466,7 +466,7 @@ const SchemeCard = ({
           {/* Contact Block (Slate Left Border) */}
           <div className="border-l-4 border-l-slate-400 bg-slate-50/50 p-3.5 rounded-r-xl space-y-2">
             <h4 className="font-bold text-xs text-slate-700 flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-slate-600 text-sm font-bold">contacts</span>
+              <span className="material-symbols-outlined notranslate text-slate-600 text-sm font-bold">contacts</span>
               Contact Info
             </h4>
             <div className="text-[10px] text-slate-800 space-y-1 font-semibold leading-relaxed">
@@ -505,7 +505,7 @@ const SchemeCard = ({
             onClick={() => startAIChat(sch)}
             className="bg-white hover:bg-surface-container text-on-surface border border-outline-variant font-extrabold px-3 py-1.5 rounded-xl text-[10px] flex items-center gap-1 transition-all"
           >
-            <span className="material-symbols-outlined text-sm font-bold text-on-surface-variant">chat</span>
+            <span className="material-symbols-outlined notranslate text-sm font-bold text-on-surface-variant">chat</span>
             <span>Ask AI Agent</span>
           </button>
         </div>
@@ -1005,7 +1005,7 @@ Guidelines:
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-12 min-h-[400px] space-y-4 bg-white border border-outline-variant/60 rounded-card shadow-sm">
-        <span className="material-symbols-outlined text-4xl text-primary animate-spin">sync</span>
+        <span className="material-symbols-outlined notranslate text-4xl text-primary animate-spin">sync</span>
         <h3 className="font-display font-extrabold text-on-surface text-lg">AI Loading Schemes...</h3>
         <p className="text-xs text-on-surface-variant max-w-xs text-center font-medium">
           Parsing and scoring government benefits tailored to your farm and crop location.
@@ -1109,7 +1109,7 @@ Guidelines:
                 <span className="text-base font-extrabold text-primary block mt-0.5">🎁 {sch.benefits || "Direct Benefit Scheme"}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`material-symbols-outlined text-2xl ${matchBadge.color}`}>{matchBadge.icon}</span>
+                <span className={`material-symbols-outlined notranslate text-2xl ${matchBadge.color}`}>{matchBadge.icon}</span>
                 <div>
                   <span className="text-[10px] text-on-surface-variant font-bold block uppercase tracking-wider">KisanMitra Verification</span>
                   <span className={`text-sm font-extrabold block ${matchBadge.color}`}>{matchBadge.label}</span>
@@ -1120,7 +1120,7 @@ Guidelines:
             {/* AI match explanation */}
             {sch.status !== 'Not Eligible' && (
               <div className="bg-[#f0fdf4] border border-primary/20 p-3.5 rounded-xl text-xs text-on-surface flex items-start gap-2">
-                <span className="material-symbols-outlined text-primary text-lg font-bold mt-0.5">sparkles</span>
+                <span className="material-symbols-outlined notranslate text-primary text-lg font-bold mt-0.5">sparkles</span>
                 <div>
                   <strong className="text-primary font-bold">KisanMitra Insight:</strong> {sch.explanation}
                 </div>
@@ -1157,13 +1157,13 @@ Guidelines:
                 className="bg-primary hover:bg-secondary text-white font-extrabold h-11 px-6 rounded-xl flex items-center justify-center gap-2 shadow-xs text-xs transition-all active:scale-[0.98]"
               >
                 <span>Visit Official Website</span>
-                <span className="material-symbols-outlined text-sm font-bold">open_in_new</span>
+                <span className="material-symbols-outlined notranslate text-sm font-bold">open_in_new</span>
               </a>
               <button
                 onClick={() => startAIChat(sch)}
                 className="bg-white hover:bg-primary/5 text-primary border-2 border-primary font-extrabold h-11 px-6 rounded-xl flex items-center justify-center gap-2 text-xs transition-all"
               >
-                <span className="material-symbols-outlined text-primary text-sm font-bold">chat</span>
+                <span className="material-symbols-outlined notranslate text-primary text-sm font-bold">chat</span>
                 <span>Ask AI About This Scheme</span>
               </button>
               
@@ -1205,7 +1205,7 @@ Guidelines:
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <span className={`material-symbols-outlined text-sm ${activeAccordion === sec.id ? 'text-primary' : 'text-on-surface-variant'}`}>{sec.icon}</span>
+                  <span className={`material-symbols-outlined notranslate text-sm ${activeAccordion === sec.id ? 'text-primary' : 'text-on-surface-variant'}`}>{sec.icon}</span>
                   <span>{sec.title}</span>
                 </div>
                 <ChevronRight className={`w-4 h-4 transition-transform ${activeAccordion === sec.id ? 'rotate-90 text-primary' : 'text-on-surface-variant'}`} />
@@ -1235,7 +1235,7 @@ Guidelines:
                 <div className="grid grid-cols-1 gap-3">
                   {sch.benefits.split(/[.\n]/).filter(s => s.trim().length > 5).map((ben, idx) => (
                     <div key={idx} className="p-3 bg-green-50/50 border border-green-100 rounded-xl flex items-start gap-3">
-                      <span className="material-symbols-outlined text-green-700 text-lg mt-0.5">payments</span>
+                      <span className="material-symbols-outlined notranslate text-green-700 text-lg mt-0.5">payments</span>
                       <div className="text-xs font-semibold text-green-950 leading-relaxed">
                         {ben.trim()}
                       </div>
@@ -1251,7 +1251,7 @@ Guidelines:
                 <div className="space-y-2.5">
                   {sch.eligibility.split(/[.\n]/).filter(s => s.trim().length > 8).map((elig, idx) => (
                     <div key={idx} className="flex items-start gap-3 p-2.5 bg-surface-container-lowest border rounded-xl">
-                      <span className="material-symbols-outlined text-primary text-lg shrink-0">check_circle</span>
+                      <span className="material-symbols-outlined notranslate text-primary text-lg shrink-0">check_circle</span>
                       <span className="text-xs text-on-surface font-semibold leading-relaxed">
                         {elig.trim()}
                       </span>
@@ -1333,7 +1333,7 @@ Guidelines:
                 <div className="space-y-3">
                   <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-1">
                     <span className="font-bold text-xs text-amber-900 flex items-center gap-1">
-                      <span className="material-symbols-outlined text-amber-700 text-sm">warning</span> Common Mistake
+                      <span className="material-symbols-outlined notranslate text-amber-700 text-sm">warning</span> Common Mistake
                     </span>
                     <p className="text-xs text-amber-950 font-medium leading-relaxed">
                       Mismatch in Land Registry names compared to Aadhaar details is the #1 reason for scheme application rejection. Ensure spelling matches exactly.
@@ -1342,7 +1342,7 @@ Guidelines:
 
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-1">
                     <span className="font-bold text-xs text-blue-900 flex items-center gap-1">
-                      <span className="material-symbols-outlined text-blue-700 text-sm">lightbulb</span> Smart Farmer Tip
+                      <span className="material-symbols-outlined notranslate text-blue-700 text-sm">lightbulb</span> Smart Farmer Tip
                     </span>
                     <p className="text-xs text-blue-950 font-medium leading-relaxed">
                       Link your active bank account to your Aadhaar number. All financial subsidies under Direct Benefit Transfer (DBT) flow through Aadhaar-linked accounts only.
@@ -1364,7 +1364,7 @@ Guidelines:
       {/* Dynamic Notifications Banner */}
       <div className="bg-primary/5 border border-primary/20 p-4 rounded-card space-y-2 relative overflow-hidden shadow-xs">
         <div className="flex items-start gap-3">
-          <span className="material-symbols-outlined text-primary text-2xl font-bold mt-0.5">notifications_active</span>
+          <span className="material-symbols-outlined notranslate text-primary text-2xl font-bold mt-0.5">notifications_active</span>
           <div>
             <h4 className="font-display font-bold text-on-surface text-sm">Upcoming Scheme Deadlines & Alerts</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2 text-xs font-semibold text-on-surface-variant">
@@ -1396,7 +1396,7 @@ Guidelines:
         <div>
           <span className="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider block">Currently Selected Profile</span>
           <div className="flex items-center gap-2 mt-1">
-            <span className="material-symbols-outlined text-primary font-bold">agriculture</span>
+            <span className="material-symbols-outlined notranslate text-primary font-bold">agriculture</span>
             <span className="font-bold text-sm text-on-surface">{activeFarm?.name || 'My Farm'}</span>
             <span className="text-xs font-medium text-on-surface-variant">
               ({activeFarm?.crop?.name?.toUpperCase()} · {activeFarm?.area} {activeFarm?.unit} · {activeFarm?.village}, {activeFarm?.district})
@@ -1637,7 +1637,7 @@ Guidelines:
         {/* --- SECTION 2: You're Eligible For --- */}
         <section className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 border-b border-surface-container-high pb-3">
-            <span className="material-symbols-outlined text-primary text-xl">check_circle</span>
+            <span className="material-symbols-outlined notranslate text-primary text-xl">check_circle</span>
             You're Eligible For
           </h3>
 
@@ -1680,7 +1680,7 @@ Guidelines:
         {/* --- SECTION 3: Possibly Eligible --- */}
         <section className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 border-b border-surface-container-high pb-3">
-            <span className="material-symbols-outlined text-amber-600 text-xl">help</span>
+            <span className="material-symbols-outlined notranslate text-amber-600 text-xl">help</span>
             Possibly Eligible
           </h3>
 
@@ -1735,7 +1735,7 @@ Guidelines:
       {!filters.showSaved && (
         <section className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 border-b border-surface-container-high pb-3">
-            <span className="material-symbols-outlined text-primary text-xl">recommend</span>
+            <span className="material-symbols-outlined notranslate text-primary text-xl">recommend</span>
             Popular National Schemes
           </h3>
 
@@ -1764,7 +1764,7 @@ Guidelines:
       {/* --- SECTION 5: Browse All Schemes --- */}
       <section className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
         <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 border-b border-surface-container-high pb-3">
-          <span className="material-symbols-outlined text-primary text-xl">list_alt</span>
+          <span className="material-symbols-outlined notranslate text-primary text-xl">list_alt</span>
           Browse All Schemes ({filteredSchemes.length})
         </h3>
 
@@ -1833,7 +1833,7 @@ Guidelines:
             {/* Header */}
             <div className="p-4 bg-primary text-white flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined fill text-xl">chat</span>
+                <span className="material-symbols-outlined notranslate fill text-xl">chat</span>
                 <div>
                   <h3 className="font-display font-extrabold text-xs">AI Scheme Assistant</h3>
                   <p className="text-[10px] text-primary-fixed truncate max-w-[280px] font-semibold">{selectedSchemeForChat.name}</p>
@@ -1843,7 +1843,7 @@ Guidelines:
                 onClick={() => setSelectedSchemeForChat(null)}
                 className="text-white hover:bg-white/10 rounded-full p-1 flex items-center justify-center"
               >
-                <span className="material-symbols-outlined text-lg">close</span>
+                <span className="material-symbols-outlined notranslate text-lg">close</span>
               </button>
             </div>
 

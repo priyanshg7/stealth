@@ -427,7 +427,7 @@ export default function DiseaseDiagnosis({ weatherData, activeFarm, farms, setFa
       <div className="flex justify-between items-center border-b border-gray-100 pb-4">
         <div>
           <h2 className="font-display font-extrabold text-xl text-gray-900 flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-2xl font-bold">photo_camera</span> Disease Diagnosis
+            <span className="material-symbols-outlined notranslate text-primary text-2xl font-bold">photo_camera</span> Disease Diagnosis
           </h2>
           <p className="text-sm text-gray-500 mt-0.5">Select a farm or enter details manually, then provide an image or symptoms.</p>
         </div>
@@ -457,7 +457,7 @@ export default function DiseaseDiagnosis({ weatherData, activeFarm, farms, setFa
             {farmSource === 'saved' ? (
               <div className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 flex justify-between items-center text-sm">
                 <span className="font-semibold text-primary">{activeFarm?.crop?.name || 'No Farm Selected'}</span>
-                <span className="material-symbols-outlined text-gray-400 text-lg">lock</span>
+                <span className="material-symbols-outlined notranslate text-gray-400 text-lg">lock</span>
               </div>
             ) : (
               <div className="relative">
@@ -477,7 +477,7 @@ export default function DiseaseDiagnosis({ weatherData, activeFarm, farms, setFa
             {farmSource === 'saved' ? (
               <div className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 flex justify-between items-center text-sm">
                 <span className="font-semibold text-gray-700">{activeFarm?.location || 'Unknown'}</span>
-                <span className="material-symbols-outlined text-gray-400 text-lg">lock</span>
+                <span className="material-symbols-outlined notranslate text-gray-400 text-lg">lock</span>
               </div>
             ) : (
               <div className="relative">
@@ -515,13 +515,13 @@ export default function DiseaseDiagnosis({ weatherData, activeFarm, farms, setFa
                   onClick={() => fileInputRef.current?.click()} 
                   className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50 flex items-center gap-2 shadow-sm"
                 >
-                  <span className="material-symbols-outlined text-[18px]">upload</span> Change Image
+                  <span className="material-symbols-outlined notranslate text-[18px]">upload</span> Change Image
                 </button>
               </div>
             ) : (
               <div className="space-y-4 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                 <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto text-primary">
-                  <span className="material-symbols-outlined text-3xl">add_photo_alternate</span>
+                  <span className="material-symbols-outlined notranslate text-3xl">add_photo_alternate</span>
                 </div>
                 <div>
                   <h4 className="font-bold text-gray-900 text-sm">Upload a clear photo of the affected plant part.</h4>
@@ -539,7 +539,7 @@ export default function DiseaseDiagnosis({ weatherData, activeFarm, farms, setFa
             disabled={!imageFile || !currentCrop}
             className={`flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-extrabold shadow-sm transition-all ${(!imageFile || !currentCrop) ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-primary hover:bg-secondary text-white hover:-translate-y-0.5 hover:shadow-md'}`}
           >
-            <span className="material-symbols-outlined text-[20px]">psychiatry</span> Diagnose Problem
+            <span className="material-symbols-outlined notranslate text-[20px]">psychiatry</span> Diagnose Problem
           </button>
         </div>
       </div>

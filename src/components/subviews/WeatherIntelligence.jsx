@@ -273,7 +273,7 @@ export default function WeatherIntelligence({
         {/* Departure Card */}
         <div className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4 flex flex-col justify-between">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-xl font-bold">query_stats</span>
+            <span className="material-symbols-outlined notranslate text-primary text-xl font-bold">query_stats</span>
             Rainfall Departure
           </h3>
 
@@ -325,7 +325,7 @@ export default function WeatherIntelligence({
           </div>
 
           <div className="p-4 bg-[#f0fdf4] border border-primary/20 rounded-xl flex gap-3 items-start mt-4">
-            <span className="material-symbols-outlined text-primary text-xl font-bold mt-0.5">tips_and_updates</span>
+            <span className="material-symbols-outlined notranslate text-primary text-xl font-bold mt-0.5">tips_and_updates</span>
             <div>
               <span className="block text-xs font-black text-primary mb-0.5">IMD Rainfall Advisory:</span>
               <p className="text-xs text-green-950 font-semibold leading-relaxed">
@@ -340,7 +340,7 @@ export default function WeatherIntelligence({
       {/* 5. AI Irrigation Advisor */}
       <div className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
         <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-          <span className="material-symbols-outlined text-blue-600 text-xl font-bold animate-pulse">water_drop</span>
+          <span className="material-symbols-outlined notranslate text-blue-600 text-xl font-bold animate-pulse">water_drop</span>
           AI Irrigation Advisor
         </h3>
 
@@ -377,7 +377,7 @@ export default function WeatherIntelligence({
       <section className="bg-white border border-outline-variant/60 rounded-card p-6 shadow-sm space-y-4">
         <div>
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-xl font-bold">calendar_month</span>
+            <span className="material-symbols-outlined notranslate text-primary text-xl font-bold">calendar_month</span>
             7-Day Weather Timeline & Suitability Advisor
           </h3>
           <p className="text-[10px] text-on-surface-variant font-semibold mt-0.5">Click any day to view farm action ratings and AI weather advice</p>
