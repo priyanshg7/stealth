@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 export default function OnboardingWorkspace({
   profile,
@@ -44,7 +44,7 @@ export default function OnboardingWorkspace({
         {/* Setup Progress Stepper */}
         <div className="bg-white rounded-card p-6 border border-outline-variant/60 shadow-sm space-y-4">
           <h3 className="font-display font-bold text-lg text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined notranslate text-primary text-xl">task_alt</span> Setup Progress
+            <span className="material-symbols-outlined text-primary text-xl">task_alt</span> Setup Progress
           </h3>
           <div className="space-y-3">
             {[
@@ -58,7 +58,7 @@ export default function OnboardingWorkspace({
                 <div className={`h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-xs ${
                   step.status ? 'bg-primary' : 'bg-surface-container text-on-surface-variant border border-outline-variant'
                 }`}>
-                  {step.status ? 'âœ“' : idx + 1}
+                  {step.status ? '✓' : idx + 1}
                 </div>
                 <span className={`font-semibold ${step.status ? 'text-on-surface' : 'text-on-surface-variant'}`}>
                   {step.label}
@@ -79,7 +79,7 @@ export default function OnboardingWorkspace({
             </button>
             <div className="space-y-2">
               <h4 className="font-bold text-primary text-base flex items-center gap-2">
-                <span className="material-symbols-outlined notranslate text-primary text-lg">science</span> Upload Soil Health Card
+                <span className="material-symbols-outlined text-primary text-lg">science</span> Upload Soil Health Card
               </h4>
               <p className="text-xs text-on-surface-variant leading-relaxed">
                 Provide your soil testing values to unlock hyper-accurate fertilizer recommendations. Otherwise, KisanMitra uses district averages.
@@ -88,7 +88,7 @@ export default function OnboardingWorkspace({
 
             <div className="flex gap-3">
               <label className="flex-1 bg-primary hover:bg-secondary text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm cursor-pointer transition-all">
-                <span className="material-symbols-outlined notranslate text-sm">upload</span> Upload Now
+                <span className="material-symbols-outlined text-sm">upload</span> Upload Now
                 <input type="file" onChange={handleSoilHealthCardUpload} className="hidden" />
               </label>
             </div>
@@ -99,7 +99,7 @@ export default function OnboardingWorkspace({
           <div className="bg-primary/5 border border-primary/20 rounded-card p-6 shadow-sm flex flex-col justify-between space-y-3">
             <div className="space-y-1">
               <h4 className="font-bold text-primary text-base flex items-center gap-1.5">
-                <span className="material-symbols-outlined notranslate text-green-700 text-lg">check_circle</span> Soil Card Parsed!
+                <span className="material-symbols-outlined text-green-700 text-lg">check_circle</span> Soil Card Parsed!
               </h4>
               <p className="text-xs text-on-surface-variant">
                 AI has extracted metrics successfully. Nitrogen: Medium, Phosphorus: Medium, Potassium: High.
@@ -118,7 +118,7 @@ export default function OnboardingWorkspace({
       {/* 3. Primary CTA: Generate Annual Planner */}
       <div className="bg-white border-2 border-primary rounded-card p-6 md:p-8 shadow-md text-center space-y-4">
         <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-2">
-          <span className="material-symbols-outlined notranslate text-3xl">psychology</span>
+          <span className="material-symbols-outlined text-3xl">psychology</span>
         </div>
         <h3 className="font-display font-extrabold text-xl text-on-surface leading-tight">
           Generate Your First Annual Farm & Season Plan
@@ -131,7 +131,7 @@ export default function OnboardingWorkspace({
           className="bg-primary hover:bg-secondary text-white font-extrabold px-8 py-3 rounded-xl text-sm shadow-md transition-all active:scale-[0.97] inline-flex items-center gap-2"
         >
           <span>Generate Crop Plan</span>
-          <span className="material-symbols-outlined notranslate text-sm font-bold">arrow_forward</span>
+          <span className="material-symbols-outlined text-sm font-bold">arrow_forward</span>
         </button>
       </div>
 
@@ -145,14 +145,14 @@ export default function OnboardingWorkspace({
               className="p-1 rounded-lg border border-outline-variant hover:bg-surface-container disabled:opacity-30"
               disabled={onboardingCarouselIndex === 0}
             >
-              <span className="material-symbols-outlined notranslate text-xs">chevron_left</span>
+              <span className="material-symbols-outlined text-xs">chevron_left</span>
             </button>
             <button 
               onClick={() => setOnboardingCarouselIndex(prev => Math.min(onboardingSlides.length - 1, prev + 1))}
               className="p-1 rounded-lg border border-outline-variant hover:bg-surface-container disabled:opacity-30"
               disabled={onboardingCarouselIndex === onboardingSlides.length - 1}
             >
-              <span className="material-symbols-outlined notranslate text-xs">chevron_right</span>
+              <span className="material-symbols-outlined text-xs">chevron_right</span>
             </button>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function OnboardingWorkspace({
             {onboardingSlides.map((slide, idx) => (
               <div key={idx} className="w-full flex-shrink-0 flex flex-col md:flex-row h-full">
                 <div className={`w-full md:w-2/5 bg-gradient-to-br ${slide.color} p-6 flex flex-col justify-between text-white`}>
-                  <span className="material-symbols-outlined notranslate text-3xl">{slide.icon}</span>
+                  <span className="material-symbols-outlined text-3xl">{slide.icon}</span>
                   <h4 className="font-display font-bold text-lg leading-tight">{slide.title}</h4>
                 </div>
                 <div className="flex-1 p-6 flex items-center text-sm font-semibold text-on-surface-variant leading-relaxed bg-white">
@@ -197,13 +197,13 @@ export default function OnboardingWorkspace({
             
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-lg font-bold text-primary flex items-center gap-1.5">
-                <span className="material-symbols-outlined notranslate text-primary text-lg">science</span> AI Annual Crop Plan Recommendations
+                <span className="material-symbols-outlined text-primary text-lg">science</span> AI Annual Crop Plan Recommendations
               </h3>
               <button 
                 onClick={() => setShowAnnualPlanWizard(false)}
                 className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1 rounded-full hover:bg-surface-container"
               >
-                <span className="material-symbols-outlined notranslate text-lg">close</span>
+                <span className="material-symbols-outlined text-lg">close</span>
               </button>
             </div>
 
@@ -214,8 +214,8 @@ export default function OnboardingWorkspace({
 
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { id: 'wheat', name: 'Wheat (Karan Vandana)', yield: '22 Qtl/Acre', profit: 'â‚¹1.1L', cost: 'â‚¹18,000/Acre', icon: 'ðŸŒ¾' },
-                  { id: 'rice', name: 'Rice (Pusa Basmati)', yield: '28 Qtl/Acre', profit: 'â‚¹1.3L', cost: 'â‚¹22,000/Acre', icon: 'ðŸŒ±' }
+                  { id: 'wheat', name: 'Wheat (Karan Vandana)', yield: '22 Qtl/Acre', profit: '₹1.1L', cost: '₹18,000/Acre', icon: '🌾' },
+                  { id: 'rice', name: 'Rice (Pusa Basmati)', yield: '28 Qtl/Acre', profit: '₹1.3L', cost: '₹22,000/Acre', icon: '🌱' }
                 ].map(c => {
                   const isSel = wizardSelectedCrop === c.id;
                   return (
@@ -233,7 +233,7 @@ export default function OnboardingWorkspace({
                         <div className={`h-4.5 w-4.5 rounded-full border flex items-center justify-center ${
                           isSel ? 'bg-primary text-white' : 'border-outline-variant'
                         }`}>
-                          {isSel && 'âœ“'}
+                          {isSel && '✓'}
                         </div>
                       </div>
                       <div>
@@ -247,7 +247,7 @@ export default function OnboardingWorkspace({
               </div>
 
               <div className="bg-surface-container-low/60 rounded-xl p-3 border text-[11px] leading-relaxed text-on-surface-variant font-medium">
-                ðŸŒ¾ <strong>Annual Crop Rotation Advice:</strong> Rotating {wizardSelectedCrop === 'wheat' ? 'Wheat' : 'Rice'} with a nitrogen-fixing legume like Moong or Chickpea in the secondary season will restore 25% soil nitrogen naturally and reduce urea expenditures by â‚¹4,500.
+                🌾 <strong>Annual Crop Rotation Advice:</strong> Rotating {wizardSelectedCrop === 'wheat' ? 'Wheat' : 'Rice'} with a nitrogen-fixing legume like Moong or Chickpea in the secondary season will restore 25% soil nitrogen naturally and reduce urea expenditures by ₹4,500.
               </div>
             </div>
 
@@ -289,4 +289,3 @@ export default function OnboardingWorkspace({
     </div>
   );
 }
-

@@ -1,4 +1,4 @@
-﻿import { t } from '../../utils/translations';
+import { t } from '../../utils/translations';
 import React from 'react';
 import { 
   Check, Volume2, Mic, MapPin, Plus, Trash2, Edit3, ArrowLeft, ArrowRight,
@@ -67,20 +67,20 @@ export default function FarmingDashboard({
     <div className="space-y-5 animate-fade-in-up font-sans pb-10">
       {translating && (
         <div className="bg-primary/10 text-primary border border-primary/20 rounded-xl p-3 text-xs font-bold flex items-center gap-2 animate-pulse">
-          <span className="material-symbols-outlined notranslate text-sm font-bold animate-spin">sync</span>
+          <span className="material-symbols-outlined text-sm font-bold animate-spin">sync</span>
           <span>{t("AI is translating your dashboard into the selected language...", language)}</span>
         </div>
       )}
 
-      {/* â”€â”€â”€â”€ 1. GREETING & FARM SWITCHER â”€â”€â”€â”€ */}
+      {/* ──── 1. GREETING & FARM SWITCHER ──── */}
       <div className="space-y-3">
         <div>
           <h1 className="text-xl md:text-2xl font-extrabold text-on-surface tracking-tight leading-tight">
-            {timeGreeting}, <span className="text-primary">{farmerName}</span> ðŸŒ¾
+            {timeGreeting}, <span className="text-primary">{farmerName}</span> 🌾
           </h1>
           <p className="text-xs font-semibold text-on-surface-variant/80 mt-0.5">
             {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-            {activeFarm && <> Â· <strong>{activeFarm.name}</strong> ({activeFarm.area} {activeFarm.unit})</>}
+            {activeFarm && <> · <strong>{activeFarm.name}</strong> ({activeFarm.area} {activeFarm.unit})</>}
           </p>
         </div>
 
@@ -100,7 +100,7 @@ export default function FarmingDashboard({
               >
                 <div className="flex justify-between items-start mb-2">
                   <span className="font-extrabold text-sm text-on-surface flex items-center gap-1">
-                    ðŸšœ {f.name}
+                    🚜 {f.name}
                   </span>
                   <span className="text-[11px] md:text-xs bg-primary/10 text-primary font-black px-2 py-0.5 rounded-full">
                     {f.area} {f.unit}
@@ -153,7 +153,7 @@ export default function FarmingDashboard({
                 </p>
                 <div className="flex gap-2 items-center text-[11px] md:text-xs text-on-surface-variant font-bold mt-3">
                   <span className="bg-surface-container-high px-2 py-0.5 rounded">Takes 3-5 min</span>
-                  <span className="text-green-700">âœ“ Full rotation benefits</span>
+                  <span className="text-green-700">✓ Full rotation benefits</span>
                 </div>
               </div>
               <button 
@@ -174,7 +174,7 @@ export default function FarmingDashboard({
                 </p>
                 <div className="flex gap-2 items-center text-[11px] md:text-xs text-on-surface-variant font-bold mt-3">
                   <span className="bg-surface-container-high px-2 py-0.5 rounded">Takes 2 min</span>
-                  <span className="text-primary">âœ“ Quick setup</span>
+                  <span className="text-primary">✓ Quick setup</span>
                 </div>
               </div>
               <button 
@@ -192,8 +192,8 @@ export default function FarmingDashboard({
               <span>Setup Progress:</span>
               <span className="flex items-center gap-1 text-green-700"><CheckCircle2 size={14} /> Profile Setup</span>
               <span className="flex items-center gap-1 text-green-700"><CheckCircle2 size={14} /> Saved Farm</span>
-              <span className="flex items-center gap-1 text-on-surface-variant/40">â—‹ Annual Plan</span>
-              <span className="flex items-center gap-1 text-on-surface-variant/40">â—‹ Seasonal Plan</span>
+              <span className="flex items-center gap-1 text-on-surface-variant/40">○ Annual Plan</span>
+              <span className="flex items-center gap-1 text-on-surface-variant/40">○ Seasonal Plan</span>
             </div>
             {farms.length > 0 && (
               <button 
@@ -231,7 +231,7 @@ export default function FarmingDashboard({
         <div className="flex justify-between items-center border-b border-surface-container-high pb-3">
           <div>
             <h3 className="font-display font-extrabold text-lg text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined notranslate text-primary font-bold">calendar_today</span>
+              <span className="material-symbols-outlined text-primary font-bold">calendar_today</span>
               {t("Today's Work Schedule", language)}
             </h3>
             <p className="text-xs text-on-surface-variant mt-0.5">{t("AI-generated schedule based on active crop stage & weather warnings", language)}</p>
@@ -257,10 +257,10 @@ export default function FarmingDashboard({
             if (pending.length === 0) {
               return (
                 <div className="p-6 bg-primary/5 rounded-2xl border border-primary/20 text-center space-y-3 animate-fade-in-up">
-                  <span className="material-symbols-outlined notranslate text-primary text-4xl fill">check_circle</span>
+                  <span className="material-symbols-outlined text-primary text-4xl fill">check_circle</span>
                   <div>
                     <h4 className="font-bold text-on-surface text-base">{t("All done for today!", language)}</h4>
-                    <p className="text-xs text-on-surface-variant mt-1">{t("Your farm is fully optimized and in excellent health.", language)} ðŸŒ¾</p>
+                    <p className="text-xs text-on-surface-variant mt-1">{t("Your farm is fully optimized and in excellent health.", language)} 🌾</p>
                   </div>
                   {completedTasks.length > 0 && (
                     <button
@@ -298,12 +298,12 @@ export default function FarmingDashboard({
                               {task.category}
                             </span>
                             <span className="text-xs text-on-surface-variant font-semibold">
-                              â° {task.time} ({task.duration})
+                              ⏰ {task.time} ({task.duration})
                             </span>
                           </div>
                           <h4 className="font-bold text-sm text-on-surface">{task.title}</h4>
                           <p className="text-[11px] text-on-surface-variant font-medium">
-                            ðŸ’¡ <strong>{t("Why:", language)}</strong> {t(task.why, language)} | ðŸ“ˆ <strong>{t("Expected Benefit:", language)}</strong> <span className="text-primary font-bold">{t(task.benefit, language)}</span>
+                            💡 <strong>{t("Why:", language)}</strong> {t(task.why, language)} | 📈 <strong>{t("Expected Benefit:", language)}</strong> <span className="text-primary font-bold">{t(task.benefit, language)}</span>
                           </p>
                         </div>
                         <div className="w-full md:w-auto flex gap-2 pt-2 md:pt-0 shrink-0">
@@ -345,7 +345,7 @@ export default function FarmingDashboard({
       {dashboardData && (
         <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-4">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined notranslate text-primary text-xl font-bold">analytics</span>
+            <span className="material-symbols-outlined text-primary text-xl font-bold">analytics</span>
             {t("Active Farm Snapshot", language)}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -401,7 +401,7 @@ export default function FarmingDashboard({
       {dashboardData && (
         <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-4">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined notranslate text-primary text-xl">route</span>
+            <span className="material-symbols-outlined text-primary text-xl">route</span>
             {t("Farm Journey Progress", language)}
           </h3>
 
@@ -427,7 +427,7 @@ export default function FarmingDashboard({
                         ? 'bg-primary text-white ring-4 ring-primary/20 animate-pulse'
                         : 'bg-surface-container text-on-surface-variant border border-outline-variant/60'
                   }`}>
-                    {isCompleted ? 'âœ“' : step.idx + 1}
+                    {isCompleted ? '✓' : step.idx + 1}
                   </div>
                   <span className={`block leading-none truncate max-w-[65px] ${isActive ? 'text-primary font-black' : 'text-on-surface-variant font-medium'}`}>
                     {step.name}
@@ -444,27 +444,27 @@ export default function FarmingDashboard({
         <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
           <div className="flex justify-between items-center border-b border-outline-variant/30 pb-2">
             <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined notranslate text-primary text-xl font-bold">store</span>
+              <span className="material-symbols-outlined text-primary text-xl font-bold">store</span>
               {t("Market Snapshot", language)}
             </h3>
             <button 
               onClick={() => setActiveDashboardTab('market')}
               className="text-xs text-primary font-bold hover:underline min-h-[36px]"
             >
-              {t("Discover Mandis â†’", language)}
+              {t("Discover Mandis →", language)}
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
               <span className="text-[11px] md:text-xs text-on-surface-variant uppercase font-black tracking-wider">{t("Best Nearby Mandi", language)}</span>
               <span className="font-bold text-sm block">{t(dashboardData.market?.recommendedMandi || 'Nashik APMC', language)}</span>
-              <span className="text-xs font-semibold text-primary">{dashboardData.market?.adjustedEarnings || 'â‚¹2,250 / Qtl'}</span>
+              <span className="text-xs font-semibold text-primary">{dashboardData.market?.adjustedEarnings || '₹2,250 / Qtl'}</span>
             </div>
             <div className="space-y-1">
               <span className="text-[11px] md:text-xs text-on-surface-variant uppercase font-black tracking-wider">{t("Minimum Support Price (MSP)", language)}</span>
-              <span className="font-bold text-sm block">{t("MSP Target: â‚¹2,425", language)}</span>
+              <span className="font-bold text-sm block">{t("MSP Target: ₹2,425", language)}</span>
               <span className="text-xs font-semibold text-green-700 font-extrabold flex items-center gap-0.5">
-                â˜… {t("Mandi price is", language)} {t(dashboardData.market?.recommendation === 'Hold' ? 'above' : 'near', language)} {t("MSP", language)}
+                ★ {t("Mandi price is", language)} {t(dashboardData.market?.recommendation === 'Hold' ? 'above' : 'near', language)} {t("MSP", language)}
               </span>
             </div>
             <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex flex-col justify-between items-start">
@@ -482,14 +482,14 @@ export default function FarmingDashboard({
         <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
           <div className="flex justify-between items-center border-b border-outline-variant/30 pb-2">
             <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined notranslate text-yellow-600 text-xl font-bold">wb_sunny</span>
+              <span className="material-symbols-outlined text-yellow-600 text-xl font-bold">wb_sunny</span>
               {t("Weather Impact Advisory", language)}
             </h3>
             <button 
               onClick={() => setActiveDashboardTab('weather')}
               className="text-xs text-primary font-bold hover:underline min-h-[36px]"
             >
-              {t("Weather details â†’", language)}
+              {t("Weather details →", language)}
             </button>
           </div>
           {weatherLoading ? (
@@ -497,10 +497,10 @@ export default function FarmingDashboard({
           ) : weatherData ? (
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
               <div className="flex items-center gap-3">
-                <span className="text-2xl font-black text-on-surface">{weatherData.current?.temp}Â°C</span>
+                <span className="text-2xl font-black text-on-surface">{weatherData.current?.temp}°C</span>
                 <div>
                   <span className="text-xs font-extrabold text-on-surface block">
-                    {weatherData.forecast?.[0]?.rainProbability > 50 ? 'ðŸŒ¦ï¸ ' + t('Expected Rain soon', language) : 'â˜€ï¸ ' + t('Sunny & Warm', language)}
+                    {weatherData.forecast?.[0]?.rainProbability > 50 ? '🌦️ ' + t('Expected Rain soon', language) : '☀️ ' + t('Sunny & Warm', language)}
                   </span>
                   <span className="text-[11px] md:text-xs text-on-surface-variant font-semibold">
                     {t("Humidity", language)}: {weatherData.current?.humidityMorning}% | {t("Wind", language)}: {weatherData.current?.windSpeed} km/h
@@ -562,19 +562,19 @@ export default function FarmingDashboard({
       <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
         <div className="flex justify-between items-center border-b border-outline-variant/30 pb-2">
           <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined notranslate text-primary text-xl font-bold">auto_awesome</span>
+            <span className="material-symbols-outlined text-primary text-xl font-bold">auto_awesome</span>
             {t("Eligible Benefits", language)} ({activeFarm?.state ? t(activeFarm.state, language) : t('Maharashtra', language)})
           </h3>
           <button 
             onClick={() => setActiveDashboardTab('schemes')}
             className="text-xs text-primary font-bold hover:underline min-h-[36px]"
           >
-            {t("All Schemes â†’", language)}
+            {t("All Schemes →", language)}
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {[
-            { id: 1, name: t('PM Kisan Samman Nidhi', language), benefits: t('â‚¹6,000 / year direct subsidy', language), deadline: t('Apply by July 15', language) },
+            { id: 1, name: t('PM Kisan Samman Nidhi', language), benefits: t('₹6,000 / year direct subsidy', language), deadline: t('Apply by July 15', language) },
             { id: 2, name: t('Subsidized Fertilizers Distribution', language), benefits: t('Up to 50% discount on Urea bags', language), deadline: t('Ongoing at APMC Coop', language) }
           ].map(scheme => (
             <div 
@@ -584,7 +584,7 @@ export default function FarmingDashboard({
               <div>
                 <h4 className="font-bold text-xs text-on-surface">{scheme.name}</h4>
                 <p className="text-[10px] text-primary font-black mt-1">{scheme.benefits}</p>
-                <span className="text-[10px] text-amber-800 font-extrabold block mt-0.5">âš ï¸ {scheme.deadline}</span>
+                <span className="text-[10px] text-amber-800 font-extrabold block mt-0.5">⚠️ {scheme.deadline}</span>
               </div>
               <button 
                 onClick={() => setSelectedScheme(scheme)}
@@ -600,7 +600,7 @@ export default function FarmingDashboard({
       {/* 11. Insights & Reminders */}
       <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
         <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-          <span className="material-symbols-outlined notranslate text-primary text-xl">notifications_active</span>
+          <span className="material-symbols-outlined text-primary text-xl">notifications_active</span>
           {t("Insights & Upcoming Reminders", language)}
         </h3>
         <div className="space-y-2.5">
@@ -610,7 +610,7 @@ export default function FarmingDashboard({
             { msg: 'Government schemes registry deadline approaching soon.', icon: 'campaign', color: 'text-amber-600' }
           ].map((rem, i) => (
             <div key={i} className="flex gap-2.5 items-start text-xs font-semibold text-on-surface-variant p-2.5 rounded-xl bg-slate-50/50 border border-outline-variant/30">
-              <span className={`material-symbols-outlined notranslate text-sm mt-0.5 ${rem.color}`}>{rem.icon}</span>
+              <span className={`material-symbols-outlined text-sm mt-0.5 ${rem.color}`}>{rem.icon}</span>
               <span className="leading-normal">{t(rem.msg, language)}</span>
             </div>
           ))}
@@ -620,7 +620,7 @@ export default function FarmingDashboard({
       {/* 12. Quick Actions */}
       <div className="bg-white border border-outline-variant/60 rounded-card p-5 shadow-sm space-y-3">
         <h3 className="font-display font-extrabold text-base text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-2">
-          <span className="material-symbols-outlined notranslate text-primary text-xl font-bold">bolt</span>
+          <span className="material-symbols-outlined text-primary text-xl font-bold">bolt</span>
           {t("Quick Actions Control Grid", language)}
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -642,7 +642,7 @@ export default function FarmingDashboard({
               }}
               className="p-3.5 rounded-2xl border border-outline-variant/60 bg-white hover:border-primary/50 flex flex-col justify-center items-center text-center gap-2 transition-all shadow-xs hover:shadow-sm group min-h-[96px]"
             >
-              <span className="material-symbols-outlined notranslate text-primary text-2xl group-hover:scale-110 transition-transform">{act.icon}</span>
+              <span className="material-symbols-outlined text-primary text-2xl group-hover:scale-110 transition-transform">{act.icon}</span>
               <span className="text-xs font-black text-on-surface-variant leading-none">{t(act.label, language)}</span>
             </button>
           ))}
@@ -655,11 +655,11 @@ export default function FarmingDashboard({
           <div className="bg-white rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto border border-outline-variant shadow-2xl flex flex-col p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-sm font-bold text-primary flex items-center gap-1.5">
-                <span className="material-symbols-outlined notranslate text-primary text-lg">calendar_today</span>
+                <span className="material-symbols-outlined text-primary text-lg">calendar_today</span>
                 Reschedule task
               </h3>
               <button onClick={() => setActiveDialogTask(null)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1">
-                <span className="material-symbols-outlined notranslate text-lg">close</span>
+                <span className="material-symbols-outlined text-lg">close</span>
               </button>
             </div>
             <div className="py-4 space-y-4 text-xs leading-relaxed">
@@ -673,7 +673,7 @@ export default function FarmingDashboard({
                 />
               </div>
               <div className="text-[10px] text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-100 font-semibold leading-relaxed">
-                âš ï¸ <strong>Agronomic Warning:</strong> Delaying this fertilization/irrigation by more than 48 hours is not advised.
+                ⚠️ <strong>Agronomic Warning:</strong> Delaying this fertilization/irrigation by more than 48 hours is not advised.
               </div>
             </div>
             <div className="border-t border-surface-container-high pt-4 flex justify-end gap-3">
@@ -695,10 +695,10 @@ export default function FarmingDashboard({
           <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-outline-variant shadow-2xl flex flex-col p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-sm font-bold text-primary flex items-center gap-1">
-                <span className="material-symbols-outlined notranslate text-primary text-lg">trending_up</span> Mandi Price Trends Analysis
+                <span className="material-symbols-outlined text-primary text-lg">trending_up</span> Mandi Price Trends Analysis
               </h3>
               <button onClick={() => setSelectedMandiDetails(null)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1">
-                <span className="material-symbols-outlined notranslate text-lg">close</span>
+                <span className="material-symbols-outlined text-lg">close</span>
               </button>
             </div>
             <div className="py-4 space-y-3 text-xs leading-relaxed">
@@ -708,18 +708,18 @@ export default function FarmingDashboard({
               <div className="space-y-2 border-b pb-3">
                 <span className="font-bold text-on-surface block">Distance & Transport Math:</span>
                 <div className="grid grid-cols-2 gap-3 text-[11px] font-semibold text-on-surface-variant">
-                  <div>ðŸ“ Mandi: {selectedMandiDetails.recommendedMandi}</div>
-                  <div>ðŸ’° Adjusted Rate: {selectedMandiDetails.adjustedEarnings}</div>
-                  <div>ðŸ“ˆ Profit Gain: {selectedMandiDetails.expectedProfitIncrease}</div>
-                  <div>ðŸŽ¯ Confidence: {selectedMandiDetails.confidence}%</div>
+                  <div>📍 Mandi: {selectedMandiDetails.recommendedMandi}</div>
+                  <div>💰 Adjusted Rate: {selectedMandiDetails.adjustedEarnings}</div>
+                  <div>📈 Profit Gain: {selectedMandiDetails.expectedProfitIncrease}</div>
+                  <div>🎯 Confidence: {selectedMandiDetails.confidence}%</div>
                 </div>
               </div>
               <div className="space-y-1">
                 <span className="font-bold text-on-surface block">Mandi Price Index (Past 3 Weeks):</span>
                 <div className="flex justify-between text-[11px] font-bold text-on-surface bg-surface-container-low/40 p-2.5 rounded-xl border border-outline-variant/30">
-                  <div>Week 1: <span className="text-on-surface-variant">â‚¹2,100</span></div>
-                  <div>Week 2: <span className="text-on-surface-variant">â‚¹2,180</span></div>
-                  <div>Week 3: <span className="text-primary font-bold">â‚¹2,280</span></div>
+                  <div>Week 1: <span className="text-on-surface-variant">₹2,100</span></div>
+                  <div>Week 2: <span className="text-on-surface-variant">₹2,180</span></div>
+                  <div>Week 3: <span className="text-primary font-bold">₹2,280</span></div>
                 </div>
               </div>
             </div>
@@ -739,7 +739,7 @@ export default function FarmingDashboard({
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-sm font-bold text-primary">{selectedScheme.name}</h3>
               <button onClick={() => setSelectedScheme(null)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1">
-                <span className="material-symbols-outlined notranslate text-lg">close</span>
+                <span className="material-symbols-outlined text-lg">close</span>
               </button>
             </div>
             <div className="py-4 space-y-3 text-xs leading-relaxed">
@@ -750,9 +750,9 @@ export default function FarmingDashboard({
               <div>
                 <span className="font-bold block text-on-surface mb-1">Required Documents:</span>
                 <ul className="space-y-1 text-on-surface-variant font-semibold">
-                  <li>âœ“ Aadhaar Card (verified)</li>
-                  <li>âœ“ Land holding registry (Khatauni)</li>
-                  <li>âœ“ Bank Account details</li>
+                  <li>✓ Aadhaar Card (verified)</li>
+                  <li>✓ Land holding registry (Khatauni)</li>
+                  <li>✓ Bank Account details</li>
                   <li>? Crop Sowing certificate (Pending upload)</li>
                 </ul>
               </div>
@@ -783,7 +783,7 @@ export default function FarmingDashboard({
                 <h3 className="font-display font-extrabold text-sm text-on-surface leading-tight mt-0.5">{selectedCommunityPost.title}</h3>
               </div>
               <button onClick={() => setSelectedCommunityPost(null)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1">
-                <span className="material-symbols-outlined notranslate text-lg">close</span>
+                <span className="material-symbols-outlined text-lg">close</span>
               </button>
             </div>
             <div className="py-4 space-y-4 text-xs leading-relaxed">
@@ -820,7 +820,7 @@ export default function FarmingDashboard({
             <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
               <h3 className="font-display text-base font-bold text-primary">Next 7 Days Farming Calendar</h3>
               <button onClick={() => setShowAllTasksModal(false)} className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1">
-                <span className="material-symbols-outlined notranslate text-lg">close</span>
+                <span className="material-symbols-outlined text-lg">close</span>
               </button>
             </div>
             <div className="py-4 space-y-3 text-xs leading-relaxed max-h-96 overflow-y-auto pr-1">
@@ -879,4 +879,3 @@ export default function FarmingDashboard({
     </div>
   );
 }
-

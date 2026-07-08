@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ArrowLeft, AlertCircle, Sparkles } from 'lucide-react';
@@ -55,7 +55,7 @@ export default function LoginPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-md">
-              <span className="material-symbols-outlined notranslate text-white text-lg fill">eco</span>
+              <span className="material-symbols-outlined text-white text-lg fill">eco</span>
             </div>
             <span className="font-display font-bold text-xl text-on-surface">Kisan<span className="text-primary">Mitra</span></span>
           </Link>
@@ -79,7 +79,7 @@ export default function LoginPage() {
             {/* Header */}
             <div className="text-center mb-8">
               <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-5">
-                <span className="material-symbols-outlined notranslate text-3xl fill">lock_open</span>
+                <span className="material-symbols-outlined text-3xl fill">lock_open</span>
               </div>
               <h1 className="font-display text-2xl font-bold text-on-surface mb-2">Welcome to KisanMitra</h1>
               <p className="text-sm text-on-surface-variant leading-relaxed">
@@ -132,7 +132,7 @@ export default function LoginPage() {
               onClick={() => navigate('/demo')}
               className="w-full border-2 border-dashed border-outline-variant bg-[#fdfdfd] hover:bg-[#f4fcf0] hover:border-primary text-on-surface-variant hover:text-primary font-bold h-14 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
             >
-              <span className="material-symbols-outlined notranslate text-lg">science</span>
+              <span className="material-symbols-outlined text-lg">science</span>
               <span>Explore Demo Mode</span>
             </button>
 
@@ -146,17 +146,16 @@ export default function LoginPage() {
           {/* Below card trust indicators */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-on-surface-variant">
             <span className="flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5 text-primary" /> Free Forever</span>
-            <span className="flex items-center gap-1.5">ðŸ”’ Secure Auth</span>
-            <span className="flex items-center gap-1.5">ðŸ‡®ðŸ‡³ Made for India</span>
+            <span className="flex items-center gap-1.5">🔒 Secure Auth</span>
+            <span className="flex items-center gap-1.5">🇮🇳 Made for India</span>
           </div>
         </div>
       </main>
 
       {/* Footer */}
       <footer className="py-4 text-center text-xs text-on-surface-variant border-t border-outline-variant/30">
-        Â© 2026 KisanMitra. Designed for Indian Farmers.
+        © 2026 KisanMitra. Designed for Indian Farmers.
       </footer>
     </div>
   );
 }
-

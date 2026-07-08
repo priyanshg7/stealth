@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 export default function VoiceAssistant({
   voiceAssistantOpen,
@@ -19,7 +19,7 @@ export default function VoiceAssistant({
         <div className="bg-primary p-4 text-white flex justify-between items-center">
           <div className="flex items-center gap-2.5">
             <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center animate-bounce">
-              <span className="material-symbols-outlined notranslate text-white text-lg font-bold">mic</span>
+              <span className="material-symbols-outlined text-white text-lg font-bold">mic</span>
             </div>
             <div>
               <h3 className="font-display font-bold text-sm">KisanMitra Voice Assistant</h3>
@@ -30,7 +30,7 @@ export default function VoiceAssistant({
             onClick={() => setVoiceAssistantOpen(false)}
             className="text-white/85 hover:text-white flex items-center justify-center p-1 rounded-full hover:bg-white/10"
           >
-            <span className="material-symbols-outlined notranslate text-lg">close</span>
+            <span className="material-symbols-outlined text-lg">close</span>
           </button>
         </div>
 
@@ -77,7 +77,7 @@ export default function VoiceAssistant({
               onClick={() => handleVoiceCommand(preset)}
               className="px-3 py-1.5 rounded-full border border-primary/30 text-primary text-[10px] font-bold hover:bg-primary/5 shrink-0 bg-white"
             >
-              ðŸŽ¤ "{preset}"
+              🎤 "{preset}"
             </button>
           ))}
         </div>
@@ -98,7 +98,7 @@ export default function VoiceAssistant({
             }`}
             title="Speak Question"
           >
-            <span className="material-symbols-outlined notranslate text-sm font-bold">
+            <span className="material-symbols-outlined text-sm font-bold">
               {isListening ? 'settings_voice' : 'mic'}
             </span>
           </button>
@@ -134,4 +134,3 @@ export default function VoiceAssistant({
     </div>
   );
 }
-

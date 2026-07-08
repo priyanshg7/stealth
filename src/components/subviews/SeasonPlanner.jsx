@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Check, ArrowRight, Info, Sparkles, AlertCircle, Calendar, 
   MapPin, ShoppingBag, Droplet, Layers, Sprout, 
@@ -26,7 +26,7 @@ const FALLBACK_VARIETY = {
   marketDemand: 'Standard',
   maturity: 'Medium',
   suitableSoil: 'Alluvial / Clay Loam',
-  price: 'â‚¹2,100/Qtl',
+  price: '₹2,100/Qtl',
   yield: '20 Qtl/Acre',
   badges: ['Best Fit'],
   yieldPotential: 20,
@@ -243,7 +243,7 @@ export default function SeasonPlanner({
         diseaseResistance: v.diseaseResistance >= 4 ? 'High' : (v.diseaseResistance >= 3 ? 'Medium' : 'Low'),
         maturity: `${v.maturityDays || 120} days`,
         suitableSoil: (v.suitableSoils || []).join(', ') || 'Clay Loam',
-        price: `â‚¹${livePrice}/Qtl`,
+        price: `₹${livePrice}/Qtl`,
         marketDemand: v.exportDemand || 'High',
         profitPerAcre
       };
@@ -387,7 +387,7 @@ export default function SeasonPlanner({
          marketDemand: 'Standard',
          maturity: 'Medium',
          suitableSoil: activeFarm.soil.type,
-         price: 'â‚¹2,100/Qtl',
+         price: '₹2,100/Qtl',
          yield: '20 Qtl/Acre',
          badges: ['Best Fit'],
          yieldPotential: 20,
@@ -577,7 +577,7 @@ export default function SeasonPlanner({
 
     const confirmedPlan = {
       cropName: formFields.cropName.charAt(0).toUpperCase() + formFields.cropName.slice(1),
-      cropIcon: formFields.cropName.toLowerCase() === 'wheat' ? 'ðŸŒ¾' : (formFields.cropName.toLowerCase() === 'rice' ? 'ðŸŒ±' : 'ðŸŒ½'),
+      cropIcon: formFields.cropName.toLowerCase() === 'wheat' ? '🌾' : (formFields.cropName.toLowerCase() === 'rice' ? '🌱' : '🌽'),
       healthScore: 92,
       growthProgress: 0,
       harvestDays: durationDays,
@@ -611,9 +611,9 @@ export default function SeasonPlanner({
       ],
       market: {
         recommendation: 'Plan Selling',
-        expectedProfitIncrease: 'â‚¹18,000',
+        expectedProfitIncrease: '₹18,000',
         recommendedMandi: formFields.targetMarket === 'Mandi' ? 'APMC Mandi Yard' : 'Local Wholesale Market',
-        adjustedEarnings: `â‚¹${costs.expectedPrice}/Quintal`,
+        adjustedEarnings: `₹${costs.expectedPrice}/Quintal`,
         confidence: 92,
         trend: 'up',
         reasoning: `Selected variety ${varietyName} commands premium demand. Sells window aligns with regional supply dips.`
@@ -813,7 +813,7 @@ export default function SeasonPlanner({
             <div className="p-8 relative z-10">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-2xl">{activeFarm.crop.confirmedPlan.cropIcon || 'ðŸŒ±'}</span>
+                  <span className="text-2xl">{activeFarm.crop.confirmedPlan.cropIcon || '🌱'}</span>
                 </div>
                 <div>
                   <h2 className="font-display font-extrabold text-2xl text-on-surface">Active Seasonal Plan</h2>
@@ -923,7 +923,7 @@ export default function SeasonPlanner({
                     <div key={i} className="p-6 hover:bg-surface-container-lowest transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="flex items-start gap-4">
                         <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0">
-                          <span className="text-lg">{pastCrop.confirmedPlan?.cropIcon || 'ðŸŒ¾'}</span>
+                          <span className="text-lg">{pastCrop.confirmedPlan?.cropIcon || '🌾'}</span>
                         </div>
                         <div>
                           <div className="flex items-center gap-2 mb-1">
@@ -931,7 +931,7 @@ export default function SeasonPlanner({
                             <span className="bg-surface-container-high text-on-surface-variant px-2 py-0.5 rounded text-[10px] font-bold uppercase">Archived</span>
                           </div>
                           <p className="text-xs text-on-surface-variant">
-                            Sown: {new Date(pastCrop.sowingDate).toLocaleDateString()} Â· 
+                            Sown: {new Date(pastCrop.sowingDate).toLocaleDateString()} · 
                             Archived: {new Date(pastCrop.archivedAt).toLocaleDateString()}
                           </p>
                         </div>
@@ -1047,7 +1047,7 @@ export default function SeasonPlanner({
                     className="w-full bg-[#f0f4f9] border border-transparent rounded-xl p-3 text-xs font-semibold focus:outline-none focus:bg-white focus:border-primary text-on-surface"
                   >
                     {farms.map((f, i) => (
-                      <option key={i} value={i}>{f.name} ({f.area} {f.unit}) Â· {f.village}, {f.district}</option>
+                      <option key={i} value={i}>{f.name} ({f.area} {f.unit}) · {f.village}, {f.district}</option>
                     ))}
                   </select>
                 )}
@@ -1066,37 +1066,37 @@ export default function SeasonPlanner({
                     onChange={(e) => handleInputChange('cropName', e.target.value)}
                     className="w-full bg-[#f0f4f9] border border-transparent rounded-xl p-3 pr-10 text-xs font-semibold focus:outline-none focus:bg-white focus:border-primary appearance-none cursor-pointer text-on-surface"
                   >
-                    <optgroup label="â”€â”€ Cereals â”€â”€">
-                      <option value="wheat">Wheat (à¤—à¥‡à¤¹à¥‚à¤‚)</option>
-                      <option value="rice">Rice (à¤§à¤¾à¤¨)</option>
-                      <option value="maize">Maize (à¤®à¤•à¥à¤•à¤¾)</option>
+                    <optgroup label="── Cereals ──">
+                      <option value="wheat">Wheat (गेहूं)</option>
+                      <option value="rice">Rice (धान)</option>
+                      <option value="maize">Maize (मक्का)</option>
                       <option value="bajra">Bajra (Pearl Millet)</option>
                       <option value="jowar">Jowar (Sorghum)</option>
                       <option value="ragi">Ragi (Finger Millet)</option>
                       <option value="barley">Barley (Jau)</option>
                       <option value="oat">Oat (Jai)</option>
                     </optgroup>
-                    <optgroup label="â”€â”€ Pulses â”€â”€">
+                    <optgroup label="── Pulses ──">
                       <option value="gram">Gram / Chickpea (Chana)</option>
                       <option value="lentil">Lentil (Masoor)</option>
                       <option value="moong">Green Gram (Moong)</option>
                       <option value="urad">Black Gram (Urad)</option>
                     </optgroup>
-                    <optgroup label="â”€â”€ Oilseeds â”€â”€">
+                    <optgroup label="── Oilseeds ──">
                       <option value="soybean">Soybean</option>
                       <option value="groundnut">Groundnut (Mungfali)</option>
                       <option value="mustard">Mustard (Sarson)</option>
                     </optgroup>
-                    <optgroup label="â”€â”€ Cash Crops â”€â”€">
+                    <optgroup label="── Cash Crops ──">
                       <option value="cotton">Cotton (Kapas)</option>
                       <option value="sugarcane">Sugarcane (Ganna)</option>
                     </optgroup>
-                    <optgroup label="â”€â”€ Vegetables â”€â”€">
+                    <optgroup label="── Vegetables ──">
                       <option value="potato">Potato (Aloo)</option>
                       <option value="onion">Onion (Pyaaz)</option>
                       <option value="garlic">Garlic (Lahsun)</option>
                     </optgroup>
-                    <optgroup label="â”€â”€ Fodder & Cover Crops â”€â”€">
+                    <optgroup label="── Fodder & Cover Crops ──">
                       <option value="bajra fodder">Bajra Fodder</option>
                       <option value="jowar fodder">Jowar Fodder</option>
                       <option value="maize fodder">Maize Fodder</option>
@@ -1256,7 +1256,7 @@ export default function SeasonPlanner({
             <details className="group border-t border-outline-variant/40 pt-4 text-xs font-semibold text-on-surface-variant">
               <summary className="list-none flex justify-between items-center cursor-pointer select-none text-primary font-extrabold focus:outline-none">
                 <span>Advanced Planning Parameters (NPK, Resources, Budget)</span>
-                <span className="material-symbols-outlined notranslate transition-transform duration-200 group-open:rotate-180">expand_more</span>
+                <span className="material-symbols-outlined transition-transform duration-200 group-open:rotate-180">expand_more</span>
               </summary>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
                 <div>
@@ -1272,7 +1272,7 @@ export default function SeasonPlanner({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] text-on-surface-variant mb-1.5">Max Input Budget (â‚¹/Acre)</label>
+                  <label className="block text-[11px] text-on-surface-variant mb-1.5">Max Input Budget (₹/Acre)</label>
                   <input
                     type="number"
                     value={formFields.budgetRange}
@@ -1469,7 +1469,7 @@ export default function SeasonPlanner({
                           <TrendingUp className="w-4 h-4 text-on-surface-variant" /> Estimated Net Profit
                         </span>
                         <div className="flex items-baseline gap-1.5">
-                          <span className="text-2xl font-black text-[#0c8a47]">â‚¹{estimatedProfitValue.toLocaleString()}</span>
+                          <span className="text-2xl font-black text-[#0c8a47]">₹{estimatedProfitValue.toLocaleString()}</span>
                           <span className="text-[11px] text-on-surface-variant font-bold">for {calculatedArea} {formFields.unit}</span>
                         </div>
                       </div>
@@ -1633,7 +1633,7 @@ export default function SeasonPlanner({
                 </div>
                 <div>
                   <span className="text-[10px] text-on-surface-variant block mb-1">Projected Net profit</span>
-                  <span className="font-extrabold text-primary text-sm">â‚¹{simData.profit.toLocaleString()}</span>
+                  <span className="font-extrabold text-primary text-sm">₹{simData.profit.toLocaleString()}</span>
                 </div>
                 <div>
                   <span className="text-[10px] text-on-surface-variant block mb-1">Suitable Soil Type</span>
@@ -1678,8 +1678,8 @@ export default function SeasonPlanner({
 
                 <div className="space-y-4">
                   {[
-                    { start: 'Nov 01, 2026', end: 'Nov 12, 2026', risk: 'Low', riskColor: 'bg-green-100 text-green-800', rainConf: '92%', tempSuit: 'Optimal', insurance: 'Eligible', yieldImpact: '+12% (Highest)', marketTiming: 'Peak Selling Price', best: true, explanation: 'Optimal day temp (24Â°C) for sprouting. Aligns crop flowering to beat winter frosts. Complete PMFBY deadline compliance ensures full risk cover.' },
-                    { start: 'Nov 13, 2026', end: 'Nov 25, 2026', risk: 'Medium', riskColor: 'bg-yellow-100 text-yellow-800', rainConf: '80%', tempSuit: 'Slightly Cold', insurance: 'Eligible', yieldImpact: 'Standard', marketTiming: 'Moderate Price Index', best: false, explanation: 'Standard window. Nights dropping to 11Â°C may delay germination by 3-4 days. Yield curves follow historical county baselines.' },
+                    { start: 'Nov 01, 2026', end: 'Nov 12, 2026', risk: 'Low', riskColor: 'bg-green-100 text-green-800', rainConf: '92%', tempSuit: 'Optimal', insurance: 'Eligible', yieldImpact: '+12% (Highest)', marketTiming: 'Peak Selling Price', best: true, explanation: 'Optimal day temp (24°C) for sprouting. Aligns crop flowering to beat winter frosts. Complete PMFBY deadline compliance ensures full risk cover.' },
+                    { start: 'Nov 13, 2026', end: 'Nov 25, 2026', risk: 'Medium', riskColor: 'bg-yellow-100 text-yellow-800', rainConf: '80%', tempSuit: 'Slightly Cold', insurance: 'Eligible', yieldImpact: 'Standard', marketTiming: 'Moderate Price Index', best: false, explanation: 'Standard window. Nights dropping to 11°C may delay germination by 3-4 days. Yield curves follow historical county baselines.' },
                     { start: 'Nov 26, 2026', end: 'Dec 10, 2026', risk: 'High', riskColor: 'bg-red-100 text-red-800', rainConf: '55%', tempSuit: 'Sub-Optimal', insurance: 'Ineligible (PMFBY deadline)', yieldImpact: '-18%', marketTiming: 'Low Price (Mandi Glut)', best: false, explanation: 'Late sowing risks. Matures during peak spring heat, causing grain shriveling. Ineligible for government subsidized insurance coverage.' }
                   ].map((w, idx) => (
                     <div key={idx} className={`p-4 rounded-xl border flex flex-col md:flex-row justify-between gap-4 relative text-xs ${
@@ -1692,7 +1692,7 @@ export default function SeasonPlanner({
                       )}
                       <div className="flex-1 space-y-1.5 font-semibold">
                         <div className="flex items-center gap-3">
-                          <span className="font-extrabold text-sm text-on-surface">{w.start} â€” {w.end}</span>
+                          <span className="font-extrabold text-sm text-on-surface">{w.start} — {w.end}</span>
                           <span className={`text-[9px] font-black px-2 py-0.5 rounded-md uppercase ${w.riskColor}`}>{w.risk} Risk</span>
                         </div>
                         <p className="text-xs text-on-surface-variant leading-relaxed">
@@ -1764,7 +1764,7 @@ export default function SeasonPlanner({
                     <li><strong>Bio-Fertilizer:</strong> Treat with Azotobacter bio-culture (1 packet/10kg seeds) to increase root zone nitrogen fixing.</li>
                     <li><strong>Government Subsidy:</strong> 50% direct subsidy rebate on certified seeds via DBT (Direct Benefit Transfer) portal.</li>
                   </ul>
-                  <div className="text-primary font-bold text-[10px]">Estimated Seed Cost: â‚¹{Math.round(calculatedArea * 1500)}</div>
+                  <div className="text-primary font-bold text-[10px]">Estimated Seed Cost: ₹{Math.round(calculatedArea * 1500)}</div>
                 </div>
 
                 <div className="space-y-3">
@@ -1773,7 +1773,7 @@ export default function SeasonPlanner({
                     <div className="p-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl flex justify-between items-center text-[10px]">
                       <div>
                         <span className="font-extrabold block text-on-surface">1. Pratapgarh Cooperative Seed Society</span>
-                        <span className="text-on-surface-variant">District Center (2.4 km) Â· Subsidized Certified</span>
+                        <span className="text-on-surface-variant">District Center (2.4 km) · Subsidized Certified</span>
                       </div>
                       <a href="https://maps.google.com/?q=Seed+Cooperative+Pratapgarh" target="_blank" rel="noreferrer" className="bg-[#0c8a47] text-white p-1.5 rounded-lg flex items-center justify-center font-bold">
                         <MapPin className="w-3.5 h-3.5" />
@@ -1782,7 +1782,7 @@ export default function SeasonPlanner({
                     <div className="p-2.5 bg-[#f5fbf6] border border-[#d2edd6] rounded-xl flex justify-between items-center text-[10px]">
                       <div>
                         <span className="font-extrabold block text-[#0f5132]">2. Mahadhan Agro Center (Private)</span>
-                        <span className="text-[#0f5132]/80">APMC Yard (4.1 km) Â· Fresh Certified Stock</span>
+                        <span className="text-[#0f5132]/80">APMC Yard (4.1 km) · Fresh Certified Stock</span>
                       </div>
                       <a href="https://maps.google.com/?q=Agro+Dealer+Pratapgarh" target="_blank" rel="noreferrer" className="bg-[#0c8a47] text-white p-1.5 rounded-lg flex items-center justify-center font-bold">
                         <MapPin className="w-3.5 h-3.5" />
@@ -1838,10 +1838,10 @@ export default function SeasonPlanner({
                         <div>Machinery: <span className="text-on-surface font-bold">{act.machinery}</span></div>
                         <div className="flex justify-between">
                           <span>Labor: <span className="text-on-surface font-bold">{act.labor}</span></span>
-                          <span>Cost: <span className="text-[#0c8a47] font-black">â‚¹{act.cost}</span></span>
+                          <span>Cost: <span className="text-[#0c8a47] font-black">₹{act.cost}</span></span>
                         </div>
                         <div className="text-[9px] text-red-700 bg-red-50 p-1.5 rounded-md mt-1 leading-snug">
-                          âš ï¸ Safety: {act.safety}
+                          ⚠️ Safety: {act.safety}
                         </div>
                       </div>
                     </div>
@@ -1969,7 +1969,7 @@ export default function SeasonPlanner({
                         </div>
                         <div className="text-right flex-shrink-0">
                           <span className="font-black text-on-surface text-sm block">{nut.qty} {nut.unit}</span>
-                          <span className="text-[10px] text-primary font-bold">â‚¹{nut.cost}</span>
+                          <span className="text-[10px] text-primary font-bold">₹{nut.cost}</span>
                         </div>
                       </div>
                     ))}
@@ -1990,7 +1990,7 @@ export default function SeasonPlanner({
                     <div className="border-t border-outline-variant/60 pt-3">
                       <div className="flex justify-between items-center font-bold text-[11px]">
                         <span>NPK Cost Subtotal:</span>
-                        <span className="text-primary font-black">â‚¹{fertilizerSubtotalCost}</span>
+                        <span className="text-primary font-black">₹{fertilizerSubtotalCost}</span>
                       </div>
                       <span className="text-[8px] text-on-surface-variant leading-none block mt-1">*Government fertilizer subsidy factored.</span>
                     </div>
@@ -2021,8 +2021,8 @@ export default function SeasonPlanner({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
-                    { name: 'Stem Rust (Puccinia graminis)', prob: 'High (78%)', affected: 'Tillering Stage', symptoms: 'Yellow-orange pustules on leaves, breaking tissues.', prev: 'Avoid excessive Urea top-dressing.', chem: 'Spray Propiconazole 25% EC (200 ml/acre).', org: 'Foliar spray of Sour Buttermilk solution (5% concentration).', store: 'APMC Coop (3.5 km)', cost: 'â‚¹950', conf: '94%' },
-                    { name: 'Powdery Mildew', prob: 'Medium (42%)', affected: 'Vegetative growth', symptoms: 'White powdery patches on upper leaf surfaces.', prev: 'Maintain proper plant spacing for canopy air circulation.', chem: 'Spray Tebucanazole 250 EC (150 ml/acre).', org: 'Baking Soda spray (5g/L water).', store: 'Pimpalgaon Farm Store (5.2 km)', cost: 'â‚¹750', conf: '88%' }
+                    { name: 'Stem Rust (Puccinia graminis)', prob: 'High (78%)', affected: 'Tillering Stage', symptoms: 'Yellow-orange pustules on leaves, breaking tissues.', prev: 'Avoid excessive Urea top-dressing.', chem: 'Spray Propiconazole 25% EC (200 ml/acre).', org: 'Foliar spray of Sour Buttermilk solution (5% concentration).', store: 'APMC Coop (3.5 km)', cost: '₹950', conf: '94%' },
+                    { name: 'Powdery Mildew', prob: 'Medium (42%)', affected: 'Vegetative growth', symptoms: 'White powdery patches on upper leaf surfaces.', prev: 'Maintain proper plant spacing for canopy air circulation.', chem: 'Spray Tebucanazole 250 EC (150 ml/acre).', org: 'Baking Soda spray (5g/L water).', store: 'Pimpalgaon Farm Store (5.2 km)', cost: '₹750', conf: '88%' }
                   ].map((dis, idx) => (
                     <div key={idx} className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/40 flex flex-col justify-between gap-3">
                       <div className="space-y-1.5">
@@ -2145,7 +2145,7 @@ export default function SeasonPlanner({
               <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8 animate-fade-in text-xs font-semibold text-on-surface-variant">
                 <div className="md:col-span-2 space-y-4">
                   <h4 className="font-extrabold text-on-surface border-b border-outline-variant/40 pb-2 flex justify-between">
-                    <span>Edit Production Expenses (â‚¹)</span>
+                    <span>Edit Production Expenses (₹)</span>
                     <span className="text-primary text-[10px]">Tweak values below to recalculate profit</span>
                   </h4>
                   
@@ -2235,7 +2235,7 @@ export default function SeasonPlanner({
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] text-on-surface mb-1 font-extrabold">Expected Sale Price (â‚¹/Qtl)</label>
+                      <label className="block text-[10px] text-on-surface mb-1 font-extrabold">Expected Sale Price (₹/Qtl)</label>
                       <input
                         type="number"
                         value={costs.expectedPrice}
@@ -2271,11 +2271,11 @@ export default function SeasonPlanner({
                     <div className="space-y-2 border-b border-outline-variant/40 pb-3 text-xs">
                       <div className="flex justify-between items-center">
                         <span className="text-on-surface-variant font-bold">Total Input Expenses:</span>
-                        <span className="text-on-surface font-extrabold">â‚¹{totalCost.toLocaleString()}</span>
+                        <span className="text-on-surface font-extrabold">₹{totalCost.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-on-surface-variant font-bold">Expected Revenue:</span>
-                        <span className="text-on-surface font-extrabold">â‚¹{simData.revenue.toLocaleString()}</span>
+                        <span className="text-on-surface font-extrabold">₹{simData.revenue.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-on-surface-variant font-bold">Return on Investment:</span>
@@ -2290,7 +2290,7 @@ export default function SeasonPlanner({
 
                   <div className="text-center p-3 bg-white rounded-xl border border-primary/20 shadow-xs">
                     <span className="block text-[9px] uppercase tracking-wider text-on-surface-variant font-extrabold">Estimated Net Profit</span>
-                    <span className="text-2xl font-black text-primary">â‚¹{simData.profit.toLocaleString()}</span>
+                    <span className="text-2xl font-black text-primary">₹{simData.profit.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -2335,4 +2335,3 @@ export default function SeasonPlanner({
     </div>
   );
 }
-

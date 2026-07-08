@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ArrowLeft, ArrowRight, Sparkles, MapPin, Wheat } from 'lucide-react';
@@ -13,19 +13,19 @@ export default function DemoLoginPage() {
     {
       key: 'rajesh',
       data: DEMO_PROFILES.rajesh,
-      avatar: 'ðŸ‘¨â€ðŸŒ¾',
+      avatar: '👨‍🌾',
       color: 'bg-amber-50 border-amber-200',
       tagColor: 'bg-amber-100 text-amber-800',
-      highlight: 'Maharashtra Â· Wheat & Sugarcane',
+      highlight: 'Maharashtra · Wheat & Sugarcane',
       farmCount: 2,
     },
     {
       key: 'priya',
       data: DEMO_PROFILES.priya,
-      avatar: 'ðŸ‘©â€ðŸŒ¾',
+      avatar: '👩‍🌾',
       color: 'bg-sky-50 border-sky-200',
       tagColor: 'bg-sky-100 text-sky-800',
-      highlight: 'Punjab Â· Rice (Organic)',
+      highlight: 'Punjab · Rice (Organic)',
       farmCount: 1,
     }
   ];
@@ -51,7 +51,7 @@ export default function DemoLoginPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-md">
-              <span className="material-symbols-outlined notranslate text-white text-lg fill">eco</span>
+              <span className="material-symbols-outlined text-white text-lg fill">eco</span>
             </div>
             <span className="font-display font-bold text-xl text-on-surface">Kisan<span className="text-primary">Mitra</span></span>
           </Link>
@@ -71,7 +71,7 @@ export default function DemoLoginPage() {
           {/* Demo badge */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold tracking-wide uppercase mb-5">
-              <span className="material-symbols-outlined notranslate text-sm">science</span>
+              <span className="material-symbols-outlined text-sm">science</span>
               Demo Environment
             </div>
             <h1 className="font-display text-2xl md:text-3xl font-bold text-on-surface mb-3">
@@ -124,10 +124,10 @@ export default function DemoLoginPage() {
                         {persona.highlight}
                       </span>
                       <span className="flex items-center gap-1">
-                        ðŸŒ¾ {persona.farmCount} {persona.farmCount === 1 ? 'Farm' : 'Farms'}
+                        🌾 {persona.farmCount} {persona.farmCount === 1 ? 'Farm' : 'Farms'}
                       </span>
                       <span className="flex items-center gap-1">
-                        ðŸ“ {persona.data.farms.reduce((sum, f) => sum + parseFloat(f.area || 0), 0)} Acres
+                        📐 {persona.data.farms.reduce((sum, f) => sum + parseFloat(f.area || 0), 0)} Acres
                       </span>
                     </div>
 
@@ -135,7 +135,7 @@ export default function DemoLoginPage() {
                     <div className="mt-3 flex flex-wrap gap-2">
                       {persona.data.farms.map((farm, i) => (
                         <span key={i} className="inline-flex items-center gap-1 text-[10px] bg-white/80 border border-outline-variant/40 px-2.5 py-1 rounded-lg font-medium text-on-surface-variant">
-                          <span className="material-symbols-outlined notranslate text-xs text-primary fill">eco</span>
+                          <span className="material-symbols-outlined text-xs text-primary fill">eco</span>
                           {farm.name}
                         </span>
                       ))}
@@ -152,7 +152,7 @@ export default function DemoLoginPage() {
           {/* Info notice */}
           <div className="bg-white rounded-xl border border-outline-variant/40 p-4 text-center">
             <p className="text-xs text-on-surface-variant leading-relaxed">
-              <span className="font-bold text-on-surface">ðŸ”¬ Demo Mode</span> â€” All farm data, weather information, market prices, and government schemes are simulated.
+              <span className="font-bold text-on-surface">🔬 Demo Mode</span> — All farm data, weather information, market prices, and government schemes are simulated.
               Changes made in demo mode are temporary and will not persist after you exit.
             </p>
           </div>
@@ -169,9 +169,8 @@ export default function DemoLoginPage() {
 
       {/* Footer */}
       <footer className="py-4 text-center text-xs text-on-surface-variant border-t border-outline-variant/30">
-        Â© 2026 KisanMitra. Designed for Indian Farmers.
+        © 2026 KisanMitra. Designed for Indian Farmers.
       </footer>
     </div>
   );
 }
-

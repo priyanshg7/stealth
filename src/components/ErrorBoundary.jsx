@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -22,7 +22,7 @@ export default class ErrorBoundary extends React.Component {
       return (
         <div className="flex flex-col items-center justify-center h-full min-h-[400px] w-full bg-background text-on-surface p-6 font-sans text-center rounded-xl">
           <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
-            <span className="material-symbols-outlined notranslate text-3xl">error</span>
+            <span className="material-symbols-outlined text-3xl">error</span>
           </div>
           <h2 className="font-display font-bold text-2xl text-on-surface mb-2">Something went wrong</h2>
           <p className="text-on-surface-variant mb-6 max-w-md">
@@ -45,4 +45,3 @@ export default class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
-
