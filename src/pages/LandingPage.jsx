@@ -300,7 +300,7 @@ function FeaturesSection() {
     {
       icon: <Shield className="w-6 h-6" />,
       title: 'Government Schemes',
-      desc: 'Access 500+ central and state government schemes. AI-powered eligibility matching finds schemes you qualify for.'
+      desc: 'Access 3500+ central and state government schemes. AI-powered eligibility matching finds schemes you qualify for.'
     },
     {
       icon: <BarChart3 className="w-6 h-6" />,
@@ -516,7 +516,7 @@ function GovtSection() {
             </p>
             <ul className="space-y-3">
               {[
-                '500+ Central & State schemes indexed',
+                '3500+ Central & State schemes indexed',
                 'AI eligibility scoring based on your profile',
                 'Application guidance with required documents',
                 'Real-time updates on new scheme announcements',
@@ -542,7 +542,7 @@ function BenefitsSection() {
     { icon: <Zap className="w-5 h-5" />, title: 'Save Time', desc: 'No more guesswork. Get precise daily task lists and recommendations.' },
     { icon: <BarChart3 className="w-5 h-5" />, title: 'Increase Yield', desc: 'Data-driven decisions lead to 15-30% higher crop yields on average.' },
     { icon: <Shield className="w-5 h-5" />, title: 'Reduce Risk', desc: 'Weather alerts, disease prediction, and crop insurance matching.' },
-    { icon: <Globe className="w-5 h-5" />, title: 'Your Language', desc: 'Available in Hindi, Marathi, Telugu, Punjabi, Kannada, and English.' },
+    { icon: <Globe className="w-5 h-5" />, title: 'Your Language', desc: 'Available in 13 Indian languages including Hindi, Marathi, Telugu, and more.' },
     { icon: <Activity className="w-5 h-5" />, title: 'Better Prices', desc: 'Sell at the right time, at the right mandi, at the best price.' },
     { icon: <BookOpen className="w-5 h-5" />, title: 'Learn & Grow', desc: 'Community discussions, expert advice, and farming best practices.' },
   ];
@@ -588,10 +588,10 @@ function FAQSection() {
 
   const faqs = [
     { q: 'Is KisanMitra free to use?', a: 'Yes! KisanMitra is completely free for all Indian farmers. We believe every farmer deserves access to AI-powered farming intelligence regardless of farm size or budget.' },
-    { q: 'Which languages are supported?', a: 'KisanMitra supports Hindi, English, Marathi, Punjabi, Telugu, and Kannada. Both text and voice interactions are available in all supported languages.' },
+    { q: 'Which languages are supported?', a: 'KisanMitra supports 13 Indian languages including Hindi, English, Marathi, Punjabi, Telugu, Kannada, Gujarati, and Bengali. Both text and voice interactions are available in all supported languages.' },
     { q: 'How does the AI recommendation work?', a: 'Our AI engine analyzes your farm\'s specific conditions — soil type, crop stage, local weather, water availability — and generates personalized daily recommendations for fertilizer, irrigation, pest management, and more.' },
     { q: 'Do I need internet to use KisanMitra?', a: 'An internet connection is required for real-time features like weather updates and market prices. However, your farm data and crop plans are cached locally so you can view them offline.' },
-    { q: 'How are government schemes matched?', a: 'KisanMitra indexes 500+ central and state government agricultural schemes. Our AI compares your profile (location, crops, land size, gender, irrigation type) against each scheme\'s eligibility criteria to calculate a match score.' },
+    { q: 'How are government schemes matched?', a: 'KisanMitra indexes 3500+ central and state government agricultural schemes. Our AI compares your profile (location, crops, land size, gender, irrigation type) against each scheme\'s eligibility criteria to calculate a match score.' },
     { q: 'Is my farm data secure?', a: 'Absolutely. Your data is encrypted and stored securely. We never share individual farm data with third parties. KisanMitra uses Google Firebase for authentication and data storage with enterprise-grade security.' },
     { q: 'Can I manage multiple farms?', a: 'Yes! KisanMitra supports multi-farm management. Register as many farms as you own, each with different crops, soil types, and water sources. Switch between farms instantly from the dashboard.' },
   ];
@@ -706,9 +706,9 @@ function Footer() {
 // ────────────────────────────────────────────────────────────
 function StatsSection() {
   const stats = [
-    { value: '500+', label: 'Govt Schemes Indexed' },
+    { value: '3500+', label: 'Govt Schemes Indexed' },
     { value: '8', label: 'Major Crops Supported' },
-    { value: '6', label: 'Indian Languages' },
+    { value: '13', label: 'Indian Languages' },
     { value: '24/7', label: 'AI Assistance' },
   ];
 
