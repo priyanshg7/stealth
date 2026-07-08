@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { generateDiseaseTreatmentPlan } from '../../utils/aiRecommendationEngine';
+import { diagnoseDisease } from '../../utils/diagnosisService';
 import { 
   ArrowLeft, ShieldAlert, Activity, CheckCircle2, AlertTriangle, 
   Thermometer, Droplets, Wind, Calendar, ShieldCheck, Leaf, 
@@ -45,30 +45,25 @@ export default function DiseaseDiagnosis({ weatherData, activeFarm, farms, setFa
     
     setMode('loading');
     try {
-      // 1. Call Python ML ONNX Pipeline
-      const formData = new FormData();
-      formData.append('image', imageFile);
-      formData.append('crop', currentCrop);
+      // 1. Call Multimodal AI Service (abstracted Gemini call)
+      const farmDetails = {
+        crop: currentCrop,
+        areaAcres: currentArea,
+        location: currentLocation,
+        weather: weatherData
+      };
       
-      const mlResponse = await fetch('/ml-api/v1/diagnosis/predict', {
-        method: 'POST',
-        body: formData
-      });
+      const aiData = await diagnoseDisease(imageFile, farmDetails);
       
-      if (!mlResponse.ok) {
-        const errText = await mlResponse.text();
-        throw new Error(`ML Pipeline failed: ${mlResponse.status} ${errText}`);
-      }
-      
-      const mlData = await mlResponse.json();
-      setRawPrediction(mlData);
-
-      // 2. Call Groq AI Recommendation Engine
-      const aiData = await generateDiseaseTreatmentPlan(currentCrop, mlData.disease, currentArea, weatherData, currentLocation);
-      
-      if (!aiData) {
+      if (!aiData || !aiData.diagnosisSummary) {
          throw new Error("AI Recommendation Engine failed to generate a treatment plan.");
       }
+      
+      // Set the raw prediction for backward compatibility with UI state
+      setRawPrediction({
+        disease: aiData.diagnosisSummary.diseaseName,
+        confidence: aiData.diagnosisSummary.confidence
+      });
       
       setTreatmentPlan(aiData);
       
@@ -79,8 +74,8 @@ export default function DiseaseDiagnosis({ weatherData, activeFarm, farms, setFa
         
         const newHistoryItem = {
           date: new Date().toISOString(),
-          disease: mlData.disease,
-          confidence: mlData.confidence,
+          disease: aiData.diagnosisSummary.diseaseName,
+          confidence: aiData.diagnosisSummary.confidence,
           treatment: aiData
         };
         
