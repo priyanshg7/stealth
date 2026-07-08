@@ -260,6 +260,22 @@ export default function DiseaseDiagnosis({ weatherData, activeFarm, farms, setFa
                 {riskAssessment?.explanation}
               </p>
             </div>
+
+            {/* Prevention & Best Practices */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2 mb-6">
+                <ShieldCheck className="w-5 h-5 text-green-600" />
+                Prevention & Best Practices
+              </h3>
+              <div className="grid grid-cols-1 gap-4">
+                {preventionAndBestPractices?.map((practice, idx) => (
+                  <div key={idx} className="bg-green-50/50 border border-green-100 p-4 rounded-xl">
+                    <h4 className="font-bold text-[15px] text-gray-900 mb-1.5">{practice.title}</h4>
+                    <p className="text-sm text-gray-700 leading-relaxed">{practice.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Right Panel: Treatments & Schedule */}
@@ -393,23 +409,6 @@ export default function DiseaseDiagnosis({ weatherData, activeFarm, farms, setFa
                 ))}
               </div>
             </div>
-
-            {/* Prevention & Best Practices */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2 mb-6">
-                <ShieldCheck className="w-5 h-5 text-green-600" />
-                Prevention & Best Practices
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {preventionAndBestPractices?.map((practice, idx) => (
-                  <div key={idx} className="bg-green-50/50 border border-green-100 p-4 rounded-xl">
-                    <h4 className="font-bold text-[15px] text-gray-900 mb-1.5">{practice.title}</h4>
-                    <p className="text-sm text-gray-700 leading-relaxed">{practice.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
