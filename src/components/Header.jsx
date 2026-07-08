@@ -78,13 +78,16 @@ export default function Header({
         {/* Language Dropdown Selector */}
         <div className="relative">
           <select 
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 rounded-xl min-h-[48px] px-3 pr-8 text-[13px] md:text-sm font-bold text-on-surface appearance-none cursor-pointer w-full max-w-[100px] md:max-w-none"
+            value="en"
+            onChange={(e) => {
+              if (e.target.value === 'other') {
+                alert("To view KisanMitra in your regional language (including all 3500+ government schemes), please use the floating Google Translate widget located at the bottom right corner of your screen.");
+              }
+            }}
+            className="bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 rounded-xl min-h-[48px] px-3 pr-8 text-[13px] md:text-sm font-bold text-on-surface appearance-none cursor-pointer w-full max-w-[110px] md:max-w-none"
           >
-            {languages.map(l => (
-              <option key={l.id} value={l.id}>{l.native}</option>
-            ))}
+            <option value="en">English</option>
+            <option value="other">Other Languages 🌐</option>
           </select>
           <span className="material-symbols-outlined notranslate absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-xs text-on-surface-variant">arrow_drop_down</span>
         </div>
