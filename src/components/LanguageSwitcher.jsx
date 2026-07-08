@@ -34,26 +34,20 @@ export default function LanguageSwitcher({ className }) {
     setCurrentLang(langCode);
     localStorage.setItem('km_language', langCode);
     
-    // Retry mechanism in case Google Translate hasn't finished loading yet
-    let retries = 0;
-    const attemptChange = () => {
-      const googleSelect = document.querySelector('.goog-te-combo');
-      if (googleSelect) {
-        googleSelect.value = langCode;
-        googleSelect.dispatchEvent(new Event('change'));
-        // Dispatch a custom event so other components can react
-        window.dispatchEvent(new CustomEvent('kmLanguageChange', { detail: langCode }));
-        
-        // Reload to ensure the entire React app gets perfectly translated by Google
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
-      } else if (retries < 10) {
-        retries++;
-        setTimeout(attemptChange, 300);
-      }
-    };
-    attemptChange();
+    // Dispatch a custom event so other components can react
+    window.dispatchEvent(new CustomEvent('kmLanguageChange', { detail: langCode }));
+    
+    const googleSelect = document.querySelector('.goog-te-combo');
+    if (googleSelect) {
+      googleSelect.value = langCode;
+      googleSelect.dispatchEvent(new Event('change'));
+    }
+    
+    // Always reload to ensure the entire React app gets perfectly translated by Google,
+    // relying on our index.html cookie injector on the next load.
+    setTimeout(() => {
+      window.location.reload();
+    }, 300);
   };
 
   return (
