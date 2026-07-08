@@ -95,12 +95,6 @@ function Navbar() {
             >
               {isAuthenticated ? 'Open App' : 'Login'}
             </button>
-            <button
-              onClick={handleDemoClick}
-              className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-primary hover:bg-secondary transition-colors shadow-md hover:shadow-lg active:scale-[0.97]"
-            >
-              Try Demo
-            </button>
           </div>
 
           {/* Mobile menu toggle */}
@@ -132,12 +126,6 @@ function Navbar() {
                 className="w-full px-5 py-3 rounded-xl text-sm font-bold text-primary border border-primary/30 hover:bg-primary-container/20"
               >
                 {isAuthenticated ? 'Open App' : 'Login'}
-              </button>
-              <button
-                onClick={handleDemoClick}
-                className="w-full px-5 py-3 rounded-xl text-sm font-bold text-white bg-primary hover:bg-secondary shadow-md"
-              >
-                Try Demo
               </button>
             </div>
           </div>
@@ -196,13 +184,6 @@ function HeroSection() {
               >
                 Get Started
                 <ArrowRight className="w-4.5 h-4.5" />
-              </button>
-              <button
-                onClick={handleDemoClick}
-                className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-primary bg-white border-2 border-primary/20 hover:border-primary/40 hover:bg-primary-container/10 transition-all flex items-center justify-center gap-2"
-              >
-                <span className="material-symbols-outlined notranslate text-lg">play_circle</span>
-                Explore Demo
               </button>
             </div>
 
