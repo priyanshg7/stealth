@@ -29,6 +29,19 @@ export default function Header({
             },
             'google_translate_element_header'
           );
+
+          // Force reload on language change to ensure entire React app translates seamlessly
+          const checkExist = setInterval(() => {
+            const googleSelect = document.querySelector('.goog-te-combo');
+            if (googleSelect) {
+              googleSelect.addEventListener('change', () => {
+                setTimeout(() => {
+                  window.location.reload();
+                }, 500); // 500ms delay to ensure google sets the cookie
+              });
+              clearInterval(checkExist);
+            }
+          }, 300);
         }
       };
 
