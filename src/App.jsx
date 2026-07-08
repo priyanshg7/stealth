@@ -532,7 +532,7 @@ export default function App() {
   const [view, setView] = useState(() => {
     const savedFarms = localStorage.getItem('km_farms');
     if (!savedFarms || JSON.parse(savedFarms).length === 0) {
-      return 'WELCOME';
+      return 'PROFILE';
     }
     return 'DASHBOARD';
   });
