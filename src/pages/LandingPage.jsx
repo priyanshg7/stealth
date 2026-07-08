@@ -92,10 +92,10 @@ function Navbar() {
             {!isAuthenticated && (
               <button
                 onClick={handleDemoClick}
-                className="w-full sm:w-auto px-10 py-4 rounded-2xl text-base font-bold text-white border-2 border-white/30 hover:border-white/60 hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-primary hover:bg-secondary shadow-sm transition-colors flex items-center gap-1.5"
               >
-                <span className="material-symbols-outlined notranslate text-lg">play_circle</span>
-                Try Demo First
+                <span className="material-symbols-outlined notranslate text-lg">science</span>
+                Try Demo
               </button>
             )}
             <button
@@ -159,7 +159,7 @@ function Navbar() {
 function HeroSection() {
   const navigate = useNavigate();
   const { demoLogin } = useAuth();
-
+  
   const handleDemoClick = () => {
     demoLogin('rajesh');
     navigate('/app');
@@ -205,7 +205,7 @@ function HeroSection() {
               </button>
               <button
                 onClick={handleDemoClick}
-                className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-white bg-primary hover:bg-secondary transition-all shadow-lg hover:shadow-xl active:scale-[0.97] flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-primary border-2 border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all active:scale-[0.97] flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined notranslate text-lg">science</span>
                 Try Demo
@@ -246,7 +246,7 @@ function HeroSection() {
                     <div className="text-[10px] font-medium text-on-surface-variant mb-1">Today's Tasks</div>
                     <div className="text-xl font-bold text-on-surface">5 <span className="text-xs font-normal text-on-surface-variant">pending</span></div>
                     <div className="mt-2 flex gap-1">
-                      {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-1.5 flex-1 rounded-full bg-primary/20"></div>)}
+                      {[1,2,3,4,5].map(i => <div key={i} className="h-1.5 flex-1 rounded-full bg-primary/20"></div>)}
                     </div>
                   </div>
                   <div className="hidden sm:block flex-1 bg-white rounded-xl p-3 border border-outline-variant/40">
@@ -644,7 +644,7 @@ function FAQSection() {
 function CTASection() {
   const navigate = useNavigate();
   const { demoLogin } = useAuth();
-
+  
   const handleDemoClick = () => {
     demoLogin('rajesh');
     navigate('/app');
