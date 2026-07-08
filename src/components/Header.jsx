@@ -17,39 +17,29 @@ export default function Header({
   handleVoiceCommand
 }) {
   useEffect(() => {
-    // Only load if not already loaded
-    if (!document.getElementById('google-translate-script')) {
-      window.googleTranslateElementInit = () => {
-        if (window.google && window.google.translate) {
-          new window.google.translate.TranslateElement(
-            {
-              pageLanguage: 'en',
-              includedLanguages: 'en,hi,mr,pa,gu,ta,te,bn,kn,ml,or,as,ur',
-              layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
-            },
-            'google_translate_element_header'
-          );
+    const initTranslate = () => {
+      if (document.querySelector('#google_translate_element_header .goog-te-combo')) return;
+      new window.google.translate.TranslateElement(
+        {
+          pageLanguage: 'en',
+          includedLanguages: 'en,hi,mr,pa,gu,ta,te,bn,kn,ml,or,as,ur',
+          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
+        },
+        'google_translate_element_header'
+      );
+    };
 
-          // Force reload on language change to ensure entire React app translates seamlessly
-          const checkExist = setInterval(() => {
-            const googleSelect = document.querySelector('.goog-te-combo');
-            if (googleSelect) {
-              googleSelect.addEventListener('change', () => {
-                setTimeout(() => {
-                  window.location.reload();
-                }, 500); // 500ms delay to ensure google sets the cookie
-              });
-              clearInterval(checkExist);
-            }
-          }, 300);
-        }
-      };
-
-      const script = document.createElement('script');
-      script.id = 'google-translate-script';
-      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      script.async = true;
-      document.body.appendChild(script);
+    if (window.google && window.google.translate && window.google.translate.TranslateElement) {
+      initTranslate();
+    } else {
+      window.googleTranslateElementInit = initTranslate;
+      if (!document.getElementById('google-translate-script')) {
+        const script = document.createElement('script');
+        script.id = 'google-translate-script';
+        script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        script.async = true;
+        document.body.appendChild(script);
+      }
     }
   }, []);
 
