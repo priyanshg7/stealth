@@ -32,15 +32,24 @@ export default function LanguageSwitcher({ className }) {
 
   const changeLanguage = (langCode) => {
     setCurrentLang(langCode);
-    const googleSelect = document.querySelector('.goog-te-combo');
-    if (googleSelect) {
-      googleSelect.value = langCode;
-      googleSelect.dispatchEvent(new Event('change'));
-    }
+    
+    // Retry mechanism in case Google Translate hasn't finished loading yet
+    let retries = 0;
+    const attemptChange = () => {
+      const googleSelect = document.querySelector('.goog-te-combo');
+      if (googleSelect) {
+        googleSelect.value = langCode;
+        googleSelect.dispatchEvent(new Event('change'));
+      } else if (retries < 10) {
+        retries++;
+        setTimeout(attemptChange, 300);
+      }
+    };
+    attemptChange();
   };
 
   return (
-    <div className={`relative flex items-center justify-between text-sm font-bold text-on-surface cursor-pointer overflow-hidden group ${className || ''}`}>
+    <div className={`notranslate relative flex items-center justify-between text-sm font-bold text-on-surface cursor-pointer overflow-hidden group ${className || ''}`}>
       <select
         value={currentLang}
         onChange={(e) => changeLanguage(e.target.value)}
