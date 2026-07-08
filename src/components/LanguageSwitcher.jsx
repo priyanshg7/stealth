@@ -43,6 +43,11 @@ export default function LanguageSwitcher({ className }) {
         googleSelect.dispatchEvent(new Event('change'));
         // Dispatch a custom event so other components can react
         window.dispatchEvent(new CustomEvent('kmLanguageChange', { detail: langCode }));
+        
+        // Reload to ensure the entire React app gets perfectly translated by Google
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
       } else if (retries < 10) {
         retries++;
         setTimeout(attemptChange, 300);
