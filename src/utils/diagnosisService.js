@@ -1,7 +1,7 @@
 // KisanMitra Disease Diagnosis Service
-// Abstracts the underlying AI model (Gemini Vision) for diagnosing crop diseases from images.
+// Abstracts the underlying AI model (Groq Vision) for diagnosing crop diseases from images.
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
 /**
  * Converts a File object to a Base64 string for API transmission.
@@ -44,8 +44,8 @@ function cleanJsonResponse(text) {
  * @returns {Promise<Object>} The structured treatment plan JSON.
  */
 export async function diagnoseDisease(imageFile, farmDetails) {
-  if (!GEMINI_API_KEY) {
-    throw new Error("Gemini API key is not configured.");
+  if (!GROQ_API_KEY) {
+    throw new Error("Groq API key is not configured.");
   }
 
   const { crop, areaAcres, location, weather } = farmDetails;
@@ -97,9 +97,10 @@ Return ONLY a raw JSON object with these exact keys. Do NOT include markdown blo
 - "riskAssessment": object with keys: "weatherImpact" (e.g. "High humidity favors spread"), "shouldMonitor" (boolean), "explanation" (detailed string analyzing current temp/humidity vs disease).
 - "preventionAndBestPractices": array of objects, each with "title" (e.g. "Crop Rotation") and "description" (detailed string).`;
 
-  let url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+  let url = 'https://api.groq.com/openai/v1/chat/completions';
   const headers = {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${GROQ_API_KEY}`
   };
 
   try {
@@ -107,36 +108,31 @@ Return ONLY a raw JSON object with these exact keys. Do NOT include markdown blo
       method: 'POST',
       headers: headers,
       body: JSON.stringify({
-        contents: [
+        model: "meta-llama/llama-4-scout-17b-16e-instruct",
+        messages: [
           {
-            parts: [
-              { text: prompt },
-              {
-                inlineData: {
-                  mimeType: mimeType,
-                  data: base64Image
-                }
-              }
+            role: "user",
+            content: [
+              { type: "text", text: prompt },
+              { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Image}` } }
             ]
           }
         ],
-        generationConfig: { 
-          responseMimeType: "application/json",
-          temperature: 0.2
-        }
+        temperature: 0.2,
+        response_format: { type: "json_object" }
       })
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      throw new Error(`Gemini API failed with status: ${response.status} - ${errText}`);
+      throw new Error(`Groq API failed with status: ${response.status} - ${errText}`);
     }
 
     const result = await response.json();
-    const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    const responseText = result.choices?.[0]?.message?.content;
     
     if (!responseText) {
-      throw new Error("No valid response from Gemini API.");
+      throw new Error("No valid response from Groq API.");
     }
 
     return JSON.parse(cleanJsonResponse(responseText));
