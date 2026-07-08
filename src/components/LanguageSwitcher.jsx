@@ -40,6 +40,11 @@ export default function LanguageSwitcher({ className }) {
       if (googleSelect) {
         googleSelect.value = langCode;
         googleSelect.dispatchEvent(new Event('change'));
+        
+        // Reload to ensure the entire React app gets perfectly translated by Google
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
       } else if (retries < 10) {
         retries++;
         setTimeout(attemptChange, 300);
