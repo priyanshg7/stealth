@@ -46,7 +46,7 @@ export default function LoginPage() {
     const success = await login();
     setLoading(false);
     if (success) {
-      navigate(redirect, { replace: true });
+      window.location.href = redirect;
     }
   };
 

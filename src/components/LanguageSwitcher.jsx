@@ -32,6 +32,7 @@ export default function LanguageSwitcher({ className }) {
 
   const changeLanguage = (langCode) => {
     setCurrentLang(langCode);
+    localStorage.setItem('km_language', langCode);
     
     // Retry mechanism in case Google Translate hasn't finished loading yet
     let retries = 0;

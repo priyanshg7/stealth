@@ -39,7 +39,7 @@ export default function DemoLoginPage() {
 
     const success = demoLogin(personaKey);
     if (success) {
-      navigate('/app', { replace: true });
+      window.location.href = '/app';
     }
     setLoading(false);
   };
