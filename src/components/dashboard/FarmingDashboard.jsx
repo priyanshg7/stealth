@@ -311,7 +311,7 @@ export default function FarmingDashboard({
                             onClick={() => setCompletedTasks([...completedTasks, task.id])}
                             className="flex-grow md:flex-grow-0 bg-primary hover:bg-secondary text-white font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
                           >
-                            <Check size={14} /> Complete
+                            <Check size={14} /> {t("Complete", language)}
                           </button>
                           <button
                             onClick={() => {
@@ -320,7 +320,7 @@ export default function FarmingDashboard({
                             }}
                             className="flex-grow md:flex-grow-0 border border-outline-variant/60 hover:bg-surface-container text-on-surface-variant font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
                           >
-                            Reschedule
+                            {t("Reschedule", language)}
                           </button>
                         </div>
                       </div>
@@ -529,9 +529,9 @@ export default function FarmingDashboard({
               <div className="flex gap-2.5 items-start">
                 <ShieldAlert className="text-red-700 shrink-0 mt-0.5" size={18} />
                 <div>
-                  <h4 className="text-sm font-black text-red-950">Active Disease Risk Alert!</h4>
+                  <h4 className="text-sm font-black text-red-950">{t("Active Disease Risk Alert!", language)}</h4>
                   <p className="text-xs text-red-900/90 font-semibold mt-0.5">
-                    Weather conditions indicate elevated risk of {activeFarm?.crop?.name === 'wheat' ? 'Stripe Rust' : 'Blast disease'} in your area.
+                    {activeFarm?.crop?.name === 'wheat' ? t('Weather conditions indicate elevated risk of Stripe Rust in your area.', language) : t('Weather conditions indicate elevated risk of Blast disease in your area.', language)}
                   </p>
                 </div>
               </div>
@@ -539,7 +539,7 @@ export default function FarmingDashboard({
                 onClick={() => setActiveDashboardTab('diagnosis')}
                 className="bg-red-700 hover:bg-red-800 text-white font-extrabold px-3 py-1.5 rounded-lg text-xs shrink-0 min-h-[36px]"
               >
-                Scan Leaf
+                {t("Scan Leaf", language)}
               </button>
             </div>
           ) : (
@@ -574,8 +574,8 @@ export default function FarmingDashboard({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {[
-            { id: 1, name: 'PM Kisan Samman Nidhi', benefits: '₹6,000 / year direct subsidy', deadline: 'Apply by July 15' },
-            { id: 2, name: 'Subsidized Fertilizers Distribution', benefits: 'Up to 50% discount on Urea bags', deadline: 'Ongoing at APMC Coop' }
+            { id: 1, name: t('PM Kisan Samman Nidhi', language), benefits: t('₹6,000 / year direct subsidy', language), deadline: t('Apply by July 15', language) },
+            { id: 2, name: t('Subsidized Fertilizers Distribution', language), benefits: t('Up to 50% discount on Urea bags', language), deadline: t('Ongoing at APMC Coop', language) }
           ].map(scheme => (
             <div 
               key={scheme.id}
@@ -590,7 +590,7 @@ export default function FarmingDashboard({
                 onClick={() => setSelectedScheme(scheme)}
                 className="bg-primary/5 hover:bg-primary/10 border border-primary/20 text-primary font-extrabold text-[11px] px-3 py-1.5 rounded-lg shrink-0 min-h-[36px]"
               >
-                Apply
+                {t("Apply", language)}
               </button>
             </div>
           ))}
