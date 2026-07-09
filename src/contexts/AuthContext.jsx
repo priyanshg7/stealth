@@ -46,7 +46,7 @@ const decodeJWT = (token) => {
 const generateMockJWT = (profile) => {
   const header = { alg: "HS256", typ: "JWT" };
   const payload = {
-    sub: "demo-user|" + Date.now(),
+    sub: "demo_" + profile.email.replace(/[^a-zA-Z0-9]/g, '_'),
     name: profile.name,
     email: profile.email,
     picture: profile.picture || '',
@@ -294,8 +294,10 @@ export function AuthProvider({ children }) {
   }, [jwtToken, decodedToken]);
 
   useEffect(() => {
-    localStorage.setItem('km_profile', JSON.stringify(profile));
-  }, [profile]);
+    if (decodedToken?.sub) {
+      localStorage.setItem(`km_${decodedToken.sub}_profile`, JSON.stringify(profile));
+    }
+  }, [profile, decodedToken]);
 
   useEffect(() => {
     if (isDemo) {
@@ -361,13 +363,6 @@ export function AuthProvider({ children }) {
     const persona = DEMO_PROFILES[personaKey];
     if (!persona) return false;
 
-    // Backup current production data
-    const keysToBackup = ['km_jwt', 'km_decoded_jwt', 'km_profile', 'km_farms', 'km_season_confirmed', 'km_selected_farm_index', 'km_completed_tasks', 'km_rescheduled_tasks', 'km_active_tab'];
-    keysToBackup.forEach(key => {
-      const val = localStorage.getItem(key);
-      if (val) localStorage.setItem('km_backup_' + key, val);
-    });
-
     const token = generateMockJWT(persona.profile);
     const decoded = decodeJWT(token);
 
@@ -377,13 +372,14 @@ export function AuthProvider({ children }) {
     setIsDemo(true);
     setUser(null);
 
-    // Seed demo farms
-    localStorage.setItem('km_farms', JSON.stringify(persona.farms));
-    localStorage.setItem('km_season_confirmed', 'true');
-    localStorage.setItem('km_selected_farm_index', '0');
-    localStorage.setItem('km_completed_tasks', '[]');
-    localStorage.setItem('km_rescheduled_tasks', '{}');
-    localStorage.setItem('km_active_tab', 'dashboard');
+    // Seed demo farms into their specific namespace
+    const prefix = `km_demo_${persona.profile.email.replace(/[^a-zA-Z0-9]/g, '_')}_`;
+    localStorage.setItem(`${prefix}farms`, JSON.stringify(persona.farms));
+    localStorage.setItem(`${prefix}season_confirmed`, 'true');
+    localStorage.setItem(`${prefix}selected_farm_index`, '0');
+    localStorage.setItem(`${prefix}completed_tasks`, '[]');
+    localStorage.setItem(`${prefix}rescheduled_tasks`, '{}');
+    localStorage.setItem(`${prefix}active_tab`, 'dashboard');
 
     return true;
   }, []);
@@ -397,25 +393,13 @@ export function AuthProvider({ children }) {
       console.error("Sign Out Error:", err);
     }
 
-    if (isDemo) {
-      // Restore production data from backup
-      const keysToRestore = ['km_jwt', 'km_decoded_jwt', 'km_profile', 'km_farms', 'km_season_confirmed', 'km_selected_farm_index', 'km_completed_tasks', 'km_rescheduled_tasks'];
-      keysToRestore.forEach(key => {
-        const backup = localStorage.getItem('km_backup_' + key);
-        if (backup) {
-          localStorage.setItem(key, backup);
-          localStorage.removeItem('km_backup_' + key);
-        } else {
-          localStorage.removeItem(key);
-        }
-      });
-      localStorage.removeItem('km_demo_mode');
-    } else {
-      // Clear all auth data
-      localStorage.removeItem('km_jwt');
-      localStorage.removeItem('km_decoded_jwt');
-    }
+    // Clear auth session data
+    localStorage.removeItem('km_jwt');
+    localStorage.removeItem('km_decoded_jwt');
+    localStorage.removeItem('km_demo_mode');
 
+    // We do NOT clear namespaced keys (farms, profile, etc.) so returning users don't lose data.
+    
     setUser(null);
     setJwtToken('');
     setDecodedToken(null);

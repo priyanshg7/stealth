@@ -529,8 +529,11 @@ export default function App() {
   const navigate = useNavigate();
   const { jwtToken, setJwtToken, decodedToken, setDecodedToken, profile: authProfile, setProfile: setAuthProfile, isDemo, logout: authLogout } = useAuth();
 
+  const uid = decodedToken?.sub || 'guest';
+  const getKey = (key) => `km_${uid}_${key}`;
+
   const [view, setView] = useState(() => {
-    const savedFarms = localStorage.getItem('km_farms');
+    const savedFarms = localStorage.getItem(getKey('farms'));
     if (!savedFarms || JSON.parse(savedFarms).length === 0) {
       return 'PROFILE';
     }
@@ -549,7 +552,7 @@ export default function App() {
 
   // Profile setup state (autofilled from local storage if available)
   const [profile, setProfile] = useState(() => {
-    const saved = localStorage.getItem('km_profile');
+    const saved = localStorage.getItem(getKey('profile'));
     return saved ? JSON.parse(saved) : {
       name: '',
       email: '',
@@ -572,7 +575,7 @@ export default function App() {
 
   // Farms state
   const [farms, setFarms] = useState(() => {
-    const saved = localStorage.getItem('km_farms');
+    const saved = localStorage.getItem(getKey('farms'));
     return saved ? JSON.parse(saved) : [];
   });
   const [currentFarm, setCurrentFarm] = useState(DEFAULT_FARM);
@@ -586,27 +589,27 @@ export default function App() {
   const [boundaryPoints, setBoundaryPoints] = useState([]);
 
   // OCR card status
-  const [soilHealthCardUploaded, setSoilHealthCardUploaded] = useState(() => localStorage.getItem('km_soil_card_uploaded') === 'true');
+  const [soilHealthCardUploaded, setSoilHealthCardUploaded] = useState(() => localStorage.getItem(getKey('soil_card_uploaded')) === 'true');
   const [soilOCRProcessing, setSoilOCRProcessing] = useState(false);
 
   // Redesigned Dashboard State Variables
-  const [seasonPlanConfirmed, setSeasonPlanConfirmed] = useState(() => localStorage.getItem('km_season_confirmed') === 'true');
-  const [selectedFarmIndex, setSelectedFarmIndex] = useState(() => parseInt(localStorage.getItem('km_selected_farm_index') || '0', 10));
+  const [seasonPlanConfirmed, setSeasonPlanConfirmed] = useState(() => localStorage.getItem(getKey('season_confirmed')) === 'true');
+  const [selectedFarmIndex, setSelectedFarmIndex] = useState(() => parseInt(localStorage.getItem(getKey('selected_farm_index')) || '0', 10));
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [completedTasks, setCompletedTasks] = useState(() => {
-    const saved = localStorage.getItem('km_completed_tasks');
+    const saved = localStorage.getItem(getKey('completed_tasks'));
     return saved ? JSON.parse(saved) : [];
   });
   const [rescheduledTasks, setRescheduledTasks] = useState(() => {
-    const saved = localStorage.getItem('km_rescheduled_tasks');
+    const saved = localStorage.getItem(getKey('rescheduled_tasks'));
     return saved ? JSON.parse(saved) : {};
   });
   const [voiceAssistantOpen, setVoiceAssistantOpen] = useState(false);
   const [voiceReplies, setVoiceReplies] = useState([
     { sender: 'ai', text: 'Namaste! I am KisanMitra Voice Assistant. Ask me anything about your farm today.' }
   ]);
-  const [activeDashboardTab, setActiveDashboardTab] = useState(() => localStorage.getItem('km_active_tab') || 'dashboard');
+  const [activeDashboardTab, setActiveDashboardTab] = useState(() => localStorage.getItem(getKey('active_tab')) || 'dashboard');
 
   const customSetCompletedTasks = (value) => {
     setCompletedTasks((prev) => {
@@ -643,9 +646,9 @@ export default function App() {
   };
 
   useEffect(() => {
-    localStorage.setItem('km_active_tab', activeDashboardTab);
-  }, [activeDashboardTab]);
-  const [soilCardReminderDismissed, setSoilCardReminderDismissed] = useState(() => localStorage.getItem('km_soil_card_reminder_dismissed') === 'true');
+    localStorage.setItem(getKey('active_tab'), activeDashboardTab);
+  }, [activeDashboardTab, uid]);
+  const [soilCardReminderDismissed, setSoilCardReminderDismissed] = useState(() => localStorage.getItem(getKey('soil_card_reminder_dismissed')) === 'true');
   const [onboardingCarouselIndex, setOnboardingCarouselIndex] = useState(0);
   const [showAnnualPlanWizard, setShowAnnualPlanWizard] = useState(false);
   const [wizardSelectedCrop, setWizardSelectedCrop] = useState('wheat');
@@ -673,12 +676,12 @@ export default function App() {
     return () => window.removeEventListener('kmLanguageChange', handleLanguageChange);
   }, []);
   useEffect(() => { localStorage.setItem('km_voice_guide', voiceGuide); }, [voiceGuide]);
-  useEffect(() => { localStorage.setItem('km_farms', JSON.stringify(farms)); }, [farms]);
-  useEffect(() => { localStorage.setItem('km_selected_farm_index', selectedFarmIndex); }, [selectedFarmIndex]);
-  useEffect(() => { localStorage.setItem('km_completed_tasks', JSON.stringify(completedTasks)); }, [completedTasks]);
-  useEffect(() => { localStorage.setItem('km_rescheduled_tasks', JSON.stringify(rescheduledTasks)); }, [rescheduledTasks]);
-  useEffect(() => { localStorage.setItem('km_soil_card_uploaded', soilHealthCardUploaded); }, [soilHealthCardUploaded]);
-  useEffect(() => { localStorage.setItem('km_soil_card_reminder_dismissed', soilCardReminderDismissed); }, [soilCardReminderDismissed]);
+  useEffect(() => { localStorage.setItem(getKey('farms'), JSON.stringify(farms)); }, [farms, uid]);
+  useEffect(() => { localStorage.setItem(getKey('selected_farm_index'), selectedFarmIndex); }, [selectedFarmIndex, uid]);
+  useEffect(() => { localStorage.setItem(getKey('completed_tasks'), JSON.stringify(completedTasks)); }, [completedTasks, uid]);
+  useEffect(() => { localStorage.setItem(getKey('rescheduled_tasks'), JSON.stringify(rescheduledTasks)); }, [rescheduledTasks, uid]);
+  useEffect(() => { localStorage.setItem(getKey('soil_card_uploaded'), soilHealthCardUploaded); }, [soilHealthCardUploaded, uid]);
+  useEffect(() => { localStorage.setItem(getKey('soil_card_reminder_dismissed'), soilCardReminderDismissed); }, [soilCardReminderDismissed, uid]);
 
   const fetchWeather = async () => {
     const activeFarm = farms[selectedFarmIndex];
@@ -946,8 +949,8 @@ export default function App() {
 
   // Sync season plan confirmed state
   useEffect(() => {
-    localStorage.setItem('km_season_confirmed', seasonPlanConfirmed);
-  }, [seasonPlanConfirmed]);
+    localStorage.setItem(getKey('season_confirmed'), seasonPlanConfirmed);
+  }, [seasonPlanConfirmed, uid]);
 
   // Illustrated Onboarding swipeable items
   const ONBOARDING_SLIDES = [
@@ -1574,8 +1577,8 @@ Instructions:
 
   // Auto-save profile
   useEffect(() => {
-    localStorage.setItem('km_profile', JSON.stringify(profile));
-  }, [profile]);
+    localStorage.setItem(getKey('profile'), JSON.stringify(profile));
+  }, [profile, uid]);
 
   // JWT syncing is now handled by AuthContext
 
