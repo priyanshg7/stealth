@@ -41,7 +41,6 @@ export default function DashboardShell({
   sidebarCollapsed,
   setSidebarCollapsed,
   jwtToken,
-  setShowJwtInspector,
   handleSignOut,
   completedTasks,
   setCompletedTasks,
@@ -129,7 +128,6 @@ export default function DashboardShell({
         setDecodedToken={setDecodedToken}
         setSeasonPlanConfirmed={setSeasonPlanConfirmed}
         jwtToken={jwtToken}
-        setShowJwtInspector={setShowJwtInspector}
         handleSignOut={handleSignOut}
       />
 

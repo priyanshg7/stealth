@@ -543,7 +543,7 @@ export default function App() {
   
   // Auth state (showGoogleDialog removed — now separate /demo route)
   const [mobileNumber, setMobileNumber] = useState('');
-  const [showJwtInspector, setShowJwtInspector] = useState(false);
+
   const [authError, setAuthError] = useState(null);
   const [authLoading, setAuthLoading] = useState(false);
 
@@ -3732,8 +3732,6 @@ Instructions:
               setSidebarOpen={setSidebarOpen}
               sidebarCollapsed={sidebarCollapsed}
               setSidebarCollapsed={setSidebarCollapsed}
-              jwtToken={jwtToken}
-              setShowJwtInspector={setShowJwtInspector}
               handleSignOut={handleSignOut}
               completedTasks={completedTasks}
               setCompletedTasks={customSetCompletedTasks}
@@ -3787,59 +3785,7 @@ Instructions:
 
         {/* Google Account Selector Dialog removed — now served by /demo route */}
 
-        {/* JWT Inspector Modal */}
-        {showJwtInspector && jwtToken && (
-          <div className="fixed inset-0 z-[130] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-2xl border border-outline-variant shadow-2xl overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in duration-200">
-              <div className="flex justify-between items-center pb-4 border-b border-surface-container-high">
-                <h3 className="font-display text-lg font-bold text-primary flex items-center gap-2">
-                  <Cpu className="w-5 h-5 text-primary" /> Decoded JWT Token & Test Profile
-                </h3>
-                <button 
-                  onClick={() => setShowJwtInspector(false)}
-                  className="text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1 rounded-full hover:bg-surface-container"
-                >
-                  <span className="material-symbols-outlined notranslate text-lg">close</span>
-                </button>
-              </div>
 
-              <div className="py-4 space-y-4 text-xs font-mono">
-                <div>
-                  <span className="block font-sans font-bold text-on-surface mb-1">Encoded JWT (Header.Payload.Signature):</span>
-                  <div className="p-3 bg-surface-container rounded-xl overflow-x-auto break-all max-h-24 overflow-y-auto text-[10px] leading-relaxed">
-                    <span className="text-red-600">{jwtToken.split('.')[0]}</span>.
-                    <span className="text-blue-600">{jwtToken.split('.')[1]}</span>.
-                    <span className="text-green-600">{jwtToken.split('.')[2]}</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <span className="block font-sans font-bold text-on-surface mb-1">Decoded Header:</span>
-                    <pre className="p-3 bg-red-50 text-red-950 rounded-xl overflow-x-auto leading-relaxed">
-{JSON.stringify(decodeJWTHeader(jwtToken), null, 2)}
-                    </pre>
-                  </div>
-                  <div>
-                    <span className="block font-sans font-bold text-on-surface mb-1">Decoded Payload:</span>
-                    <pre className="p-3 bg-blue-50 text-blue-950 rounded-xl overflow-x-auto max-h-48 overflow-y-auto leading-relaxed text-[11px]">
-{JSON.stringify(decodedToken, null, 2)}
-                    </pre>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t border-surface-container-high pt-4 flex justify-end">
-                <button
-                  onClick={() => setShowJwtInspector(false)}
-                  className="bg-primary hover:bg-secondary text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-colors active:scale-95 shadow-sm"
-                >
-                  Close Inspector
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Universal Footer */}
         {view !== 'DASHBOARD' && (

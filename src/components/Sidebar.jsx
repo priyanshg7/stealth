@@ -1,6 +1,5 @@
 import { t as tr } from '../utils/translations';
 import React, { useEffect, useRef } from 'react';
-import { Cpu } from 'lucide-react';
 
 export default function Sidebar({
   isDemo,
@@ -24,7 +23,6 @@ export default function Sidebar({
   setDecodedToken,
   setSeasonPlanConfirmed,
   jwtToken,
-  setShowJwtInspector,
   handleSignOut
 }) {
   const activeFarm = farms[selectedFarmIndex];
@@ -198,23 +196,6 @@ export default function Sidebar({
         <div className={`border-t border-surface-container-high bg-white transition-all duration-300 flex-shrink-0 overflow-hidden whitespace-nowrap space-y-1
           ${sidebarCollapsed ? 'p-2 lg:p-0 lg:py-2' : 'p-3'}`}
         >
-          {/* JWT Inspector (only when token exists) */}
-          {jwtToken && (
-            <button
-              onClick={() => setShowJwtInspector && setShowJwtInspector(true)}
-              title={sidebarCollapsed ? 'Inspect JWT' : undefined}
-              className={`w-full flex items-center font-semibold text-xs text-[#006e2d] bg-[#f0fdf4] hover:bg-[#dcfce7] transition-colors rounded-xl overflow-hidden relative
-                ${sidebarCollapsed ? 'lg:rounded-none lg:bg-transparent lg:hover:bg-surface-container-low' : 'border border-[#bbf7d0]'}`}
-            >
-              <div className="w-12 lg:w-[80px] h-12 flex-shrink-0 flex items-center justify-center">
-                <Cpu className="w-4 h-4" />
-              </div>
-              <span className={`text-left truncate transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'flex-1 opacity-100 pr-3'}`}>
-                Inspect JWT
-              </span>
-            </button>
-          )}
-
           {/* Exit Demo (only in demo environment) */}
           {isDemo && (
             <button
