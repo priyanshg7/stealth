@@ -343,9 +343,9 @@ function cleanJsonResponse(text) {
  * Resilient multi-provider API router. Tries Groq 70B, then Groq 8B, then Gemini 2.0.
  */
 async function callAIRouter(prompt) {
-  // 1. Try Groq (Llama-3.3-70b-versatile)
+  // 1. Try Groq (openai/gpt-oss-120b)
   try {
-    console.log("[AI Router] Attempting Groq (llama-3.3-70b-versatile)...");
+    console.log("[AI Router] Attempting Groq (openai/gpt-oss-120b)...");
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: 'POST',
       headers: {
@@ -353,7 +353,7 @@ async function callAIRouter(prompt) {
         'Authorization': `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "openai/gpt-oss-120b",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.1
       })
@@ -365,15 +365,15 @@ async function callAIRouter(prompt) {
         return JSON.parse(cleanJsonResponse(text));
       }
     } else {
-      console.warn(`[AI Router] Groq 70B failed with status: ${response.status}`);
+      console.warn(`[AI Router] Groq 120B failed with status: ${response.status}`);
     }
   } catch (e) {
-    console.warn("[AI Router] Groq 70B error:", e.message);
+    console.warn("[AI Router] Groq 120B error:", e.message);
   }
 
-  // 2. Try Groq (Llama-3.1-8b-instant)
+  // 2. Try Groq (openai/gpt-oss-20b)
   try {
-    console.log("[AI Router] Attempting Groq (llama-3.1-8b-instant)...");
+    console.log("[AI Router] Attempting Groq (openai/gpt-oss-20b)...");
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: 'POST',
       headers: {
@@ -381,7 +381,7 @@ async function callAIRouter(prompt) {
         'Authorization': `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
+        model: "openai/gpt-oss-20b",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.1
       })
@@ -393,10 +393,10 @@ async function callAIRouter(prompt) {
         return JSON.parse(cleanJsonResponse(text));
       }
     } else {
-      console.warn(`[AI Router] Groq 8B failed with status: ${response.status}`);
+      console.warn(`[AI Router] Groq 20B failed with status: ${response.status}`);
     }
   } catch (e) {
-    console.warn("[AI Router] Groq 8B error:", e.message);
+    console.warn("[AI Router] Groq 20B error:", e.message);
   }
 
   // 3. Try Gemini (gemini-2.0-flash with new API key)
