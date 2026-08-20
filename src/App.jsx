@@ -728,7 +728,7 @@ export default function App() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
+          model: "openai/gpt-oss-20b",
           messages: [
             ...(systemInstruction ? [{ role: "system", content: systemInstruction }] : []),
             { role: "user", content: prompt }
