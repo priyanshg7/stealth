@@ -933,7 +933,7 @@ Guidelines:
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
+          model: "openai/gpt-oss-20b",
           messages: [
             { role: "system", content: "You are KisanMitra AI Scheme Expert, a friendly digital assistant. Explain government schemes in very simple Hindi or English suitable for Indian farmers." },
             { role: "user", content: prompt }
