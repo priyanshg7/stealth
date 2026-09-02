@@ -172,11 +172,6 @@ export default function AnnualPlanner({
                 heatTolerance: 4,
                 suitableSoils: [setupForm.soilType],
                 suitableStates: [setupForm.state],
-                cropRotationBonus: {},
-                nutrientRequirement: { N: 120, P: 60, K: 40 },
-                organicAlternatives: { FYM: 10000 },
-                msp: mspVal,
-                livePrice: mspVal,
                 projectedProfit,
                 badges: Array.isArray(v.badges) ? v.badges : ['Gemini AI Recommended'],
                 cropName: manualCrop,
@@ -247,7 +242,6 @@ export default function AnnualPlanner({
         });
         setSeasonRecs(mappedGemini);
         setLoadingRecs(false);
-        return;
       } else {
          // Pause and ask user for retry or local fallback
          setLoadingRecs(false);

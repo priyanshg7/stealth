@@ -322,14 +322,8 @@ export default function SeasonPlanner({
       setStep('recommendations');
       setViewingActivePlan(false);
     } else {
-      // Pause and ask user for retry or local fallback
-      setIsGenerating(false);
-      setRecommendationError({
-        message: 'AI Service Rate Limited (Quota Exceeded)',
-        description: 'The Gemini AI variety recommendation engine returned a rate-limiting response (429). Silently falling back to generic placeholder templates is disabled to ensure data transparency.'
-      });
-      setStep('recommendations');
-      setViewingActivePlan(false);
+      console.warn("[SeasonPlanner] Gemini API rate limited. Auto-falling back to ICAR database...");
+      handleUseLocalFallback();
     }
   };
 
