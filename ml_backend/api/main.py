@@ -1,31 +1,42 @@
 from fastapi import FastAPI
 from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 import os
 
 from api.routers import diagnosis, system
 from api.middleware.logging import log_requests
 from api.utils.config import settings
-import api.events.handlers # Register handlers
+import api.events.handlers  # Register event handlers
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    description="Production Inference Pipeline for Crop Diseases",
-    version=settings.VERSION
-)
+def create_app() -> FastAPI:
+    """
+    Application factory for KisanMitra ML Backend.
+    Configures middleware, routes, event handlers, and global exception handlers.
+    """
+    app = FastAPI(
+        title=settings.PROJECT_NAME,
+        description="Production Inference & Risk Assessment Pipeline for Crop Diseases",
+        version=settings.VERSION,
+        docs_url="/docs",
+        redoc_url="/redoc"
+    )
 
-# Middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-app.add_middleware(BaseHTTPMiddleware, dispatch=log_requests)
+    # Configure CORS Middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS if hasattr(settings, 'CORS_ORIGINS') else ["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
-# Include Routers
-app.include_router(diagnosis.router)
-app.include_router(system.router)
+    # Configure Request Logging Middleware
+    app.add_middleware(BaseHTTPMiddleware, dispatch=log_requests)
+
+    # Register API Routers
+    app.include_router(diagnosis.router)
+    app.include_router(system.router)
+
+    return app
+
+app = create_app()
