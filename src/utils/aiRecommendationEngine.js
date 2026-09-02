@@ -325,7 +325,9 @@ export function generateCropComparison(cropIds, farm, profile, weatherData, mand
 
 // ── API Key Definitions ───────────────────────────────────────────────
 export const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+export const BACKUP_GEMINI_API_KEY = import.meta.env.VITE_BACKUP_GEMINI_API_KEY;
 export const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+export const BACKUP_GROQ_API_KEY = import.meta.env.VITE_BACKUP_GROQ_API_KEY;
 
 /**
  * Strips markdown codeblock markers (e.g. ```json) to ensure clean JSON parsing.
@@ -340,87 +342,101 @@ function cleanJsonResponse(text) {
 }
 
 /**
- * Resilient multi-provider API router. Tries Groq 70B, then Groq 8B, then Gemini 2.0.
+ * Resilient multi-provider API router. Tries Groq primary/backup, then Gemini primary/backup.
  */
 async function callAIRouter(prompt) {
-  // 1. Try Groq (openai/gpt-oss-120b)
-  try {
-    console.log("[AI Router] Attempting Groq (openai/gpt-oss-120b)...");
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-oss-120b",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.1
-      })
-    });
-    if (response.ok) {
-      const result = await response.json();
-      const text = result.choices?.[0]?.message?.content;
-      if (text) {
-        return JSON.parse(cleanJsonResponse(text));
+  const groqKeys = [GROQ_API_KEY, BACKUP_GROQ_API_KEY].filter(Boolean);
+  const geminiKeys = [GEMINI_API_KEY, BACKUP_GEMINI_API_KEY].filter(Boolean);
+
+  // 1. Try Groq Keys (openai/gpt-oss-120b and openai/gpt-oss-20b)
+  for (let keyIdx = 0; keyIdx < groqKeys.length; keyIdx++) {
+    const apiKey = groqKeys[keyIdx];
+    const keyTag = keyIdx === 0 ? 'Primary' : 'Backup';
+    
+    // 1a. Try Groq (openai/gpt-oss-120b)
+    try {
+      console.log(`[AI Router] Attempting Groq ${keyTag} Key (openai/gpt-oss-120b)...`);
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-oss-120b",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.1
+        })
+      });
+      if (response.ok) {
+        const result = await response.json();
+        const text = result.choices?.[0]?.message?.content;
+        if (text) {
+          return JSON.parse(cleanJsonResponse(text));
+        }
+      } else {
+        console.warn(`[AI Router] Groq ${keyTag} 120B failed with status: ${response.status}`);
       }
-    } else {
-      console.warn(`[AI Router] Groq 120B failed with status: ${response.status}`);
+    } catch (e) {
+      console.warn(`[AI Router] Groq ${keyTag} 120B error:`, e.message);
     }
-  } catch (e) {
-    console.warn("[AI Router] Groq 120B error:", e.message);
+
+    // 1b. Try Groq (openai/gpt-oss-20b)
+    try {
+      console.log(`[AI Router] Attempting Groq ${keyTag} Key (openai/gpt-oss-20b)...`);
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-oss-20b",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.1
+        })
+      });
+      if (response.ok) {
+        const result = await response.json();
+        const text = result.choices?.[0]?.message?.content;
+        if (text) {
+          return JSON.parse(cleanJsonResponse(text));
+        }
+      } else {
+        console.warn(`[AI Router] Groq ${keyTag} 20B failed with status: ${response.status}`);
+      }
+    } catch (e) {
+      console.warn(`[AI Router] Groq ${keyTag} 20B error:`, e.message);
+    }
   }
 
-  // 2. Try Groq (openai/gpt-oss-20b)
-  try {
-    console.log("[AI Router] Attempting Groq (openai/gpt-oss-20b)...");
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-oss-20b",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.1
-      })
-    });
-    if (response.ok) {
-      const result = await response.json();
-      const text = result.choices?.[0]?.message?.content;
-      if (text) {
-        return JSON.parse(cleanJsonResponse(text));
-      }
-    } else {
-      console.warn(`[AI Router] Groq 20B failed with status: ${response.status}`);
-    }
-  } catch (e) {
-    console.warn("[AI Router] Groq 20B error:", e.message);
-  }
+  // 2. Try Gemini Keys (gemini-2.0-flash)
+  for (let keyIdx = 0; keyIdx < geminiKeys.length; keyIdx++) {
+    const apiKey = geminiKeys[keyIdx];
+    const keyTag = keyIdx === 0 ? 'Primary' : 'Backup';
 
-  // 3. Try Gemini (gemini-2.0-flash with new API key)
-  try {
-    console.log("[AI Router] Attempting Gemini (gemini-2.0-flash)...");
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json" }
-      })
-    });
-    if (response.ok) {
-      const result = await response.json();
-      const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) {
-        return JSON.parse(cleanJsonResponse(text));
+    try {
+      console.log(`[AI Router] Attempting Gemini ${keyTag} Key (gemini-2.0-flash)...`);
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: "application/json" }
+        })
+      });
+      if (response.ok) {
+        const result = await response.json();
+        const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          return JSON.parse(cleanJsonResponse(text));
+        }
+      } else {
+        console.warn(`[AI Router] Gemini ${keyTag} failed with status: ${response.status}`);
       }
-    } else {
-      console.warn(`[AI Router] Gemini failed with status: ${response.status}`);
+    } catch (e) {
+      console.warn(`[AI Router] Gemini ${keyTag} error:`, e.message);
     }
-  } catch (e) {
-    console.warn("[AI Router] Gemini error:", e.message);
   }
 
   return null;
