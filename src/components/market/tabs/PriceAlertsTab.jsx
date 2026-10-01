@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell, BellRing, Plus, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Bell, BellRing, Plus, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 export default function PriceAlertsTab({ mandi }) {
   const [alerts, setAlerts] = useState([
@@ -11,16 +11,16 @@ export default function PriceAlertsTab({ mandi }) {
   const [newThreshold, setNewThreshold] = useState('');
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 w-full">
       
-      <div className="bg-white rounded-3xl p-6 md:p-8 border border-outline-variant shadow-sm flex flex-col md:flex-row gap-8 items-start">
-        <div className="flex-1">
+      <div className="bg-white rounded-3xl p-6 md:p-8 border border-outline-variant shadow-sm flex flex-col lg:flex-row gap-8 items-start">
+        <div className="flex-1 min-w-0">
           <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-4">
             <BellRing size={24} />
           </div>
           <h3 className="font-display font-extrabold text-2xl text-on-surface mb-2">Smart Market Alerts</h3>
           <p className="text-sm font-semibold text-on-surface-variant leading-relaxed mb-6">
-            Set custom rule-based alerts and KisanMitra will notify you instantly via Push Notification and WhatsApp when your conditions are met at <strong>{mandi.market}</strong>.
+            Set custom rule-based alerts and KisanMitra will notify you instantly via in-app push notifications and SMS when your conditions are met at <strong>{mandi.market}</strong>.
           </p>
           
           <div className="bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant space-y-4">
@@ -113,10 +113,6 @@ export default function PriceAlertsTab({ mandi }) {
               </div>
             )}
           </div>
-          
-          <button className="w-full py-3 bg-[#25D366]/10 text-[#075E54] hover:bg-[#25D366]/20 transition-colors rounded-xl font-bold text-sm flex items-center justify-center gap-2 border border-[#25D366]/30">
-            Connect WhatsApp <ArrowRight size={16} />
-          </button>
         </div>
       </div>
       
