@@ -138,7 +138,7 @@ export default function MarketDetails({
       {/* ── Mandi Details Overlay Drawer ── */}
       {selectedMandi && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-end animate-fade-in">
-          <div className="bg-[#f4f7f5] w-full sm:w-[85vw] md:w-[75vw] lg:w-[65vw] max-w-5xl h-full flex flex-col shadow-2xl relative animate-slide-in-right overflow-y-auto">
+          <div className="bg-[#f4f7f5] w-full sm:w-[92vw] md:w-[85vw] lg:w-[80vw] xl:w-[75vw] max-w-6xl h-full flex flex-col shadow-2xl relative animate-slide-in-right overflow-y-auto">
             
             {/* Drawer Header */}
             <div className="bg-white border-b border-outline-variant p-6 sticky top-0 z-30 flex items-center justify-between">
