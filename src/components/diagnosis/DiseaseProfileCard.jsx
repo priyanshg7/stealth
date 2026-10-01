@@ -8,6 +8,23 @@ export function DiseaseProfileCard({ diagnosisSummary, weatherRisk, cropName }) 
     ? 'bg-red-100 text-red-800 border-red-200'
     : 'bg-amber-100 text-amber-800 border-amber-200';
 
+  const formattedConfidence = (() => {
+    const val = diagnosisSummary.confidence;
+    if (typeof val === 'number') {
+      const pct = val <= 1 ? Math.round(val * 100) : Math.round(val);
+      return `${pct}% Confidence`;
+    }
+    if (typeof val === 'string') {
+      const num = parseFloat(val);
+      if (!isNaN(num)) {
+        const pct = num <= 1 ? Math.round(num * 100) : Math.round(num);
+        return `${pct}% Confidence`;
+      }
+      return `${val} Confidence`;
+    }
+    return '95% Confidence';
+  })();
+
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-outline-variant/60 shadow-xs space-y-6">
       {/* 1. Header Row */}
@@ -30,7 +47,7 @@ export function DiseaseProfileCard({ diagnosisSummary, weatherRisk, cropName }) 
           </span>
           <span className="text-xs font-extrabold bg-green-100 text-green-800 border border-green-200 px-3 py-1 rounded-full flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>{Math.round(diagnosisSummary.confidence * 100)}% Confidence</span>
+            <span>{formattedConfidence}</span>
           </span>
         </div>
       </div>

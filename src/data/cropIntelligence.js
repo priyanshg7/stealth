@@ -475,6 +475,22 @@ export const DISEASE_DATABASE = {
     { name: 'Yellow Mosaic Virus (YMV)', humidityThreshold: 75, tempRange: [25, 35], riskFactor: 'warm_humid', severity: 'Severe', treatment: 'Thiamethoxam 25% WG @ 0.2g/L (whitefly vector control)', organicTreatment: 'Neem oil spray to control whitefly vector + resistant varieties' },
     { name: 'Rust (Phakopsora)', humidityThreshold: 80, tempRange: [20, 28], riskFactor: 'humidity', severity: 'High', treatment: 'Hexaconazole 5% EC @ 2ml/L', organicTreatment: 'Trichoderma viride seed treatment + neem-based fungicide spray' },
     { name: 'Stem Fly', humidityThreshold: 70, tempRange: [25, 35], riskFactor: 'warm_humid', severity: 'Medium', treatment: 'Thiamethoxam 30% FS seed treatment', organicTreatment: 'Intercropping with maize; neem seed kernel extract spray' }
+  ],
+  potato: [
+    { name: 'Early Blight (Alternaria solani)', humidityThreshold: 80, tempRange: [20, 30], riskFactor: 'humidity', severity: 'High', treatment: 'Mancozeb 75% WP @ 2.5g/L or Chlorothalonil 75% WP', organicTreatment: 'Trichoderma viride seed & soil treatment + Neem oil spray (3ml/L)' },
+    { name: 'Late Blight (Phytophthora infestans)', humidityThreshold: 90, tempRange: [12, 22], riskFactor: 'high_humidity_cool', severity: 'Severe', treatment: 'Metalaxyl 8% + Mancozeb 64% WP (Ridomil MZ) @ 2.5g/L', organicTreatment: 'Bordeaux mixture 1% foliar spray + Copper oxychloride' }
+  ],
+  tomato: [
+    { name: 'Early Blight', humidityThreshold: 80, tempRange: [22, 30], riskFactor: 'humidity', severity: 'High', treatment: 'Mancozeb 75% WP @ 2.5g/L or Azoxystrobin 23% SC @ 1ml/L', organicTreatment: 'Neem Oil 10000 ppm @ 3ml/L + Pseudomonas fluorescens' },
+    { name: 'Late Blight', humidityThreshold: 90, tempRange: [15, 24], riskFactor: 'high_humidity', severity: 'Severe', treatment: 'Cymoxanil 8% + Mancozeb 64% WP @ 2g/L', organicTreatment: 'Copper soap / Bordeaux mixture 1% spray' },
+    { name: 'Leaf Curl Virus', humidityThreshold: 70, tempRange: [25, 35], riskFactor: 'whitefly_vector', severity: 'Severe', treatment: 'Imidacloprid 17.8% SL @ 0.5ml/L for whitefly control', organicTreatment: 'Yellow sticky traps + Neem seed kernel extract 5%' }
+  ],
+  onion: [
+    { name: 'Purple Blotch (Alternaria porri)', humidityThreshold: 85, tempRange: [20, 30], riskFactor: 'humidity', severity: 'High', treatment: 'Mancozeb 75% WP @ 2.5g/L + sticker @ 0.5ml/L', organicTreatment: 'Trichoderma viride @ 5g/L foliar spray' },
+    { name: 'Thrips Infestation', humidityThreshold: 60, tempRange: [25, 35], riskFactor: 'dry_warm', severity: 'High', treatment: 'Fipronil 5% SC @ 1.5ml/L', organicTreatment: 'Blue sticky traps + Neem oil 2% spray' }
+  ],
+  chilli: [
+    { name: 'Chilli Leaf Curl & Anthracnose', humidityThreshold: 80, tempRange: [24, 32], riskFactor: 'thrips_mite_vector', severity: 'High', treatment: 'Azoxystrobin 18.2% + Difenoconazole 11.4% SC @ 1ml/L', organicTreatment: 'Neem oil spray + fermented buttermilk spray' }
   ]
 };
 
